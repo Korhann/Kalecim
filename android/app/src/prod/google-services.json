@@ -120,6 +120,42 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:783910203845:android:8df9caee8627f6c7c2dbac",
+        "android_client_info": {
+          "package_name": "com.kiralik.kalecim"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "783910203845-eic2sl6nub7mjctkv7vjkc3i7t66iav5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIdbnLqEXRI_7etAi7ZsC1HrBsx5Shb2U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "783910203845-eic2sl6nub7mjctkv7vjkc3i7t66iav5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "783910203845-0kpj67jstaclttl15hok58rq91tcetk5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.kiralikKaleci"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

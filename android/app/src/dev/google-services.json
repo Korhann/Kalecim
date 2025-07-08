@@ -41,6 +41,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:385957866629:android:606884e69f2105bc474dec",
+        "android_client_info": {
+          "package_name": "com.kiralik.kalecim.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "385957866629-939qnhk3jp34p57bne5gba4r6jab6j7l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBm-CoPCBpSm9klzd5d7H9JEHBzZicKBrk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "385957866629-939qnhk3jp34p57bne5gba4r6jab6j7l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

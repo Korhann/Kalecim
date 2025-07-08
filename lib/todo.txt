@@ -1,6 +1,6 @@
 Yapılacaklar
 
-- android ve ios a nasıl yükleniyor video izle
+- app ikonu yükleyince aynı değil
 
 
 ERRORS

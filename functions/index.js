@@ -74,22 +74,22 @@ exports.resetAppointments = onSchedule(
     }
   }
 );
-exports.runVerificationFunction = onSchedule(
+// exports.runVerificationFunction = onSchedule(
 
-  {schedule : 'every 30 minutes', timeZone: 'Europe/Istanbul'},
-  async ()=> {
+//   {schedule : 'every 30 minutes', timeZone: 'Europe/Istanbul'},
+//   async ()=> {
     
-    try {
-      const usersRef = admin.firestore().collection('Users');
-      const usersSnapshot = await usersRef.get();
+//     try {
+//       const usersRef = admin.firestore().collection('Users');
+//       const usersSnapshot = await usersRef.get();
 
-      for (const userDoc of usersSnapshot.docs) {
-        const userRef = userDoc.doc('');
-      }
-    } catch (e) {
-    }
-  }
-);
+//       for (const userDoc of usersSnapshot.docs) {
+//         const userRef = userDoc.doc('');
+//       }
+//     } catch (e) {
+//     }
+//   }
+// );
 
 exports.api = onRequest({ region: 'europe-west2' }, iyzipayApp);
 
