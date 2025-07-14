@@ -51,7 +51,7 @@ class _SignUpState extends State<SignUp> {
   }
 
   Future signUpUser() async {
-    String email = emailController.text;
+    String email = emailController.text.trim();
     String password = passwordController.text;
 
     saveUserType('user');
