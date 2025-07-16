@@ -319,24 +319,17 @@ class _LogInState extends State<LogIn> {
                       const SizedBox(height: 40),
                 
                       // Giriş yap butonu
-                      PlatformElevatedButton(
+                      ElevatedButton(
                         onPressed: () async{
                           if (formkey.currentState!.validate()) {
                             await signInUser();
                           }
                         },
+                        style: GlobalStyles.buttonPrimary(context),
                         child: Text(
                           "Giriş Yap",
                           style: GoogleFonts.inter(textStyle: style, color: Colors.black),
                           key: Key('login_enter_key'),
-                        ),
-                        material: (_,__) => MaterialElevatedButtonData(
-                          style: GlobalStyles.buttonPrimary(context)
-                        ),
-                        cupertino: (_,__) => CupertinoElevatedButtonData(
-                          borderRadius: BorderRadius.circular(20),
-                          color: green,
-                          originalStyle: true
                         ),
                       ),
                             

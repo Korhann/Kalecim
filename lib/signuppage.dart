@@ -417,19 +417,17 @@ class _SignUpState extends State<SignUp> {
                           ),
                           const SizedBox(height: 50.0),
               
-                          PlatformElevatedButton(
+                          ElevatedButton(
                             key: Key('signup_button'),
                             onPressed: () async {
                               if (formkey.currentState!.validate()) {
                                 await signUpUser();
                               }
                             },
+                            style: GlobalStyles.buttonPrimary(context),
                             child: Text(
                               "Kayıt Ol",
                               style: GoogleFonts.inter(color: Colors.black, textStyle: style)),
-                              material: (_, __) => MaterialElevatedButtonData(
-                                style: GlobalStyles.buttonPrimary(context)),
-                              cupertino: (_, __) => CupertinoElevatedButtonData(),
                           ),
                         ],
                       ),

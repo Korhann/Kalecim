@@ -30,7 +30,7 @@ class _DirectMessagesState extends State<DirectMessages> {
   }
   @override
   void dispose() {
-    // TODO: implement dispose
+
     super.dispose();
   }
 
@@ -126,6 +126,7 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
   if (user == null) return const Stream.empty();
 
   final currentUser = user.uid;
+
   Stream<QuerySnapshot> sentStream = FirebaseFirestore.instance
       .collectionGroup('messages')
       .where('senderId', isEqualTo: currentUser)
@@ -147,6 +148,7 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
       for (var doc in receivedSnap.docs) {
         participantIds.add(doc['senderId']);
       }
+      print(participantIds);
       return participantIds.toList();
     },
   );
@@ -284,118 +286,118 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
   Widget build(BuildContext context) {
   final width = MediaQuery.sizeOf(context).width;
   final iconSize = width * 0.06;
-  return ConnectivityWrapper(
-    child: StreamBuilder<List<String>>(
-      stream: fetchParticipantIds(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return MessagesShimmer();
-        }
-        if (!snapshot.hasData) {
-          return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.message, size: iconSize, color: Colors.grey.shade500),
-                  const SizedBox(height: 10),
-                  Text(
-                  'Henüz bir mesajınız bulunmuyor',
-                  style: GoogleFonts.inter(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black
-                  ),
-                  textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
-                ),
-                ],
-              ),
-            ),
-          );
-        }
-        var participantIds = snapshot.data!;
+  return StreamBuilder<List<String>>(
+    stream: fetchParticipantIds(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return MessagesShimmer();
+      }
+      if (snapshot.data!.isEmpty) {
+        print('does it enter here');
         return Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: Padding(
-              padding: const EdgeInsets.only(top: 30),
-              child: GlobalStyles.textStyle(
-                text: 'Mesajlar',
-                context: context,
-                size: 20,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.message, size: iconSize, color: Colors.grey.shade500),
+                const SizedBox(height: 10),
+                Text(
+                'Henüz bir mesajınız bulunmuyor',
+                style: GoogleFonts.inter(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black
+                ),
+                textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
               ),
+              ],
             ),
-            backgroundColor: background,
-            centerTitle: true,
-          ),
-          backgroundColor: background,
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              final width = constraints.maxWidth;
-              return ListView.builder(
-                itemCount: participantIds.length,
-                itemBuilder: (context, index) {
-                  final participantId = participantIds[index];
-                  return FutureBuilder<Map<String, dynamic>>(
-                    future: fetchConversationData(participantId),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        // todo: change the message shimmer
-                        return ListTile(
-                          title: const SizedBox(),
-                        );
-                      }
-                      var conversation = snapshot.data!;
-                      return ListTile(
-                        leading: CircleAvatar(
-                          radius: MediaQuery.of(context).size.width * 0.055,
-                          backgroundImage: conversation['imageUrl'] != null
-                              ? NetworkImage(conversation['imageUrl'])
-                              : null,
-                          child: conversation['imageUrl'] == null
-                              ? const Icon(Icons.person)
-                              : null,
-                        ),
-                        title: Text(conversation['receiverName'], style: TextStyle(fontSize: width * 0.045)),
-                        subtitle: Row(
-                          children: [
-                            Text(conversation['lastMessage'], style: TextStyle(fontSize: width * 0.04)),
-                            const Spacer(),
-                            if (conversation['unread'] > 0)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  '${conversation['unread']}',
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              )
-                          ],
-                        ),
-                        onTap: () async {
-                          await resetUnredMessages(conversation['receiverId']);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Direct2Message(receiverId: conversation['receiverId']),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  );
-                },
-              );
-            },
           ),
         );
-      },
-    ),
+      }
+      var participantIds = snapshot.data!;
+      print('ids are $participantIds');
+      return Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Padding(
+            padding: const EdgeInsets.only(top: 30),
+            child: GlobalStyles.textStyle(
+              text: 'Mesajlar',
+              context: context,
+              size: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.black,
+            ),
+          ),
+          backgroundColor: background,
+          centerTitle: true,
+        ),
+        backgroundColor: background,
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            return ListView.builder(
+              itemCount: participantIds.length,
+              itemBuilder: (context, index) {
+                final participantId = participantIds[index];
+                return FutureBuilder<Map<String, dynamic>>(
+                  future: fetchConversationData(participantId),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      // todo: change the message shimmer
+                      return ListTile(
+                        title: const SizedBox(),
+                      );
+                    }
+                    var conversation = snapshot.data!;
+                    return ListTile(
+                      leading: CircleAvatar(
+                        radius: MediaQuery.of(context).size.width * 0.055,
+                        backgroundImage: conversation['imageUrl'] != null
+                            ? NetworkImage(conversation['imageUrl'])
+                            : null,
+                        child: conversation['imageUrl'] == null
+                            ? const Icon(Icons.person)
+                            : null,
+                      ),
+                      title: Text(conversation['receiverName'], style: TextStyle(fontSize: width * 0.045)),
+                      subtitle: Row(
+                        children: [
+                          Text(conversation['lastMessage'], style: TextStyle(fontSize: width * 0.04)),
+                          const Spacer(),
+                          if (conversation['unread'] > 0)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '${conversation['unread']}',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            )
+                        ],
+                      ),
+                      onTap: () async {
+                        await resetUnredMessages(conversation['receiverId']);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Direct2Message(receiverId: conversation['receiverId']),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            );
+          },
+        ),
+      );
+    },
   );
 }
 }

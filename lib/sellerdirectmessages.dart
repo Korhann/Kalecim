@@ -151,109 +151,107 @@ class _SellerDirectMessagesState extends State<SellerDirectMessages> {
   Widget build(BuildContext context) {
   final width = MediaQuery.sizeOf(context).width;
   final iconSize = width * 0.06;
-    return ConnectivityWrapper(
-      child: StreamBuilder<List<String>>(
-        stream: fetchParticipantIds(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return MessagesShimmer();
-          }
-          if (!snapshot.hasData){
-            return Scaffold(
-              body: Container(
-                color: sellerbackground,
-                child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.message, size: iconSize, color: Colors.white),
-                    const SizedBox(height: 10),
-                    Text(
-                    'Henüz bir mesajınız bulunmuyor',
-                    style: GoogleFonts.inter(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white
-                    ),
-                    textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
-                  ),
-                  ],
-                ),
-                          ),
-              ),
-            );
-          }
-          var participantIds = snapshot.data!;
+    return StreamBuilder<List<String>>(
+      stream: fetchParticipantIds(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return MessagesShimmer();
+        }
+        if (snapshot.data!.isEmpty){
           return Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
-              title: GlobalStyles.textStyle(
-                text: 'Mesajlar',
-                context: context,
-                size: 20,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
+            body: Container(
+              color: sellerbackground,
+              child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.message, size: iconSize, color: Colors.white),
+                  const SizedBox(height: 10),
+                  Text(
+                  'Henüz bir mesajınız bulunmuyor',
+                  style: GoogleFonts.inter(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white
+                  ),
+                  textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+                ),
+                ],
               ),
-              backgroundColor: sellerbackground,
-              centerTitle: true,
-            ),
-            backgroundColor: sellerbackground,
-            body: ListView.builder(
-              itemCount: participantIds.length,
-              itemBuilder: (context, index) {
-                final participantId = participantIds[index];
-                return FutureBuilder<Map<String, dynamic>>(
-                  future: fetchConversationData(participantId),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return ListTile(
-                        title: const SizedBox(),
-                      );
-                    }
-                    var conversation = snapshot.data!;
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: conversation['imageUrl'] != null
-                            ? NetworkImage(conversation['imageUrl'])
-                            : null,
-                        child: conversation['imageUrl'] == null ? const Icon(Icons.person) : null,
-                      ),
-                      title: Text(conversation['receiverName'], style: const TextStyle(color: Colors.white)),
-                      subtitle: Row(
-                        children: [
-                          Text(conversation['lastMessage'], style: const TextStyle(color: Colors.white)),
-                          const Spacer(),
-                          if (conversation['unread'] > 0)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                '${conversation['unread']}',
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            )
-                        ],
-                      ),
-                      onTap: () async {
-                        await resetUnredMessages(conversation['receiverId']);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Direct2Message(receiverId: conversation['receiverId']),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                );
-              },
+                        ),
             ),
           );
-        },
-      ),
+        }
+        var participantIds = snapshot.data!;
+        return Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: GlobalStyles.textStyle(
+              text: 'Mesajlar',
+              context: context,
+              size: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+            backgroundColor: sellerbackground,
+            centerTitle: true,
+          ),
+          backgroundColor: sellerbackground,
+          body: ListView.builder(
+            itemCount: participantIds.length,
+            itemBuilder: (context, index) {
+              final participantId = participantIds[index];
+              return FutureBuilder<Map<String, dynamic>>(
+                future: fetchConversationData(participantId),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return ListTile(
+                      title: const SizedBox(),
+                    );
+                  }
+                  var conversation = snapshot.data!;
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: conversation['imageUrl'] != null
+                          ? NetworkImage(conversation['imageUrl'])
+                          : null,
+                      child: conversation['imageUrl'] == null ? const Icon(Icons.person) : null,
+                    ),
+                    title: Text(conversation['receiverName'], style: const TextStyle(color: Colors.white)),
+                    subtitle: Row(
+                      children: [
+                        Text(conversation['lastMessage'], style: const TextStyle(color: Colors.white)),
+                        const Spacer(),
+                        if (conversation['unread'] > 0)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${conversation['unread']}',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          )
+                      ],
+                    ),
+                    onTap: () async {
+                      await resetUnredMessages(conversation['receiverId']);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Direct2Message(receiverId: conversation['receiverId']),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

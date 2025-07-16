@@ -53,6 +53,7 @@ class _MainPageState extends State<MainPage> {
 
 @override
 Widget build(BuildContext context) {
+  final height = MediaQuery.sizeOf(context).height;
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top]);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
   return StreamBuilder<User?>(
@@ -71,6 +72,7 @@ Widget build(BuildContext context) {
                 _currentIndex = index;
               });
             },
+            containerHeight: height * 0.050,
             items: [
               BottomNavyBarItem(
                 icon: const Icon(

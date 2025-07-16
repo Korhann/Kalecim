@@ -9,7 +9,6 @@ import 'package:kiralik_kaleci/messagepage.dart';
 import 'package:kiralik_kaleci/apptRequest.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/selleraddpage.dart';
-import 'package:kiralik_kaleci/sellermainpage.dart';
 import 'package:kiralik_kaleci/sharedvalues.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
@@ -108,46 +107,44 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
             icon: Icon(Icons.arrow_back, color: userorseller ? Colors.white: Colors.black),
           ),
         ),
-        body: SafeArea(
-          child: Container(
-            width: width,
-            color: sellerbackground,
-            child: Column(
-              children: [
-                SizedBox(height: height * 0.030),
-                Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Text(
-                  'Henüz bir ilanınız bulunmamaktadır',
-                  style: GoogleFonts.poppins(
-                    fontSize: 26,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
-                  textAlign: TextAlign.center,
-                ),
-              ),
+        body: Container(
+          width: width,
+          color: sellerbackground,
+          child: Column(
+            children: [
               SizedBox(height: height * 0.030),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SellerAddPage())
-                  );
-                },
-                style: GlobalStyles.buttonPrimary(context),
-                child: Text(
-                  'İlan ver',
-                  style: GoogleFonts.inter(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w600,
-                    color: userorseller ? Colors.white : Colors.black,
-                  ),
-                )
-              )
-            ],
+              Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(
+                'Henüz bir ilanınız bulunmamaktadır',
+                style: GoogleFonts.poppins(
+                  fontSize: 26,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+                textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+                textAlign: TextAlign.center,
+              ),
             ),
+            SizedBox(height: height * 0.030),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SellerAddPage())
+                );
+              },
+              style: GlobalStyles.buttonPrimary(context),
+              child: Text(
+                'İlan ver',
+                style: GoogleFonts.inter(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w600,
+                  color: userorseller ? Colors.white : Colors.black,
+                ),
+              )
+            )
+          ],
           ),
         )
       );
@@ -181,29 +178,30 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
             icon: Icon(Icons.arrow_back, color: userorseller ? Colors.white: Colors.black),
           ),
         ),
-          body: SafeArea(
-            child: Stack(
-            children: [
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: height * 0.60
-                ),
-                child: SingleChildScrollView(
-                  child: Container(
-                  color: userorseller ? sellerbackground : background,
-                  height: height,
-                  child: Column(
-                    children: [
-                      SizedBox(height: height * 0.025),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Container(
-                            color: userorseller ? sellergrey: Colors.white,
-                            height: height * 0.65,
-                            width: width,
-                            child: SingleChildScrollView(
+          body: Stack(
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: height * 0.60
+              ),
+              child: SingleChildScrollView(
+                child: Container(
+                height: height,
+                color: userorseller ? sellerbackground : background,
+                child: Column(  
+                  children: [
+                    SizedBox(height: height * 0.025),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),  
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          color: userorseller ? sellergrey: Colors.white,
+                          height: height * 0.65,
+                          width: width,
+                          child: SingleChildScrollView(
+                            child: Padding(
+                              padding: EdgeInsets.only(bottom: 20),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -334,33 +332,42 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                           ),
                         ),
                       ),
-                      SizedBox(height: height * 0.015),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: showInfoAppointments(width: width, height: height)
+                    ),
+                    SizedBox(height: height * 0.015),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: showInfoAppointments(width: width, height: height)
+                          ),
+                          SizedBox(width: 10),
+                          ChatButton(
+                            sellerUid: widget.sellerUid,
+                            width: width,
+                            height: height,
+                            currentUser: currentUserUid
+                          ),
+                        ],
                       ),
-                      SizedBox(height: height * 0.030),
-                      PaymentButton(
-                        selectedDay: _selectedDay,
-                        selectedHour: _selectedHour,
-                        selectedField: _selectedField,
-                        currentUserUid: currentUserUid,
-                        sellerUid: widget.sellerUid,
-                        sellerDetails: widget.sellerDetails
-                      ),
-                      SizedBox(height: height * 0.030),
-                    ],
-                  ),
-                                ),
+                    ),
+                    SizedBox(height: height * 0.030),
+                    PaymentButton(
+                      selectedDay: _selectedDay,
+                      selectedHour: _selectedHour,
+                      selectedField: _selectedField,
+                      currentUserUid: currentUserUid,
+                      sellerUid: widget.sellerUid,
+                      sellerDetails: widget.sellerDetails
+                    ),
+                  ],
                 ),
               ),
-              Positioned(
-                bottom: height > 700 ? height*0.18: height*0.12,
-                right: 20,
-                child: ChatButton(sellerUid: widget.sellerUid, width: width,height: height, currentUser: currentUserUid)
-              )
-            ],
+              ),
             ),
+          ],
           )
         );
         }

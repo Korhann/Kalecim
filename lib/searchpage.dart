@@ -120,38 +120,40 @@ class _GetUserDataState extends State<GetUserData> {
   final height = MediaQuery.sizeOf(context).height;
   final bannerHeight = width * 0.3;
 
-  return Scaffold(
-    backgroundColor: background,
-    body: MediaQuery.removePadding(
-      context: context,
-      removeTop: true,
-      removeBottom: true,
-      removeLeft: true,
-      removeRight: true,
-      child: Column(
-        children: [
-          _HeaderSection(
-            onFilterTap: _navigateToFilterPage,
-            onNotificationTap: _navigateToAppsPage,
-            width: width,
-            height: height,
-          ),
-          ImageSliderDemo(width: width, height: bannerHeight),
-          const SizedBox(height: 10),
-          Expanded(
-            child: isLoading && sellers.isEmpty
-                ? SellerGridShimmer()
-                : sellers.isEmpty
-                    ? _EmptyState()
-                    : _SellerGrid(
-                        docs: sellers,
-                        onCardTap: _handleCardTap,
-                        isLoading: isLoading,
-                        scrollController: _scrollController,
-                        hasMore: hasMore,
-                      ),
-          ),
-        ],
+  return SafeArea(
+    child: Scaffold(
+      backgroundColor: background,
+      body: MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        removeBottom: true,
+        removeLeft: true,
+        removeRight: true,
+        child: Column(
+          children: [
+            _HeaderSection(
+              onFilterTap: _navigateToFilterPage,
+              onNotificationTap: _navigateToAppsPage,
+              width: width,
+              height: height,
+            ),
+            ImageSliderDemo(width: width, height: bannerHeight),
+            const SizedBox(height: 10),
+            Expanded(
+              child: isLoading && sellers.isEmpty
+                  ? SellerGridShimmer()
+                  : sellers.isEmpty
+                      ? _EmptyState()
+                      : _SellerGrid(
+                          docs: sellers,
+                          onCardTap: _handleCardTap,
+                          isLoading: isLoading,
+                          scrollController: _scrollController,
+                          hasMore: hasMore,
+                        ),
+            ),
+          ],
+        ),
       ),
     ),
   );
@@ -285,7 +287,7 @@ class _HeaderSection extends StatelessWidget {
       return Container(
         width: width,
         height: height * 0.07,
-        color: background,
+        color: background,  
         padding: const EdgeInsets.only(top: 15),
         child: Row(
           children: [
@@ -297,7 +299,6 @@ class _HeaderSection extends StatelessWidget {
             const SizedBox(width: 10),
             Icon(Icons.handshake, size: iconSize),
             const Spacer(),
-      
             GestureDetector(
               onTap: onNotificationTap,
               child: Stack(

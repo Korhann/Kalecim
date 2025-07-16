@@ -35,6 +35,7 @@ class _ConnectivityWrapperState extends State<ConnectivityWrapper> {
   @override
   void dispose() {
     _connectionSubscription.cancel();
+    connectionChecker.dispose();
     super.dispose();
   }
 
