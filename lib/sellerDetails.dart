@@ -98,7 +98,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
     final width = MediaQuery.sizeOf(context).width;
     if (widget.sellerDetails.isEmpty) {
       return Scaffold(
-        appBar: AppBar(
+        appBar: AppBar( 
           backgroundColor: userorseller ? sellerbackground : background,
           leading: IconButton(
             onPressed: () {

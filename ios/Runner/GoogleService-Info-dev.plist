@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>385957866629-e9bekn7f2bp42j506t3iqoodjsbrg87t.apps.googleusercontent.com</string>
+	<string>385957866629-umk1pj3i498cv8o4io32g3gqoqov5gca.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.385957866629-e9bekn7f2bp42j506t3iqoodjsbrg87t</string>
+	<string>com.googleusercontent.apps.385957866629-umk1pj3i498cv8o4io32g3gqoqov5gca</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>385957866629-0qurccc5dlvc74v9kgp3u81leaj8k983.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.kiralik.kalecim.dev</string>
+	<string>com.korhandemir.kalecim.dev</string>
 	<key>PROJECT_ID</key>
 	<string>kiralikkaleci-dev</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:385957866629:ios:aef9607cbc72bbe2474dec</string>
+	<string>1:385957866629:ios:c8551e2705b6bedd474dec</string>
 </dict>
 </plist>
