@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-
 import 'bildirim_model.dart';
 
 class PushHelper {
@@ -121,7 +120,9 @@ class PushHelper {
               "include_subscription_ids": [id],
               "contents": {"en": text},
               'data': data
-            }));
+            })
+        );
+        print('OneSignal response: ${result.statusCode} ${result.body}');
     } catch (e){
       print('Error send push $e');
     }

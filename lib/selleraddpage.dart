@@ -228,6 +228,7 @@ class _SellerAddPageState extends State<SellerAddPage> {
                     if (image != null) {
                       setState(() {
                         imageFileList.add(image);
+                        print(imageFileList.length);
                       });
                     }
                   },

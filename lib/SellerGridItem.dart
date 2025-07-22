@@ -27,7 +27,7 @@ class SellerGridItem extends StatelessWidget {
         color: Colors.white,
         margin: EdgeInsets.zero,
         elevation: 0,
-        //shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        // shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         child: Padding(
           padding: EdgeInsets.all(1),
           child: Column(
