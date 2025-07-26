@@ -1,7 +1,7 @@
 name: kiralik_kaleci
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.0+2
+version: 1.0.0+3
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -76,17 +76,17 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  integration_test:
-    sdk: flutter
+  #integration_test:
+  # sdk: flutter
 
 
 flutter_launcher_icons:
     android: 'launcher_icon'
     ios: true
-    # image_path: 'assets/play_store_512.png'  
     image_path: 'assets/play_store_512.png'
     adaptive_icon_foreground: 'assets/play_store_512.png'
-    adaptive_icon_background: '#000000'
+    adaptive_icon_background: '#ffffff'
+    min_sdk_android: 21
 
 
 dependency_overrides:
