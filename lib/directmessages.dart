@@ -148,7 +148,6 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
       for (var doc in receivedSnap.docs) {
         participantIds.add(doc['senderId']);
       }
-      print(participantIds);
       return participantIds.toList();
     },
   );
@@ -293,7 +292,6 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
         return MessagesShimmer();
       }
       if (snapshot.data!.isEmpty) {
-        print('does it enter here');
         return Scaffold(
           body: Center(
             child: Column(
@@ -316,7 +314,6 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
         );
       }
       var participantIds = snapshot.data!;
-      print('ids are $participantIds');
       return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,

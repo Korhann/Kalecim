@@ -4,6 +4,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kiralik_kaleci/forgetpasswordpage.dart';
+import 'package:kiralik_kaleci/mainpage.dart';
 import 'package:kiralik_kaleci/signuppage.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
@@ -77,7 +78,12 @@ class _LogInState extends State<LogIn> {
     saveUserType('user');
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text.trim());
-
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MainPage(index:0))
+        );
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'network-request-failed') {
         print('İnternet bağlantısı yok');
