@@ -66,6 +66,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: background,
@@ -81,52 +82,85 @@ class _ForgetPasswordState extends State<ForgetPassword> {
         child: SingleChildScrollView(
           child: Form(
             key: formkey,
-            child: Column(
-              children: [
-                const SizedBox(height: 160),
-                PlatformText(
-                  "Şifreni yenile",
-                  style: GoogleFonts.inter(textStyle: style),
-                ),
-                const SizedBox(height: 40),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: PlatformText(
-                    "Email giriniz ve hesabınıza şifrenizi yenilemek için link gönderilecek",
-                    textAlign: TextAlign.start,
-                    style: GoogleFonts.inter(textStyle: textstyle, color: grey),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
-                  child: _buildTextField(resetController, 'Email', _showError,(value) {
-                    setState(() => _showError = value.trim().isEmpty ||!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value));
-                  } ),
-                ),
-
-                const SizedBox(height: 30),
-
-                ElevatedButton(
-                  style: GlobalStyles.buttonPrimary(context),
-                  onPressed: () async{
-                    if (formkey.currentState!.validate()) {
-                      if (resetController.text.trim().isNotEmpty) {
-                        await sendResetLink();
-                        setState(() {
-                          _showError = false;
-                        });
-                      }
-                    }
-                  },
-                  child: Text(
-                    "Yenile",
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 30),
+              child: Column(
+                children: [
+                  const SizedBox(height: 160),
+                  PlatformText(
+                    "Şifreni yenile",
                     style: GoogleFonts.inter(textStyle: style),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 40),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: PlatformText(
+                      "Email giriniz ve hesabınıza şifrenizi yenilemek için link gönderilecek",
+                      textAlign: TextAlign.start,
+                      style: GoogleFonts.inter(textStyle: textstyle, color: grey),
+                    ),
+                  ),
+              
+                  const SizedBox(height: 10),
+              
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 5.0),
+                  //   child: _buildTextField(resetController, 'Email', _showError,(value) {
+                  //     setState(() => _showError = value.trim().isEmpty ||!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value));
+                  //   } ),
+                  // ),
+                  SizedBox(
+                    width: width,
+                    child: TextFormField(
+                      keyboardType: TextInputType.emailAddress,
+                      controller: resetController,
+                      onChanged: (value) => clearErrors(),
+                      style: const TextStyle(color: Colors.black, fontSize: 20),
+                      decoration: GlobalStyles.inputDecoration1(hintText: 'Email',showError: _showError),
+                      validator: (value) {
+                        final email = value?.trim();
+                        if (email!.isEmpty || !RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value!)) {
+                          setState(() {
+                            _showError = true;
+                          });
+                          return '';
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 2,),
+                  if (_showError) 
+                    Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Girdiğiniz mail hatalı',
+                              textAlign: TextAlign.start,
+                              style: GoogleFonts.inter(
+                                textStyle: errorstyle
+                              ),
+                            ),
+                          ),
+                  const SizedBox(height: 30),
+              
+                  ElevatedButton(
+                    style: GlobalStyles.buttonPrimary(context),
+                    onPressed: () async{
+                      if (formkey.currentState!.validate()) {
+                        if (resetController.text.trim().isNotEmpty) {
+                          await sendResetLink();
+                          setState(() {
+                            _showError = false;
+                          });
+                        }
+                      }
+                    },
+                    child: Text(
+                      "Yenile",
+                      style: GoogleFonts.inter(textStyle: style),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -144,15 +178,13 @@ class _ForgetPasswordState extends State<ForgetPassword> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       SizedBox(
-        height: 45,
-        width: 335,
         child: PlatformTextFormField(
           controller: controller,
           obscureText: obscureText,
           onChanged: (value) => clearErrors(),
           style: const TextStyle(color: Colors.black, fontSize: 20),
           material: (_, __) => MaterialTextFormFieldData(
-            decoration: _inputDecoration(hintText, showError),
+            decoration: GlobalStyles.inputDecoration1(hintText: hintText, showError: showError)
           ),
           cupertino: (_, __) => CupertinoTextFormFieldData(
             decoration: BoxDecoration(
@@ -160,7 +192,6 @@ class _ForgetPasswordState extends State<ForgetPassword> {
               borderRadius: BorderRadius.circular(15.0),
               border: Border.all(color: showError ? Colors.red : Colors.black), // Keep style but change border color
             ),
-            placeholder: hintText,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           ),
           validator: (value) {
