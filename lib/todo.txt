@@ -1,7 +1,10 @@
 Yapılacaklar
 
-- app ikonu yükleyince aynı değil
+- Hesap silme ekle +
+- Telefon numarasını ödeme kısmında al, kayıtta opsiyonel yap -
+- Privacy Policy için web sitesi yap -
 
 
-ERRORS
-- login de bazen giriş yapmıyor
+- kullanıcının hesabı silinince önceden var olan mesajlara ne olduğuna bak
+- default resimlerin depolanma mantığına bak, belki resim default ise db den çekebilirsin
+

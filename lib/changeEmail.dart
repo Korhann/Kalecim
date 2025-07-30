@@ -31,8 +31,7 @@ class _ChangeEmailState extends State<ChangeEmail> {
   String _reauthErrorMessage = '';
   bool isUpdated = false;
   //
-  final errorstyle = const TextStyle(
-      fontSize: 14, fontWeight: FontWeight.w300, color: Colors.red);
+  final errorstyle = const TextStyle(fontSize: 14, fontWeight: FontWeight.w300, color: Colors.red);
 
   @override
   Widget build(BuildContext context) {

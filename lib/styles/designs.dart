@@ -164,6 +164,44 @@ static InputDecoration inputDecorationPhone({
     prefixIcon: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Text(
+        '+90 (Opsiyonel)',
+        style: GoogleFonts.inter(
+          fontSize: 20,
+          fontWeight: FontWeight.normal,
+          color: Colors.grey,
+        ),
+      ),
+    ),
+    prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: showError ? Colors.red : Colors.black),
+      borderRadius: BorderRadius.circular(15.0),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: showError ? Colors.red : Colors.black),
+      borderRadius: BorderRadius.circular(15.0),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderSide: const BorderSide(color: Colors.red),
+      borderRadius: BorderRadius.circular(15.0),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderSide: const BorderSide(color: Colors.red),
+      borderRadius: BorderRadius.circular(15.0),
+    ),
+    fillColor: const Color(0xFFE5E5E5),
+    filled: true,
+    errorStyle: const TextStyle(height: 0),
+  );
+}
+static InputDecoration inputDecorationPhoneNotOptional({
+  required bool showError,
+}) {
+  return InputDecoration(
+    contentPadding: const EdgeInsets.fromLTRB(0.0, 10.0, 20.0, 10.0),
+    prefixIcon: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Text(
         '+90',
         style: GoogleFonts.inter(
           fontSize: 20,
@@ -194,7 +232,6 @@ static InputDecoration inputDecorationPhone({
     errorStyle: const TextStyle(height: 0),
   );
 }
-
 
 
 

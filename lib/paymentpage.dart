@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kiralik_kaleci/addPhoneNo.dart';
 import 'package:kiralik_kaleci/appointmentspage.dart';
 import 'package:kiralik_kaleci/mainpage.dart';
 import 'package:kiralik_kaleci/notification/push_helper.dart';
@@ -162,13 +163,14 @@ class _PaymentPageState extends State<PaymentPage> {
               child: isPaymentLoading 
               ? CircularProgressIndicator() 
               : ElevatedButton(
-                onPressed: () async{
+                onPressed: () async {
+                  // if the phone no is empty or null, navigate to add phone no page
+                  await checkPhoneNo();
                   await checkIfDayPast();
                   bool? hourTaken = await checkIfHourTaken();
                   bool isPast = await checkIfHourPast();
                   if (hourTaken == false && isPast == false) {
                     bool isSuccess = await _processPayment();
-                    print('is success here $isSuccess');
                     await sendNotificationToSeller();
                     if (isSuccess) {
                       await _markHourTaken();
@@ -328,8 +330,6 @@ class _PaymentPageState extends State<PaymentPage> {
       final data = jsonDecode(response.body);
       final paymentPageUrl = data['paymentPageUrl'];
       final token = data['token'];
-      print('token is not $token');
-      print('url payment page is $paymentPageUrl');
       final result = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -556,6 +556,28 @@ Future<bool> waitForPaymentStatus(String docId) async {
       DocumentSnapshot snapshot = await _firestore.collection('Users').doc(currentuser).get();
       var data = snapshot.data() as Map<String,dynamic>;
       buyerPhoneNo = data['phoneNo'];
+      if (buyerPhoneNo.isEmpty) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PhoneNo())
+        );
+      }
+    } catch (e) {
+      print('Error getting phone no $e');
+    }
+  }
+  Future<void> checkPhoneNo() async{
+    // buraya bir pop up dialog koy telefon numarası girmelisiniz de
+    try {
+      DocumentSnapshot snapshot = await _firestore.collection('Users').doc(currentuser).get();
+      var data = snapshot.data() as Map<String,dynamic>;
+      buyerPhoneNo = data['phoneNo'];
+      if (buyerPhoneNo.isEmpty) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PhoneNo())
+        );
+      }
     } catch (e) {
       print('Error getting phone no $e');
     }

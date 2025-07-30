@@ -154,7 +154,7 @@ class _SignUpState extends State<SignUp> {
                                 onChanged: (value) => clearErrors(),
                                 validator: (value) {
                                   final nameSurname = value?.trim();
-                                  if (nameSurname!.isEmpty || !RegExp(r'^[a-z A-Z]+$').hasMatch(nameSurname)) {
+                                  if (nameSurname!.isEmpty || !RegExp(r'^[a-zA-ZçÇğĞıİöÖşŞüÜ\s]+$').hasMatch(nameSurname)) {
                                     setState(() {
                                       _showErrorName = true;
                                     });
@@ -234,19 +234,22 @@ class _SignUpState extends State<SignUp> {
                                 decoration: GlobalStyles.inputDecorationPhone(
                                    showError: _showErrorPhone,
                                   ),
-                                  onChanged: (value) => clearErrors(),
+                                onChanged: (value) => clearErrors(),
                                 validator: (value) {
-                                  if (value == null || value.isEmpty || value.length < 10) {
-                                    setState(() {
-                                      _showErrorPhone = true;
-                                    });
-                                    return 'Lütfen telefon numaranızı girin';
-                                  } else {
+                                  if (value == null || value.isEmpty) {
                                     setState(() {
                                       _showErrorPhone = false;
                                     });
                                   }
-                                  return null;
+                                  if (value!.isNotEmpty && value.length < 10) {
+                                    setState(() {
+                                      _showErrorPhone = true;
+                                    });
+                                    return '';
+                                  }
+                                  else {
+                                    return null;
+                                  }
                                 },
                                 onSaved: (value) {
                                   phoneController.text = value!;
