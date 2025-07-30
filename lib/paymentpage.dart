@@ -164,8 +164,8 @@ class _PaymentPageState extends State<PaymentPage> {
               ? CircularProgressIndicator() 
               : ElevatedButton(
                 onPressed: () async {
-                  // if the phone no is empty or null, navigate to add phone no page
-                  await checkPhoneNo();
+                  
+                  bool phoneError = await checkPhoneNo();
                   await checkIfDayPast();
                   bool? hourTaken = await checkIfHourTaken();
                   bool isPast = await checkIfHourPast();
@@ -176,7 +176,10 @@ class _PaymentPageState extends State<PaymentPage> {
                       await _markHourTaken();
                       Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
                     } else {
-                      Showalert(context: context, text: 'Ooopps...').showErrorAlert();
+                      // for not having both errors at the same time
+                      if (phoneError == false) {
+                        Showalert(context: context, text: 'Ooopps...').showErrorAlert();
+                      }
                     }
                   } else {
                     if (hourTaken && isPast == false) {
@@ -556,31 +559,37 @@ Future<bool> waitForPaymentStatus(String docId) async {
       DocumentSnapshot snapshot = await _firestore.collection('Users').doc(currentuser).get();
       var data = snapshot.data() as Map<String,dynamic>;
       buyerPhoneNo = data['phoneNo'];
-      if (buyerPhoneNo.isEmpty) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PhoneNo())
-        );
-      }
     } catch (e) {
       print('Error getting phone no $e');
     }
   }
-  Future<void> checkPhoneNo() async{
-    // buraya bir pop up dialog koy telefon numarası girmelisiniz de
+  Future<bool> checkPhoneNo() async{
     try {
       DocumentSnapshot snapshot = await _firestore.collection('Users').doc(currentuser).get();
       var data = snapshot.data() as Map<String,dynamic>;
       buyerPhoneNo = data['phoneNo'];
       if (buyerPhoneNo.isEmpty) {
-        Navigator.push(
+        // buraya bir pop up dialog koy telefon numarası girmelisiniz de
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Telefon numaranızı ekleyiniz'
+            ),
+            backgroundColor: Colors.red
+          )
+        );
+        Future.delayed(const Duration(seconds: 1), () async {
+          Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => PhoneNo())
         );
+        });
+        return true;
       }
     } catch (e) {
       print('Error getting phone no $e');
     }
+    return false;
   }
 }
 
