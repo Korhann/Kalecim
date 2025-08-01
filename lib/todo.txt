@@ -1,7 +1,7 @@
 Yapılacaklar
 
 - Hesap silme ekle +
-- Telefon numarasını ödeme kısmında al, kayıtta opsiyonel yap -
+- Telefon numarasını ödeme kısmında al, kayıtta opsiyonel yap +
 - Privacy Policy için web sitesi yap -
 
 
