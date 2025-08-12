@@ -173,6 +173,7 @@ class _LogInState extends State<LogIn> {
                         width: width,  
                         child: TextFormField(
                           keyboardType: TextInputType.emailAddress,
+                          onTapOutside: (e) => FocusScope.of(context).unfocus(),
                           key: Key('login_email_key'),
                           controller: emailController,
                           onChanged: (value) => clearErrors(),
@@ -211,6 +212,7 @@ class _LogInState extends State<LogIn> {
                         width: width,
                         child: TextFormField(
                           keyboardType: TextInputType.text,
+                          onTapOutside: (e) => FocusScope.of(context).unfocus(),
                           obscureText: _obsecureText,
                           controller: passwordController,
                           onChanged: (value) => clearErrors(),

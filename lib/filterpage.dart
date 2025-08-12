@@ -872,6 +872,7 @@ class _PriceRangerState extends State<PriceRanger> {
               child: Center(
                 child: TextField(
                   controller: widget.minPriceController,
+                  onTapOutside: (e) => FocusScope.of(context).unfocus(),
                   onChanged: updateMinFilter,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
@@ -903,6 +904,7 @@ class _PriceRangerState extends State<PriceRanger> {
               child: Center(
                 child: TextField(
                   controller: widget.maxPriceController,
+                  onTapOutside: (e) => FocusScope.of(context).unfocus(),
                   onChanged: updateMaxFilter,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,

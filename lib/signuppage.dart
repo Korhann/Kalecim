@@ -148,6 +148,7 @@ class _SignUpState extends State<SignUp> {
                             width: width,
                             child: TextFormField(
                                 controller: fullNameController,
+                                onTapOutside: (e) => FocusScope.of(context).unfocus(),
                                 key: Key('signup_name'),
                                 style: const TextStyle(color: Colors.black, fontSize: 20),
                                 decoration: GlobalStyles.inputDecoration1(hintText: 'Ad Soyad', showError: _showErrorName),
@@ -185,6 +186,7 @@ class _SignUpState extends State<SignUp> {
                             width: width,
                             child: TextFormField(
                                 controller: emailController,
+                                onTapOutside: (e) => FocusScope.of(context).unfocus(),
                                 key: Key('signup_email'),
                                 keyboardType: TextInputType.emailAddress,
                                 style: const TextStyle(color: Colors.black, fontSize: 20),
@@ -227,6 +229,7 @@ class _SignUpState extends State<SignUp> {
                             width: width,
                             child: TextFormField(
                                 controller: phoneController,
+                                onTapOutside: (e) => FocusScope.of(context).unfocus(),
                                 key: Key('signup_phone'),
                                 inputFormatters: [LengthLimitingTextInputFormatter(10)],
                                 keyboardType: TextInputType.phone,
@@ -275,6 +278,7 @@ class _SignUpState extends State<SignUp> {
                             width: width,
                             child: TextFormField(
                               controller: passwordController,
+                              onTapOutside: (e) => FocusScope.of(context).unfocus(),
                               key: Key('signup_password'),
                               style: const TextStyle(color: Colors.black, fontSize: 20),
                               decoration: GlobalStyles.inputDecoration1(
@@ -339,6 +343,7 @@ class _SignUpState extends State<SignUp> {
                             child: Focus(
                               child: TextFormField(
                                 controller: confirmPasswordController,
+                                onTapOutside: (e) => FocusScope.of(context).unfocus(),
                                 key: Key('signup_password_again'),
                                 style: const TextStyle(color: Colors.black, fontSize: 20),
                                 decoration: GlobalStyles.inputDecoration1(

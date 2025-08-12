@@ -1,8 +1,11 @@
 Yapılacaklar
 
-- Hesap silme ekle +
-- Telefon numarasını ödeme kısmında al, kayıtta opsiyonel yap +
-- Privacy Policy için web sitesi yap -
+- Ödeme butonu altta kalıyor +
+- Tutar girdikten sonra klavye kapanmıyor (dolap gibi bir yere dokununca kapansın) +
+- Kullanıcı telefon numarası ekledikten sonra ödeme sayfasına geri at +
+- Satıcıya randevu talebi gelince navigasyon barında da gözüksün +
+- Ödeme yaptıktan sonra bidaha ödemeye çalışınca dolu olarak işaretliyor, ikisinin de ben olmama rağmen (bir daha dene sonradan ama şuan oldu) ?
+- Satıcı ilanını yenileyince alınmış olarak saatler gidiyor ve bidaha alınabiliyor !!!!!
 
 
 - kullanıcının hesabı silinince önceden var olan mesajlara ne olduğuna bak

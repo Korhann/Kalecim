@@ -69,9 +69,40 @@ class SellerMainPageState extends State<SellerMainPage> {
           },
           items: [
             BottomNavyBarItem(
-              icon: const Icon(Icons.home,color: Colors.white,),
-              title: const Text('Ana Sayfa'),
+  icon: Stack(
+    children: [
+      const Icon(Icons.home, color: Colors.white),
+      StreamBuilder<int>(
+        stream: getUnreadAppointmentCount(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData || snapshot.data == 0) return SizedBox();
+          return Positioned(
+            right: 0,
+            top: 0,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+              constraints: const BoxConstraints(minWidth: 15, minHeight: 15),
+              child: Text(
+                '${snapshot.data}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
+          );
+        },
+      ),
+    ],
+  ),
+  title: const Text('Ana Sayfa'),
+),
             BottomNavyBarItem(
               icon: Stack(
                 children: [
@@ -162,6 +193,18 @@ class SellerMainPageState extends State<SellerMainPage> {
   } catch (e, stack) {
     await reportErrorToCrashlytics(e, stack, reason: 'Message counter failed');
   }
+}
+
+Stream<int> getUnreadAppointmentCount() {
+  final String currentUser = FirebaseAuth.instance.currentUser!.uid;
+  return FirebaseFirestore.instance
+      .collection('Users')
+      .doc(currentUser)
+      .collection('appointmentseller')
+      .where('appointmentDetails.status', isEqualTo: 'pending')
+      .where('appointmentDetails.isSeen', isEqualTo: false)
+      .snapshots()
+      .map((snapshot) => snapshot.docs.length);
 }
 
 

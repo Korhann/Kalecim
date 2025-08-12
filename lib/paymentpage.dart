@@ -77,7 +77,8 @@ class _PaymentPageState extends State<PaymentPage> {
             Navigator.pushAndRemoveUntil<void>(
             context,
             MaterialPageRoute<void>(builder: (BuildContext context) => const MainPage(index: 0)),
-            ModalRoute.withName('/'),
+            // ModalRoute.withName('/'),
+            (Route<dynamic> route) => false,
             );
         }, icon: const Icon(Icons.arrow_back, color: Colors.black)),
       ),
@@ -164,21 +165,31 @@ class _PaymentPageState extends State<PaymentPage> {
               ? CircularProgressIndicator() 
               : ElevatedButton(
                 onPressed: () async {
-                  
                   bool phoneError = await checkPhoneNo();
                   await checkIfDayPast();
                   bool? hourTaken = await checkIfHourTaken();
                   bool isPast = await checkIfHourPast();
                   if (hourTaken == false && isPast == false) {
+                    // if the payment is succesfull
                     bool isSuccess = await _processPayment();
                     await sendNotificationToSeller();
                     if (isSuccess) {
                       await _markHourTaken();
-                      Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
+                      await Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
+                      await Future.delayed(Duration(seconds: 1));
+                      if (mounted) {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => AppointmentsPage(whereFrom: 'fromPayment')),
+                          (Route<dynamic> route) => false,
+                        );
+                      }
+                      // if the payment is declined
                     } else {
-                      // for not having both errors at the same time
                       if (phoneError == false) {
-                        Showalert(context: context, text: 'Ooopps...').showErrorAlert();
+                        if (mounted) {
+                          Showalert(context: context, text: 'Ooopps...').showErrorAlert();
+                        }
                       }
                     }
                   } else {
@@ -343,15 +354,19 @@ class _PaymentPageState extends State<PaymentPage> {
         ),
       );
       if (result == true) {
-        //bool isPaid = await waitForPaymentStatus(widget.buyerDocId!);
-        //todo : sonradan güvenli bir şekilde iyzipay de yap
         bool isPaid = await updatePaymentStatus();
         setState(() {
           isPaymentLoading = false;
         });
         return isPaid;
+      } else {
+        setState(() {
+          isPaymentLoading = false;
+        });
+        return false;
       }
     } else {
+      // the payment is not successfull
       setState(() {
         isPaymentLoading = false;
       });

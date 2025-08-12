@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:kiralik_kaleci/globals.dart';
@@ -107,6 +108,7 @@ class _PhoneNoState extends State<PhoneNo> {
                           phoneController.clear();
                           if (mounted) {
                             Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
+                            await Future.delayed(const Duration(seconds: 2));
                           }
                         }
                       } else {
@@ -144,6 +146,8 @@ class _PhoneNoState extends State<PhoneNo> {
         'phoneNo': phoneNo
       });
       isUpdated = true;
+      print('is updated $isUpdated');
+      Navigator.of(context).pop();
     } catch (e,stack) {
       await reportErrorToCrashlytics(e, stack, reason: 'add phone page add phone failed');
     }

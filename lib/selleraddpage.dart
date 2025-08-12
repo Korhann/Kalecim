@@ -1523,7 +1523,6 @@ class FieldsDropDown extends StatelessWidget {
                                 _setState(() { // First, update the modal UI
                                 if (isSelected == true) {
                                   multFields.add(e);
-                                  print(multFields);
                                 } else {
                                   multFields.remove(e);
                                 }
@@ -1642,6 +1641,7 @@ class priceField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
                   controller: controller,
+                  onTapOutside: (e) => FocusScope.of(context).unfocus(),
                   keyboardType: TextInputType.number,
                   maxLines: null,
                   textInputAction: TextInputAction.done,
@@ -1653,9 +1653,9 @@ class priceField extends StatelessWidget {
                     if (value == null) {
                       return 'Fiyat bilgisi girmelisiniz';
                     }
-                    // if (value < 250) {
-                    //   return "Fiyat 250 TL'den az olamaz!";
-                    // } 
+                    if (value < 250) {
+                      return "Fiyat 250 TL'den az olamaz!";
+                    } 
                     else {
                       return null;
                     }
@@ -1689,6 +1689,7 @@ class priceFieldAfterMidnight extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
                   controller: controller,
+                  onTapOutside: (e) => FocusScope.of(context).unfocus(),
                   keyboardType: TextInputType.number,
                   maxLines: null,
                   textInputAction: TextInputAction.done,

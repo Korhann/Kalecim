@@ -197,7 +197,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                         borderRadius: BorderRadius.circular(20),
                         child: Container(
                           color: userorseller ? sellergrey: Colors.white,
-                          height: height * 0.65,
+                          height: height * 0.60,
                           width: width,
                           child: SingleChildScrollView(
                             child: Padding(
@@ -654,7 +654,7 @@ class _showImageState extends State<showImage> {
   @override
   Widget build(BuildContext context) {
 
-    final imageHeight = widget.height * 0.40;
+    final imageHeight = widget.height * 0.30;
 
     return Stack(
       children: [

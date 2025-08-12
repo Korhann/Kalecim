@@ -5,6 +5,7 @@ import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
 import 'package:kiralik_kaleci/enterVerificationCode.dart';
+import 'package:kiralik_kaleci/mainpage.dart';
 import 'package:kiralik_kaleci/notification/push_helper.dart';
 import 'package:kiralik_kaleci/paymentpage.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
@@ -145,6 +146,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
         backgroundColor: userorseller ? sellerbackground : background,
         leading: IconButton(
           onPressed: () {
+            // if its a seller
             if (userorseller) {
               if (widget.whereFrom == 'fromProfile') {
                 Navigator.of(context).pop();
@@ -163,8 +165,17 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                   ModalRoute.withName('/'),
                 );
               }
+              // else if the its a user
             } else {
-              Navigator.of(context).pop();
+                if (widget.whereFrom == 'fromPayment') {
+                Navigator.pushAndRemoveUntil<void>(
+                  context,
+                  MaterialPageRoute<void>(builder: (BuildContext context) => const MainPage(index: 0)),
+                  (Route<dynamic> route) => false,
+                );
+              } else {
+                Navigator.of(context).pop();
+              }
             }
           },
           icon: Icon(Icons.arrow_back, color: userorseller ? Colors.white : Colors.black),

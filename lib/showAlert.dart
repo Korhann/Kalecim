@@ -12,7 +12,7 @@ class Showalert {
 
   Showalert({required this.context, required this.text});
 
-  void showSuccessAlert() {
+  Future<void> showSuccessAlert() async{
     QuickAlert.show(
       context: context,
       text: text,
