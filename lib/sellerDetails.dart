@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
@@ -8,9 +10,12 @@ import 'package:kiralik_kaleci/globals.dart';
 import 'package:kiralik_kaleci/messagepage.dart';
 import 'package:kiralik_kaleci/apptRequest.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
+import 'package:kiralik_kaleci/sellerHomepage.dart';
 import 'package:kiralik_kaleci/selleraddpage.dart';
+import 'package:kiralik_kaleci/sellermainpage.dart';
 import 'package:kiralik_kaleci/sharedvalues.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
+import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
@@ -63,6 +68,8 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
     super.initState();
     _daysNameFuture = _getDaysName(widget.sellerUid);
     _checkIfFavorited();
+    //print(widget.sellerDetails);
+    //print(_daysNameFuture);
   }
 
   Future<void> _checkIfFavorited() async {
@@ -102,6 +109,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
           backgroundColor: userorseller ? sellerbackground : background,
           leading: IconButton(
             onPressed: () {
+              
               Navigator.pop(context);
             },
             icon: Icon(Icons.arrow_back, color: userorseller ? Colors.white: Colors.black),
@@ -158,7 +166,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
         builder: (context,snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             switch (widget.wherFrom){
-              case 'fromSomewhere':
+              case 'fromSomewhere' || 'fromSuccess':
                 return SellerDetailsDarkShimmer();
               default:
                 return SellerDetailsShimmer();
@@ -173,7 +181,12 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
           backgroundColor: userorseller ? sellerbackground : background,
           leading: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              switch (widget.wherFrom) {
+                case 'fromSuccess':
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => SellerMainPage(index: 0)));
+                default:
+                  Navigator.pop(context);
+              }
             },
             icon: Icon(Icons.arrow_back, color: userorseller ? Colors.white: Colors.black),
           ),
@@ -206,7 +219,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                    child: showImage(imageUrl: imageUrl, isFavorited: isFavorited, sellerDetails: widget.sellerDetails, sellerUid: widget.sellerUid, width: width, height: height)
+                                    child: showImage(imageUrl: imageUrl, isFavorited: isFavorited, sellerDetails: widget.sellerDetails, sellerUid: widget.sellerUid, width: width, height: height, whereFrom: widget.wherFrom,)
                                   ),
                                   SizedBox(height: height * 0.020),
                                   
@@ -627,6 +640,7 @@ class showImage extends StatefulWidget {
   final String sellerUid;
   final double width;
   final double height;
+  final String whereFrom;
 
   const showImage({
     super.key,
@@ -635,7 +649,8 @@ class showImage extends StatefulWidget {
     required this.sellerDetails,
     required this.sellerUid,
     required this.width,
-    required this.height
+    required this.height,
+    required this.whereFrom
   });
 
   @override
@@ -644,6 +659,7 @@ class showImage extends StatefulWidget {
 
 class _showImageState extends State<showImage> {
   late bool _isFavorited; 
+  final user = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
@@ -672,6 +688,23 @@ class _showImageState extends State<showImage> {
             );
           },
         ),
+        // delete icon
+        if (widget.whereFrom == 'fromSomewhere' || widget.whereFrom == 'fromSuccess')
+        Positioned(
+          top: 15,
+          left: 25, 
+          child: GestureDetector(
+            onTap: () {
+              _showMyDialog();
+            },
+            child: Icon(
+              Icons.delete,
+              color: Colors.red,
+              size: widget.width * 0.08,
+            ),
+          ),
+        ),
+        // Favorite icon
         Positioned(
           top: 15,
           right: 25,
@@ -682,7 +715,7 @@ class _showImageState extends State<showImage> {
             child: Icon(
               Icons.favorite,
               color: _isFavorited ? Colors.red : Colors.grey,
-              size: widget.width * 0.06,
+              size: widget.width * 0.08,
             ),
           ),
         ),
@@ -723,6 +756,97 @@ class _showImageState extends State<showImage> {
     }
     } catch (e, stack) {
       await reportErrorToCrashlytics(e, stack, reason: 'SellerDetails _toggleFavorite error for user $currentUserUid');
+    }
+  }
+  Future<void> _showMyDialog() async {
+  if (Platform.isIOS) {
+    // iOS style dialog
+    return showCupertinoDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: const Text('İlanı Sil'),
+          content: const Text('İlanı silmek istediğinize emin misiniz?'),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              child: const Text('İptal'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              child: const Text('Sil'),
+              onPressed: () async{
+                // delete the post
+                await deletePost();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  } else {
+    // Android style dialog
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Hesabı Sil'),
+          content: const Text('Hesabınızı silmek istediğinize emin misiniz?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('İptal'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Sil'),
+              onPressed: () async{
+                // delete the post
+                await deletePost();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+  Future<void> deletePost() async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: Colors.green,
+              backgroundColor: Colors.grey,
+            ),
+          );
+        }
+      );
+    try {
+      await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user)
+        .update({
+          'sellerDetails': FieldValue.delete()
+        });
+        Navigator.of(context).pop(); // Close loading dialog
+        await Showalert(context: context, text: 'İlanınız başarı ile silinmiştir').showSuccessAlert();
+        await Future.delayed(const Duration(seconds: 2)); 
+        Navigator.of(context).pop();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => SellerMainPage(index: 0)),
+        );
+    } catch (e, stack) {
+        //await Showalert(context: context, text: 'Ooopps...').showErrorAlert();
+        await reportErrorToCrashlytics(e, stack, reason: 'SellerDetails deletion of post error $user');
     }
   }
 }

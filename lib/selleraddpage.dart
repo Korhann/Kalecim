@@ -228,7 +228,6 @@ class _SellerAddPageState extends State<SellerAddPage> {
                     if (image != null) {
                       setState(() {
                         imageFileList.add(image);
-                        print(imageFileList.length);
                       });
                     }
                   },
@@ -697,20 +696,41 @@ class _SellerAddPageState extends State<SellerAddPage> {
         }
       );
 
+      // burada sorun satıcı ilanı düzenleyince istaken değeri ve takenby değeri de yenileniyor
       try {
-
         String userId = FirebaseAuth.instance.currentUser?.uid ?? "";
         if (userId.isNotEmpty) {
-          List<String> imageUrls = await _uploadImagesToStorage();
+          // Fetch previous sellerDetails from Firestore
+          final userDoc = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+          final prevSellerDetails = userDoc.data()?['sellerDetails'];
+          final prevSelectedHoursByDay = prevSellerDetails?['selectedHoursByDay'] ?? {};
 
           Map<String, dynamic> formattedData = {};
           _AmenitiesState.selectedHoursByDay.forEach((day, selectedHours) {
             if (selectedHours.isNotEmpty) {
-              formattedData[day] = selectedHours.map((hour) => {
+              formattedData[day] = selectedHours.map((hour) {
+                // Try to find previous hour data
+                final prevDayHours = prevSelectedHoursByDay[day] as List<dynamic>? ?? [];
+                final prevHour = prevDayHours.firstWhere(
+                  (h) => h['title'] == hour.title,
+                  orElse: () => null,
+                );
+                if (prevHour != null) {
+                  // Keep previous istaken and takenby
+                  return {
+                    'title': hour.title,
+                    'istaken': prevHour['istaken'],
+                    'takenby': prevHour['takenby'],
+                  };
+                } else {
+                  // New hour, set defaults
+                  return {
                     'title': hour.title,
                     'istaken': false,
-                    'takenby': 'empty'
-                  }).toList();
+                    'takenby': 'empty',
+                  };
+                }
+              }).toList();
             } 
           });
           List<String> dayNames = formattedData.keys.toList();
@@ -727,7 +747,7 @@ class _SellerAddPageState extends State<SellerAddPage> {
             "city": selectedCity,
             "district": selectedDistrict ?? districtFromDb,
             'fields': selectedFields,
-            "imageUrls": imageUrls,
+            "imageUrls": await _uploadImagesToStorage(),
             'chosenDays': formattedData.keys.toList(),
             'queryTags' : querytags,
             "selectedHoursByDay": formattedData,

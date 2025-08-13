@@ -188,7 +188,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     } else {
                       if (phoneError == false) {
                         if (mounted) {
-                          Showalert(context: context, text: 'Ooopps...').showErrorAlert();
+                          await Showalert(context: context, text: 'Ooopps...').showErrorAlert();
                         }
                       }
                     }

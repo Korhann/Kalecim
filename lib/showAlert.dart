@@ -21,7 +21,7 @@ class Showalert {
       title: 'Başarılı',
     );
   }
-  void showErrorAlert() {
+  Future<void> showErrorAlert() async{
     QuickAlert.show(context: context, text: text,type: QuickAlertType.error,confirmBtnText: 'Tamam',title: 'Bir şeyler ters gitti');
   }
 }

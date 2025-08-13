@@ -66,7 +66,8 @@ class _SellerSuccessPageState extends State<SellerSuccessPage> {
 }
 
   void navigate(Map<String,dynamic> details, String user) {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SellerDetailsPage(sellerDetails: details, sellerUid: user, wherFrom: 'fromSomewhere')));
+    print('Details are $details');
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SellerDetailsPage(sellerDetails: details, sellerUid: user, wherFrom: 'fromSuccess')));
   }
   @override
   Widget build(BuildContext context) {

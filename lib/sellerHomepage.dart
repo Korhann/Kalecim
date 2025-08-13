@@ -75,6 +75,7 @@ class _SellerHomePageState extends State<SellerHomePage> {
         page = const AppointmentsPage(whereFrom: 'fromSellerHomePage');
         break;
       case 'posts':
+        print('details home $sellerDetails');
         page = SellerDetailsPage(sellerDetails: sellerDetails, sellerUid: currentUser, wherFrom: 'fromSomewhere');
         break;
       case 'earnings':
@@ -107,6 +108,7 @@ class _SellerHomePageState extends State<SellerHomePage> {
 
       if (documentSnapshot.exists) {
         Map<String,dynamic> data = documentSnapshot.data() as Map<String,dynamic>;
+        print(data);
         if (data.isNotEmpty && data.containsKey('sellerDetails')) {
           sellerDetails = data['sellerDetails'];
         }
