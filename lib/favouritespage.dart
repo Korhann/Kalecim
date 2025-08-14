@@ -19,41 +19,18 @@ class FavouritesPage extends StatefulWidget {
 }
 
 class _FavouritesPageState extends State<FavouritesPage> {
-  bool isLoading = true;
-  List<Map<String, dynamic>> favourites = [];
-
-  late Future<void> fetchFavourites;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchFavourites = _fetchFavorites();
-  }
-
-  Future<void> _fetchFavorites() async {
+  
+  Stream<QuerySnapshot<Map<String, dynamic>>> _fetchFavorites() {
     final String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
-    try {
-      if (currentUserUid != null && currentUserUid.isNotEmpty) {
-        QuerySnapshot snapshot = await FirebaseFirestore.instance
-            .collection('Users')
-            .doc(currentUserUid)
-            .collection('favourites')
-            .get();
-
-        setState(() {
-          favourites = snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
-          isLoading = false;
-        });
-      }
-    } catch (e, stack) {
-      await reportErrorToCrashlytics(
-        e,
-        stack,
-        reason: 'favouritespage _fetchFavorites error for user $currentUserUid',
-      );
-      setState(() {
-        isLoading = false;
-      });
+    if (currentUserUid != null && currentUserUid.isNotEmpty) {
+      return FirebaseFirestore.instance
+          .collection('Users')
+          .doc(currentUserUid)
+          .collection('favourites')
+          .snapshots();
+    } else {
+      // Return an empty stream if user is not logged in
+      return const Stream.empty();
     }
   }
 
@@ -62,50 +39,75 @@ class _FavouritesPageState extends State<FavouritesPage> {
     final width = MediaQuery.sizeOf(context).width;
     final height = MediaQuery.sizeOf(context).height;
     return ConnectivityWithBackButton(
-      child: FutureBuilder(
-        future: fetchFavourites,
+      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: _fetchFavorites(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Padding(
               padding: EdgeInsets.only(top: 50),
-              child: FavouritesShimmer()
+              child: FavouritesShimmer(),
             );
           }
-        return Scaffold(
-        appBar: AppBar(
-        backgroundColor: userorseller ? sellerbackground: background,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      backgroundColor: userorseller ? sellerbackground: background,
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : favourites.isEmpty
-          ? Center(child: GlobalStyles.textStyle(text: 'Henüz favori eklenmedi', context:context, size: 25, fontWeight: FontWeight.bold, color: Colors.black))
-              : Column(
-                children: [
-                  showFavouritesText(),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(10),
-                    itemCount: favourites.length,
-                    itemBuilder: (context, index) {
-                      final favourite = favourites[index];
-                      final sellerFullName = favourite['sellerFullName'] ?? '';
-                      final city = favourite['city'] ?? 'Bilinmiyor';
-                      final district = favourite['district'] ?? '';
-                      final imageUrl = (favourite['imageUrls'] != null && favourite['imageUrls'].isNotEmpty)
-                          ? favourite['imageUrls'][0]
-                          : 'https://via.placeholder.com/150';
-
-                      return showCardFavourite(imageUrl: imageUrl, sellerFullName: sellerFullName, city: city, district: district, favourite: favourite, width: width,height: height,);
-                
-                    },
-                  ),
-                ],
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Scaffold(
+              appBar: AppBar(
+                backgroundColor: userorseller ? sellerbackground : background,
+                elevation: 0,
+                centerTitle: true,
               ),
-    );
-        }
+              backgroundColor: userorseller ? sellerbackground : background,
+              body: Center(
+                child: GlobalStyles.textStyle(
+                  text: 'Henüz favori eklenmedi',
+                  context: context,
+                  size: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            );
+          }
+
+          final favourites = snapshot.data!.docs.map((doc) => doc.data()).toList();
+
+          return Scaffold(
+            appBar: AppBar(
+              backgroundColor: userorseller ? sellerbackground : background,
+              elevation: 0,
+              centerTitle: true,
+            ),
+            backgroundColor: userorseller ? sellerbackground : background,
+            body: Column(
+              children: [
+                showFavouritesText(),
+                ListView.builder(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.all(10),
+                  itemCount: favourites.length,
+                  itemBuilder: (context, index) {
+                    final favourite = favourites[index];
+                    final sellerFullName = favourite['sellerFullName'] ?? '';
+                    final city = favourite['city'] ?? 'Bilinmiyor';
+                    final district = favourite['district'] ?? '';
+                    final imageUrl = (favourite['imageUrls'] != null && favourite['imageUrls'].isNotEmpty)
+                        ? favourite['imageUrls'][0]
+                        : 'https://via.placeholder.com/150';
+
+                    return showCardFavourite(
+                      imageUrl: imageUrl,
+                      sellerFullName: sellerFullName,
+                      city: city,
+                      district: district,
+                      favourite: favourite,
+                      width: width,
+                      height: height,
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

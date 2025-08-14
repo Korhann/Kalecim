@@ -21,10 +21,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: background,
-      body: const Padding(
-        padding: EdgeInsets.all(20.0),
-        child: GetUserData()
-      )
+      body: GetUserData()
     );
   }
 }

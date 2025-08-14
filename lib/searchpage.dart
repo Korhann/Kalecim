@@ -131,11 +131,14 @@ class _GetUserDataState extends State<GetUserData> {
         removeRight: true,
         child: Column(
           children: [
-            _HeaderSection(
-              onFilterTap: _navigateToFilterPage,
-              onNotificationTap: _navigateToAppsPage,
-              width: width,
-              height: height,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: _HeaderSection(
+                onFilterTap: _navigateToFilterPage,
+                onNotificationTap: _navigateToAppsPage,
+                width: width,
+                height: height,
+              ),
             ),
             ImageSliderDemo(width: width, height: bannerHeight),
             const SizedBox(height: 10),
@@ -144,13 +147,16 @@ class _GetUserDataState extends State<GetUserData> {
                   ? SellerGridShimmer()
                   : sellers.isEmpty
                       ? _EmptyState()
-                      : _SellerGrid(
-                          docs: sellers,
-                          onCardTap: _handleCardTap,
-                          isLoading: isLoading,
-                          scrollController: _scrollController,
-                          hasMore: hasMore,
-                        ),
+                      : Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: _SellerGrid(
+                            docs: sellers,
+                            onCardTap: _handleCardTap,
+                            isLoading: isLoading,
+                            scrollController: _scrollController,
+                            hasMore: hasMore,
+                          ),
+                      ),
             ),
           ],
         ),
@@ -468,8 +474,8 @@ class ImageSliderDemo extends StatelessWidget {
           height: height,
           child: CarouselSlider(
             options: CarouselOptions(
-              viewportFraction: 1.0,
-              enlargeCenterPage: false,
+              viewportFraction: 1,
+              enlargeCenterPage: true,
               autoPlay: true,
               height: height,
               padEnds: false,

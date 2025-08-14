@@ -19,6 +19,8 @@ import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
+import 'package:quickalert/quickalert.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class SellerDetailsPage extends StatefulWidget {
   const SellerDetailsPage({
@@ -58,7 +60,6 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
   ];
 
   bool isLoading = true;
-  bool isFavorited = false;
   final String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
   bool isEmpty = false;
   late Future<void> _daysNameFuture;
@@ -67,35 +68,6 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
   void initState() {
     super.initState();
     _daysNameFuture = _getDaysName(widget.sellerUid);
-    _checkIfFavorited();
-    //print(widget.sellerDetails);
-    //print(_daysNameFuture);
-  }
-
-  Future<void> _checkIfFavorited() async {
-    final String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
-    try {
-      if (currentUserUid != null && currentUserUid.isNotEmpty) {
-        QuerySnapshot snapshot = await FirebaseFirestore.instance
-            .collection('Users')
-            .doc(currentUserUid)
-            .collection('favourites')
-            .where('sellerUid', isEqualTo: widget.sellerUid)
-            .get();
-
-        if (mounted) {
-          setState(() {
-            isFavorited = snapshot.docs.isNotEmpty;
-          });
-        }
-      }
-    } catch (e, stack) {
-      await reportErrorToCrashlytics(
-        e,
-        stack,
-        reason: 'sellerDetails _checkIfFavorited error for user $currentUserUid',
-      );
-    }
   }
 
   @override
@@ -109,7 +81,6 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
           backgroundColor: userorseller ? sellerbackground : background,
           leading: IconButton(
             onPressed: () {
-              
               Navigator.pop(context);
             },
             icon: Icon(Icons.arrow_back, color: userorseller ? Colors.white: Colors.black),
@@ -219,7 +190,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                    child: showImage(imageUrl: imageUrl, isFavorited: isFavorited, sellerDetails: widget.sellerDetails, sellerUid: widget.sellerUid, width: width, height: height, whereFrom: widget.wherFrom,)
+                                    child: showImage(imageUrl: imageUrl, sellerDetails: widget.sellerDetails, sellerUid: widget.sellerUid, width: width, height: height, whereFrom: widget.wherFrom,)
                                   ),
                                   SizedBox(height: height * 0.020),
                                   
@@ -635,7 +606,6 @@ class _SellerFieldsState extends State<SellerFields> {
 
 class showImage extends StatefulWidget {
   final String imageUrl;
-  final bool isFavorited; 
   final Map<String, dynamic> sellerDetails;
   final String sellerUid;
   final double width;
@@ -645,7 +615,6 @@ class showImage extends StatefulWidget {
   const showImage({
     super.key,
     required this.imageUrl,
-    required this.isFavorited,
     required this.sellerDetails,
     required this.sellerUid,
     required this.width,
@@ -658,13 +627,11 @@ class showImage extends StatefulWidget {
 }
 
 class _showImageState extends State<showImage> {
-  late bool _isFavorited; 
   final user = FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void initState() {
     super.initState();
-    _isFavorited = widget.isFavorited; 
   }
 
   @override
@@ -708,56 +675,88 @@ class _showImageState extends State<showImage> {
         Positioned(
           top: 15,
           right: 25,
-          child: GestureDetector(
-            onTap: () {
-              _toggleFavorite(widget.sellerDetails, widget.sellerUid);
-            },
-            child: Icon(
-              Icons.favorite,
-              color: _isFavorited ? Colors.red : Colors.grey,
-              size: widget.width * 0.08,
-            ),
-          ),
+          child: buildFavoriteIcon(),
         ),
       ],
     );
   }
+  Widget buildFavoriteIcon() {
+  final currentUserUid = FirebaseAuth.instance.currentUser?.uid;
+  return StreamBuilder<QuerySnapshot>(
+    stream: FirebaseFirestore.instance
+      .collection('Users')
+      .doc(currentUserUid)
+      .collection('favourites')
+      .where('sellerUid', isEqualTo: widget.sellerUid)
+      .snapshots(),
+    builder: (context, snapshot) {
+      bool isFavorited = snapshot.hasData && snapshot.data!.docs.isNotEmpty;
 
-  void _toggleFavorite(Map<String, dynamic> sellerDetails, String sellerUid) async {
-    final String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
-    try {
-      if (currentUserUid != null && currentUserUid.isNotEmpty) {
-      if (_isFavorited) {
-        // Remove from favorites
-        QuerySnapshot snapshot = await FirebaseFirestore.instance
-            .collection('Users')
-            .doc(currentUserUid)
-            .collection('favourites')
-            .where('sellerUid', isEqualTo: sellerUid)
-            .get();
-        for (var doc in snapshot.docs) {
-          await doc.reference.delete();
-        }
-        setState(() {
-          _isFavorited = false;
-        });
-      } else {
-        // Add to favorites
-        sellerDetails['sellerUid'] = sellerUid;
-        await FirebaseFirestore.instance
-            .collection('Users')
-            .doc(currentUserUid)
-            .collection('favourites')
-            .add(sellerDetails);
-        setState(() {
-          _isFavorited = true;
-        });
-      }
-    }
-    } catch (e, stack) {
-      await reportErrorToCrashlytics(e, stack, reason: 'SellerDetails _toggleFavorite error for user $currentUserUid');
-    }
-  }
+      return GestureDetector(
+        onTap: () async {
+          if (isFavorited) {
+            // Remove from favorites
+            for (var doc in snapshot.data!.docs) {
+              await doc.reference.delete();
+            }
+          } else {
+            // Add to favorites
+            widget.sellerDetails['sellerUid'] = widget.sellerUid;
+            await FirebaseFirestore.instance
+                .collection('Users')
+                .doc(currentUserUid)
+                .collection('favourites')
+                .add(widget.sellerDetails);
+          }
+        },
+        child: Icon(
+          Icons.favorite,
+          color: isFavorited ? Colors.red : Colors.grey,
+          size: widget.width * 0.08,
+        ),
+      );
+    },
+  );
+}
+
+  // void _toggleFavorite(Map<String, dynamic> sellerDetails, String sellerUid) async {
+  //   final String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
+  //   try {
+  //     if (currentUserUid != null && currentUserUid.isNotEmpty) {
+  //     if (_isFavorited) {
+  //       // Remove from favorites
+  //       QuerySnapshot snapshot = await FirebaseFirestore.instance
+  //           .collection('Users')
+  //           .doc(currentUserUid)
+  //           .collection('favourites')
+  //           .where('sellerUid', isEqualTo: sellerUid)
+  //           .get();
+  //       for (var doc in snapshot.docs) {
+  //         await doc.reference.delete();
+  //         print('its deleted');
+  //       }
+  //       setState(() {
+  //         _isFavorited = false;
+  //       });
+  //     } else {
+  //       // Add to favorites
+  //       sellerDetails['sellerUid'] = sellerUid;
+  //       await FirebaseFirestore.instance
+  //           .collection('Users')
+  //           .doc(currentUserUid)
+  //           .collection('favourites')
+  //           .add(sellerDetails);
+  //       setState(() {
+  //         _isFavorited = true;
+  //         print('added again');
+  //       });
+  //     }
+  //   }
+  //   } catch (e, stack) {
+  //     await reportErrorToCrashlytics(e, stack, reason: 'SellerDetails _toggleFavorite error for user $currentUserUid');
+  //   }
+  // }
+
   Future<void> _showMyDialog() async {
   if (Platform.isIOS) {
     // iOS style dialog
@@ -838,12 +837,23 @@ class _showImageState extends State<showImage> {
           'sellerDetails': FieldValue.delete()
         });
         Navigator.of(context).pop(); // Close loading dialog
-        await Showalert(context: context, text: 'İlanınız başarı ile silinmiştir').showSuccessAlert();
-        await Future.delayed(const Duration(seconds: 2)); 
-        Navigator.of(context).pop();
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => SellerMainPage(index: 0)),
-        );
+        //await Showalert(context: context, text: 'İlanınız başarı ile silinmiştir').showSuccessAlert();
+        QuickAlert.show(
+          context: context,
+          text: 'İlanınız başarı ile silinmiştir',
+          title: 'Başarılı',
+          confirmBtnText: 'Tamam',
+          type: QuickAlertType.success, onConfirmBtnTap: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => SellerMainPage(index: 0)),
+            );
+        });
+        // await Future.delayed(const Duration(seconds: 1)); 
+        // Navigator.of(context).pop();
+        // Navigator.of(context).pushReplacement(
+        //   MaterialPageRoute(builder: (context) => SellerMainPage(index: 0)),
+        // );
     } catch (e, stack) {
         //await Showalert(context: context, text: 'Ooopps...').showErrorAlert();
         await reportErrorToCrashlytics(e, stack, reason: 'SellerDetails deletion of post error $user');
