@@ -149,7 +149,6 @@ class PushHelper {
               .collection('Users')
               .doc(userId)
               .update({'notificationToken' : oneSignal}).then((value) {
-            debugPrint('oneSignal suc');
           }).onError((error, stackTrace) {
             debugPrint('oneSignal: $error');
           });

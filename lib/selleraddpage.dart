@@ -89,6 +89,9 @@ class _SellerAddPageState extends State<SellerAddPage> {
 
   late Future<bool> sellerCheckFuture;
 
+  final String defaultImageUrl = 'https://firebasestorage.googleapis.com/v0/b/kiralikkaleci-21f26.appspot.com/o/images%2Fdefault_1754929226518.jpg?alt=media&token=4c611bc8-4761-45db-b4e4-7015e5b63374';
+  //final String defaultDevImageUrl = 'https://firebasestorage.googleapis.com/v0/b/kiralikkaleci-dev.firebasestorage.app/o/images%2Fdefault_1750425664401.jpg?alt=media&token=fe58a3fc-4fe4-4779-acaa-fa3af9bd14c3';
+
   @override
   void initState() {
     super.initState();
@@ -796,45 +799,32 @@ class _SellerAddPageState extends State<SellerAddPage> {
     }
   }
 
-  Future<List<String>> _uploadImagesToStorage() async {
-    List<String> imageUrls = [];
-    if (imageFileList.isNotEmpty) {
-      for (XFile imageFile in imageFileList) {
-        try {
-          File file = File(imageFile.path);
-          String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-          Reference ref = FirebaseStorage.instance.ref().child('images/$fileName.jpg');
-          UploadTask uploadTask = ref.putFile(file);
-          TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
-          String imageUrl = await taskSnapshot.ref.getDownloadURL();
-          imageUrls.add(imageUrl);
-        } catch (e, stack) {
-          await reportErrorToCrashlytics(
-            e,
-            stack,
-            reason: 'selleraddpage _uploadImagesToStorage error',
-          );
-        }
-      }
-    } else {
+
+Future<List<String>> _uploadImagesToStorage() async {
+  List<String> imageUrls = [];
+  if (imageFileList.isNotEmpty) {
+    for (XFile imageFile in imageFileList) {
       try {
-        File defaultImage = await getDefaultImageFile();
+        File file = File(imageFile.path);
         String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-        Reference ref = FirebaseStorage.instance.ref().child('images/default_$fileName.jpg');
-        UploadTask uploadTask = ref.putFile(defaultImage);
+        Reference ref = FirebaseStorage.instance.ref().child('images/$fileName.jpg');
+        UploadTask uploadTask = ref.putFile(file);
         TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
-        String defaultImageUrl = await taskSnapshot.ref.getDownloadURL();
-        imageUrls.add(defaultImageUrl);
+        String imageUrl = await taskSnapshot.ref.getDownloadURL();
+        imageUrls.add(imageUrl);
       } catch (e, stack) {
         await reportErrorToCrashlytics(
           e,
           stack,
-          reason: 'selleraddpage _uploadImagesToStorage default image error',
+          reason: 'selleraddpage _uploadImagesToStorage error',
         );
       }
     }
-    return imageUrls;
+  } else {
+    imageUrls.add(defaultImageUrl);
   }
+  return imageUrls;
+}
 
   Future<File> getDefaultImageFile() async {
     try {
