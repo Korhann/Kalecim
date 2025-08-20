@@ -4,7 +4,7 @@ Yapılacaklar
 
 Yeni düzeltilecekler
 - Kayıt ta maili iki kere kayıt ediyor +
-- Saatler fazla ekleniyor - 
+- Saatler fazla ekleniyor - ekle sonradan
 - Eklenmesi istenen halı sahaları ekle +
 
 Kontrol edilecekler
