@@ -8,6 +8,9 @@ Yapılacaklar
 - Ana sayfadaki kaydırmalı kaleci postu büyüyecek +
 - İlanlarım sayfası ilanı silince göstermeye devam ediyor +
 
+
+- Kullanıcıların girdiği sahaları local db ye ekle
+
 Kontrol edilecekler
 - Randevu talebi gönderdikten sonra gönderilmiştir mesajı
 
