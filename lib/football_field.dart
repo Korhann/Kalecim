@@ -24,7 +24,7 @@ class FootballField {
   // Clear existing data
   await localDb.clear();
 
-  // add the user reccomendations
+  // add the user reccomendations aynn
 
   // Define data with cities and districts
   final List<FootballField> fields = [
