@@ -7,6 +7,9 @@ Yeni düzeltilecekler
 - Saatler fazla ekleniyor - ekle sonradan
 - Eklenmesi istenen halı sahaları ekle +
 
+
+- Kullanıcıların girdiği sahaları local db ye ekle
+
 Kontrol edilecekler
 - Randevu talebi gönderdikten sonra gönderilmiştir mesajı
 
