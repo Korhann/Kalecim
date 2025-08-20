@@ -1,12 +1,11 @@
 Yapılacaklar
 
 - Ödeme yaptıktan sonra bidaha ödemeye çalışınca dolu olarak işaretliyor, ikisinin de ben olmama rağmen (bir daha dene sonradan ama şuan oldu) ?
-- Satıcı ilanını yenileyince alınmış olarak saatler gidiyor ve bidaha alınabiliyor +
-- default resimlerin depolanma mantığına bak, belki resim default ise db den çekebilirsin +
-- İlanı silme özelliği eklenecek ilanlarım sayfasına +
-- Favori ekleme ve favorilerim sayfasını düzelt +
-- Ana sayfadaki kaydırmalı kaleci postu büyüyecek +
-- İlanlarım sayfası ilanı silince göstermeye devam ediyor +
+
+Yeni düzeltilecekler
+- Kayıt ta maili iki kere kayıt ediyor +
+- Saatler fazla ekleniyor - 
+- Eklenmesi istenen halı sahaları ekle +
 
 Kontrol edilecekler
 - Randevu talebi gönderdikten sonra gönderilmiştir mesajı

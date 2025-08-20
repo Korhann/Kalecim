@@ -39,6 +39,10 @@ class _SignUpState extends State<SignUp> {
   bool _showErrorRePassword = false;
   bool _emailInUse = false;
 
+  // for double tapping the Kayıt ol button
+  bool _buttonDisable = false;
+
+
   void clearErrors() {
     setState(() {
   _showErrorName = false;
@@ -427,9 +431,19 @@ class _SignUpState extends State<SignUp> {
               
                           ElevatedButton(
                             key: Key('signup_button'),
-                            onPressed: () async {
+                            onPressed: _buttonDisable ? null : () async {
                               if (formkey.currentState!.validate()) {
+                                if (!_buttonDisable) {
+                                  setState(() {
+                                    _buttonDisable = true;
+                                  });
+                                } 
                                 await signUpUser();
+                                Future.delayed(const Duration(seconds: 5), () {
+                                  setState(() {
+                                    _buttonDisable = false;
+                                  });
+                                }); 
                               }
                             },
                             style: GlobalStyles.buttonPrimary(context),
