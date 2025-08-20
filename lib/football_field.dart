@@ -24,6 +24,8 @@ class FootballField {
   // Clear existing data
   await localDb.clear();
 
+  // add the user reccomendations
+
   // Define data with cities and districts
   final List<FootballField> fields = [
     // ADANA

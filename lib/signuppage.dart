@@ -428,11 +428,12 @@ class _SignUpState extends State<SignUp> {
                             ],
                           ),
                           const SizedBox(height: 50.0),
-              
+                   
                           ElevatedButton(
                             key: Key('signup_button'),
                             onPressed: _buttonDisable ? null : () async {
                               if (formkey.currentState!.validate()) {
+                                // for not signing in the same user twice
                                 if (!_buttonDisable) {
                                   setState(() {
                                     _buttonDisable = true;
