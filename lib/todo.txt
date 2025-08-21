@@ -4,11 +4,12 @@ Yapılacaklar
 
 Yeni düzeltilecekler
 - Kayıt ta maili iki kere kayıt ediyor +
-- Saatler fazla ekleniyor - ekle sonradan
+- Saatler fazla ekleniyor +
 - Eklenmesi istenen halı sahaları ekle +
+- İlandaki saatleri sıraya göre göster +
 
 
-- Kullanıcıların girdiği sahaları local db ye ekle
+- Kullanıcıların girdiği sahaları local db ye ekle +
 
 Kontrol edilecekler
 - Randevu talebi gönderdikten sonra gönderilmiştir mesajı

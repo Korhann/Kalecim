@@ -63,6 +63,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
   final String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
   bool isEmpty = false;
   late Future<void> _daysNameFuture;
+  List<String> hours = []; 
 
   @override
   void initState() {
@@ -267,8 +268,9 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                                         final String dayHourKey = '$day $title';
                                                         List<String> nightTitles = ['00:00-01:00','01:00-02:00','02:00-03:00'];
                                                         bool isNightHour = nightTitles.contains(title);
+
                                                       
-                                                        dayChecker(i, currentDayIndex, now, startTime, dayHourKey, takenby!, day, title, hourTitles, isNightHour, istaken);
+                                                        dayChecker(i, currentDayIndex, now, startTime, dayHourKey, takenby!, day, title, hourTitles, isNightHour, istaken, hours);
                                                       }
                                                       
                                                   }
@@ -359,7 +361,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
     );
   }
   
-  void dayChecker(int i, int currentDayIndex, final now, String startTime, String dayHourKey, String takenby, String day, String title, List<String> hourTitles, bool isNightHour, bool istaken) {
+  void dayChecker(int i, int currentDayIndex, final now, String startTime, String dayHourKey, String takenby, String day, String title, List<String> hourTitles, bool isNightHour, bool istaken, List<String> hours) {
     if (isNightHour) {
       // Mark as taken if istaken is true
       if (istaken) {
@@ -373,6 +375,9 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
         }
       }
       hourTitles.add(title);
+      // shows the hours in order
+      showHoursInOrder(hourTitles);
+
       hoursByDay[day] = hourTitles;
     } else {
       bool isPastDay = i < currentDayIndex;
@@ -389,9 +394,35 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
         hourColors[dayHourKey] = Colors.cyan;
       }
       hourTitles.add(title);
+      // shows the hours in order
+      showHoursInOrder(hourTitles);
     }
     hoursByDay[day] = hourTitles;
   }
+
+  void showHoursInOrder(List<String> hourTitles) {
+  hourTitles.sort((a, b) {
+    // Extract start hour and minute
+    int startHourA = int.parse(a.split(':')[0]);
+    int startHourB = int.parse(b.split(':')[0]);
+
+    // Night hours: 00, 01, 02
+    bool isNightA = startHourA == 0 || startHourA == 1;
+    bool isNightB = startHourB == 0 || startHourB == 1;
+
+    if (isNightA && !isNightB) {
+      return 1; // Night hours go after normal hours
+    } else if (!isNightA && isNightB) {
+      return -1; // Normal hours go before night hours
+    } else if (isNightA && isNightB) {
+      // Both are night hours, sort 00, 01, 02
+      return startHourA.compareTo(startHourB);
+    } else {
+      // Both are normal hours, sort as usual
+      return startHourA.compareTo(startHourB);
+    }
+  });
+}
 
   Stream<DocumentSnapshot> _stream() {
     return FirebaseFirestore.instance
