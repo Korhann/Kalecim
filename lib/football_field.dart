@@ -762,7 +762,7 @@ class FootballField {
     FootballField(
       city: 'İstanbul',
       district: 'Küçükçekmece',
-      fieldName: ['Dörtler Halı Saha','Futbol Center Halı Saha','Efor Halı Saha','İst.Atakent SK Halı Saha','Nihat Yüceur Spor Kompleksi Halı Saha','Birlik Halı Saha','Seçkin Marakana Halı Saha','Fevzi Çakmak Halı Saha','Seçkin Marakana 2 Halı Saha','Hayat Park Halı Saha','Kanarya Stadı Halı Saha','Metin Oktay Stadı']
+      fieldName: ['Dörtler Halı Saha','Futbol Center Halı Saha','Efor Halı Saha','İst.Atakent SK Halı Saha','Nihat Yüceur Spor Kompleksi Halı Saha','Birlik Halı Saha','Seçkin Marakana Halı Saha','Fevzi Çakmak Halı Saha','Seçkin Marakana 2 Halı Saha','Hayat Park Halı Saha','Kanarya Stadı Halı Saha','Metin Oktay Stadı','İfa Stadyumu']
     ),
     FootballField(
       city: 'İstanbul',
