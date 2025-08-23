@@ -435,15 +435,19 @@ class _SignUpState extends State<SignUp> {
                               if (formkey.currentState!.validate()) {
                                 // for not signing in the same user twice
                                 if (!_buttonDisable) {
-                                  setState(() {
+                                  if (mounted) {
+                                    setState(() {
                                     _buttonDisable = true;
                                   });
+                                  }
                                 } 
                                 await signUpUser();
                                 Future.delayed(const Duration(seconds: 5), () {
-                                  setState(() {
+                                  if (mounted) {
+                                    setState(() {
                                     _buttonDisable = false;
                                   });
+                                  }
                                 }); 
                               }
                             },

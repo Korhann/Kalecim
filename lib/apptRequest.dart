@@ -42,9 +42,17 @@ class _ApptRequestState extends State<ApptRequest> {
   String currentuser = FirebaseAuth.instance.currentUser!.uid;
   late String sellerFullName;
 
+  bool _buttonDisable = false;
+
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    
+    super.dispose();
   }
   
   @override
@@ -146,10 +154,34 @@ class _ApptRequestState extends State<ApptRequest> {
             Center(
               child: ElevatedButton(
                 // check for the internet connection
-                onPressed: () async{
+                onPressed: _buttonDisable ? null : () async{
                   if (await InternetConnection().hasInternetAccess) {
-                    await sendRequest();
-                    await navigateToHomePage();
+                    if (!_buttonDisable) {
+                      if (mounted) {
+                        setState(() {
+                        _buttonDisable = true;
+                      });
+                      }
+                    }
+                    bool isSameAppointment = await checkIfSameApptRequest();
+                    if (isSameAppointment) {
+                      await sendRequest();
+                      await navigateToHomePage();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Aynı saat için birden fazla talep gönderemezsiniz'),
+                          backgroundColor: Colors.red,
+                        )
+                      );
+                    }
+                    Future.delayed(const Duration(seconds: 5), () {
+                      if (mounted) {
+                        setState(() {
+                        _buttonDisable = false;
+                      });
+                      }
+                    }); 
                   } else {
                     if (mounted) {
                       Showalert(context: context, text: 'Ooops...').showErrorAlert();
@@ -172,6 +204,22 @@ class _ApptRequestState extends State<ApptRequest> {
         ),
       ),
     );
+  }
+
+  Future<bool> checkIfSameApptRequest() async{
+    QuerySnapshot<Map<String,dynamic>> oldApptRequest = await _firestore.collection('Users')
+    .doc(currentuser)
+    .collection('appointmentbuyer')
+    .get();
+
+    for (var doc in oldApptRequest.docs) {
+      final data = doc.data();
+      final oldAppt = data['appointmentDetails'];
+      if (oldAppt['day'] == widget.selectedDay && oldAppt['hour'] == widget.selectedHour && oldAppt['selleruid'] == widget.sellerUid) {
+        return false;
+      }
+    }
+    return true;
   }
 
   Future<void> navigateToHomePage() async{
