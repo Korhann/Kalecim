@@ -1,17 +1,13 @@
 Yapılacaklar
 
-- Ödeme yaptıktan sonra bidaha ödemeye çalışınca dolu olarak işaretliyor, ikisinin de ben olmama rağmen (bir daha dene sonradan ama şuan oldu) ?
-
-Yeni düzeltilecekler
-- Kayıt ta maili iki kere kayıt ediyor +
-- Saatler fazla ekleniyor +
-- Eklenmesi istenen halı sahaları ekle +
-- İlandaki saatleri sıraya göre göster +
-
-
-- Kullanıcıların girdiği sahaları local db ye ekle +
-
-Kontrol edilecekler
-- Randevu talebi gönderdikten sonra gönderilmiştir mesajı
+- Kaleciler için açıklama özelliği. +
+- Kalecinin db sine kazanacağı tutar da girilsin (randevu da da) +
+- Eğer iban kopyala yapışıtır yapılmış ise baştaki TR yi çıkar +
+- Para çekim için talep oluştur butonu, ödemeleri daha kolay takip edebilmek için -
+- Olduğun günün halısahaları 12 den sonra açık kalıyor (şuan saat 00:45 ve saatler açık pazar için)
+- Eklenen halısahalara göz at. -
+- Kalecilerin iban girmesi için ilan açanlara pushNotification gönderme. -
 
 
+Kontrol edilecekler:
+- Randevu isteği düzgün çalışıyor mu -

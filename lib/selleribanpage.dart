@@ -110,7 +110,7 @@ class SellerIbanPageState extends State<SellerIbanPage> {
                         } else if (!newText.startsWith('TR')) {
                           newText = 'TR${formatIban(newText)}';
                         } else {
-                          newText = 'TR${formatIban(newText.substring(2))}';
+                          newText = '${formatIban(newText.substring(2))}';
                         }
                         
                         return TextEditingValue(

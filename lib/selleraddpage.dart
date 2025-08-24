@@ -40,6 +40,11 @@ class _SellerAddPageState extends State<SellerAddPage> {
   TextEditingController sellerFullName = TextEditingController();
   TextEditingController sellerPrice = TextEditingController();
   TextEditingController sellerPriceAfterMidnight = TextEditingController();
+  TextEditingController sellerGig = TextEditingController();
+
+  // for inserting the users earning
+  int sellerEarning = 0;
+  int sellerEarningMidnight = 0;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -68,6 +73,7 @@ class _SellerAddPageState extends State<SellerAddPage> {
   late String initialName = '';
   late int initialPrice = 0; 
   late int initialPriceMidnight = 0;
+  late String initialGig = '';
   // this three is for printing the initial district
   late String initialDistrict = '';
   String districtFromDb = '';
@@ -137,6 +143,7 @@ class _SellerAddPageState extends State<SellerAddPage> {
     getInitialDistrict(),
     getInitialFields(),
     getInitialDayHours(),
+    getInitialGig()
   ]);
 
   districtFromDb = results[3] as String;
@@ -162,6 +169,7 @@ class _SellerAddPageState extends State<SellerAddPage> {
       setState(() {
         imageFileList.clear();
         sellerFullName.clear();
+        sellerGig.clear();
         sellerPrice.clear();
         multFields.clear();
         selectedCity = null;
@@ -253,6 +261,27 @@ class _SellerAddPageState extends State<SellerAddPage> {
                 */
                 
                 SizedBox(height: height*0.040),
+
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Row(
+                    children: [
+                      GlobalStyles.textStyle(text: 'Açıklama', context: context, size: 18, fontWeight: FontWeight.w600, color: Colors.white),
+                      const SizedBox(width: 5),
+                      GlobalStyles.textStyle(text: '(Opsiyonel)', context: context, size: 15, fontWeight: FontWeight.w500, color: Colors.white),
+                    ],
+                  )
+                ),
+
+                const SizedBox(height: 10),
+
+                gigField(
+                  controller: sellerGig,
+                  height: 130,
+                ),
+
+                SizedBox(height: height*0.040),
+
                 Padding(
                   padding: const EdgeInsets.only(left: 10), 
                   child: GlobalStyles.textStyle(text: 'İlçe', context: context, size: 18, fontWeight: FontWeight.w600, color: Colors.white),
@@ -520,7 +549,7 @@ class _SellerAddPageState extends State<SellerAddPage> {
 
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: YourEarning(earnedPrice: sellerPrice),
+                  child: YourEarning(earnedPrice: sellerPrice, sellerEarning: sellerEarning,),
                 ),
 
                 const SizedBox(height: 20),
@@ -541,7 +570,7 @@ class _SellerAddPageState extends State<SellerAddPage> {
 
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: YourEarning(earnedPrice: sellerPriceAfterMidnight),
+                  child: YourEarning(earnedPrice: sellerPriceAfterMidnight, sellerEarning: sellerEarningMidnight,),
                 ),
                 
                 const SizedBox(height: 40),
@@ -745,8 +774,11 @@ class _SellerAddPageState extends State<SellerAddPage> {
 
           Map<String, dynamic> sellerDetails = {
             "sellerFullName": sellerFullName.text,
+            'sellerGig': sellerGig.text,
             "sellerPrice": price,
             'sellerPriceMidnight': priceAfterMidnight,
+            'sellerEarning': price! - (price * 0.10),
+            'sellerEarningMidnight': priceAfterMidnight! - (priceAfterMidnight * 0.10),
             "city": selectedCity,
             "district": selectedDistrict ?? districtFromDb,
             'fields': selectedFields,
@@ -857,6 +889,32 @@ Future<List<String>> _uploadImagesToStorage() async {
         initialName = sellerDetails['sellerFullName'];
         sellerFullName.text = initialName;
         return initialName;
+      }
+    }
+  } catch (e, stack) {
+    await reportErrorToCrashlytics(
+      e,
+      stack,
+      reason: 'selleraddpage getInitialName error for user $currentUser',
+    );
+  }
+  return '';
+}
+
+  Future<String> getInitialGig() async {
+  try {
+    final doc = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(currentUser)
+      .get();
+
+    if (doc.exists) {
+      final data = doc.data();
+      final sellerDetails = data?['sellerDetails'];
+      if (sellerDetails != null && sellerDetails['sellerGig'] != null) {
+        initialGig = sellerDetails['sellerGig'];
+        sellerGig.text = initialGig;
+        return initialGig;
       }
     }
   } catch (e, stack) {
@@ -1308,6 +1366,61 @@ class _PickImageGalleryState extends State<PickImageGallery> {
     );
   }
 }
+
+class gigField extends StatelessWidget {
+  final TextEditingController controller;
+  final double height;
+  const gigField({
+    required this.controller,
+    required this.height,
+    super.key
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: TextFormField(
+        buildCounter: (context, {required currentLength, required isFocused, maxLength}) {
+        return Text(
+          "$currentLength / ${200} karakter",
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
+          );
+        },
+        inputFormatters: [
+          LengthLimitingTextInputFormatter(200)
+        ],
+        maxLines: null,
+        minLines: null,
+        expands: true,
+        textAlign: TextAlign.start,
+        controller: controller,
+        validator: (value) {
+          // user can leave the gig empty 
+          return null;
+        },
+        style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300
+                      ),
+                    decoration: InputDecoration(
+                        hintText: "İletişim bilgisi paylaşan kullanıcıların hesapı kapatılacaktır !",
+                        hintStyle: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w200
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.all(10),
+                        fillColor: sellergrey,
+                        filled: true,
+                    ),
+      ),
+    );
+  }
+}
+
 class NameField extends StatelessWidget {
   final TextEditingController controller;
   const NameField({
@@ -1738,10 +1851,12 @@ class priceFieldAfterMidnight extends StatelessWidget {
 }
 class YourEarning extends StatelessWidget {
   final TextEditingController earnedPrice;
+  final int sellerEarning;
 
   const YourEarning({
     super.key,
     required this.earnedPrice,
+    required this.sellerEarning
   });
 
 
@@ -1766,7 +1881,7 @@ class YourEarning extends StatelessWidget {
 
   int calculateEarning() {
     int getValue = int.tryParse(earnedPrice.text) ?? 0;
-    int fivePercent = (getValue * 10 ~/ 100); 
+    int fivePercent = (getValue * 10 ~/ 100);
     return getValue - fivePercent;
   }
 }
