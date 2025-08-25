@@ -64,11 +64,31 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
   bool isEmpty = false;
   late Future<void> _daysNameFuture;
   List<String> hours = []; 
+  //bool hasGig = false;
 
   @override
   void initState() {
     super.initState();
     _daysNameFuture = _getDaysName(widget.sellerUid);
+    //hasGig = checkIfSellerHasGig();
+  }
+
+  bool checkIfSellerHasGig() {
+    try {
+      final gig = widget.sellerDetails['sellerGig'];
+      if (gig == null || gig is! String || gig.trim().isEmpty) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch (e,stack) {
+      reportErrorToCrashlytics(
+        e, 
+        stack,
+        reason: 'sellerDetails error for user $currentUserUid'
+      );
+    }
+    return false;
   }
 
   @override
@@ -200,9 +220,28 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                   SizedBox(height: height * 0.007),
                                   
                                   showCityDistrict(sellerDetails: widget.sellerDetails),
-                                  
+
+                                  // check if user posted a gig
+                                  StreamBuilder<DocumentSnapshot>(
+                                    stream: FirebaseFirestore.instance.collection('Users').doc(widget.sellerUid).snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (!snapshot.hasData) return SizedBox();
+                                        final sellerDetailsMap = snapshot.data!.data() as Map<String, dynamic>;
+                                        final nestedSellerDetails = sellerDetailsMap['sellerDetails'] as Map<String, dynamic>?;
+                                        
+                                        final bool hasGig = nestedSellerDetails != null && nestedSellerDetails['sellerGig'] != null && (nestedSellerDetails['sellerGig'] as String).trim().isNotEmpty;
+                                        
+                                        return Column(
+                                          children: [
+                                            if (hasGig) SizedBox(height: height * 0.020),
+                                            if (hasGig) showGig(sellerDetails: nestedSellerDetails),
+                                            ],
+                                          );
+                                      },
+                                    ),
+
                                   SizedBox(height: height * 0.005),
-                                  
+
                                   SellerFields(
                                     selectedField: _selectedField ?? widget.sellerDetails['fields'][0],
                                     sellerDetails: widget.sellerDetails,
@@ -935,6 +974,61 @@ class showCityDistrict extends StatelessWidget {
     );
   }
 }
+
+class showGig extends StatefulWidget {
+  final Map<String, dynamic> sellerDetails;
+  const showGig({required this.sellerDetails, super.key});
+
+  @override
+  _ShowGigState createState() => _ShowGigState();
+}
+
+class _ShowGigState extends State<showGig> {
+  bool isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = widget.sellerDetails['sellerGig'] ?? '';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            text,
+            maxLines: isExpanded ? null : 2,
+            overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w200,
+              color: userorseller ? Colors.white : Colors.black,
+            ),
+            textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+          ),
+          if (text.length > 100) // optional: only show if text is long
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  isExpanded = !isExpanded;
+                });
+              },
+              child: Text(
+                isExpanded ? 'daha az' : 'daha fazla',
+                style: const TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
 class chooseCard extends StatelessWidget {
   final String field;
   final bool isSelected;
