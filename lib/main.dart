@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +42,8 @@ Future<void> initializeApp() async {
   OneSignal.initialize("de08ba6c-7f05-4304-90ac-a3c3c1f6b94d");
   await PushHelper.updateOneSignal();
 
+  //addKeepersToOneSignal();
+
   // firebase crashlytics
   FlutterError.onError = (errorDetails) {
     FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
@@ -64,6 +67,20 @@ Future<String?> getUserType() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getString('userType'); // Retrieve user type
 } 
+
+// void addKeepersToOneSignal() async{
+//   final user = await FirebaseAuth.instance.currentUser;
+//   final userDoc = await FirebaseFirestore.instance
+//     .collection('Users')
+//     .doc(user!.uid)
+//     .get();
+
+// if (userDoc.exists && userDoc.data()?['sellerDetails'] != null) {
+//   OneSignal.User.addTag("isKeeper", "true");
+// } else {
+//   OneSignal.User.addTag("isKeeper", "false");
+// }
+// }
 
 
 
