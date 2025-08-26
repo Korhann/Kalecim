@@ -4,7 +4,8 @@ Yapılacaklar
 - Kalecinin db sine kazanacağı tutar da girilsin (randevu da) +
 - Eğer iban kopyala yapışıtır yapılmış ise baştaki TR yi çıkar +
 - Para çekim için talep oluştur butonu, ödemeleri daha kolay takip edebilmek için -
-- Olduğun günün halısahaları 12 den sonra açık kalıyor (şuan saat 00:45 ve saatler açık pazar için)
+- Olduğun günün halısahaları 12 den sonra açık kalıyor (şuan saat 00:45 ve saatler açık pazar için) -
+- Uygulama ana sayfada boş bir grid gözüküyor -
 - Eklenen halısahalara göz at. -
 - Kalecilerin iban girmesi için ilan açanlara pushNotification gönderme. -
 
