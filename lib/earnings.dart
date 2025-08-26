@@ -16,6 +16,7 @@ class _EarningsPageState extends State<EarningsPage> {
 
   int balance = 0;
   num withDrawalBalance = 0;
+  bool withDrawRequest = false;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   String currentuser = FirebaseAuth.instance.currentUser!.uid;
 
@@ -81,8 +82,18 @@ class _EarningsPageState extends State<EarningsPage> {
             Center(
               child: ElevatedButton(
                 style: GlobalStyles.buttonPrimary(context),
-                onPressed: () async{
-                  await sendWithdrawalRequest();
+                onPressed: () async {
+                  if (balance > 0) {
+                    withDrawRequest = true;
+                    await sendWithdrawalRequest();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Çekim talebi için hesabınızda birikmiş bakiye olması gerekir !'),
+                        backgroundColor: Colors.red,
+                      )
+                    );
+                  }
                 },
                 child: GlobalStyles.textStyle(text: 'Çekim Talebi', context: context, size: 24, fontWeight: FontWeight.w600, color: Colors.white),
               ),
@@ -107,34 +118,69 @@ class _EarningsPageState extends State<EarningsPage> {
           final appointmentDetails = data['appointmentDetails'];
           if (appointmentDetails != null) {
             final sellerEarnings = appointmentDetails['sellerEarning'];
-            if (sellerEarnings is int || sellerEarnings is double || sellerEarnings is num) {
+            if (withDrawRequest == true && (sellerEarnings is int || sellerEarnings is double || sellerEarnings is num)) {
               withDrawalAmount += sellerEarnings;
-            }
+              await insertBalanceToSellersDb(withDrawalAmount);
+              await doc.reference.update({
+                'appointmentDetails.sellerEarning': 0
+              });
+            } 
           }
         }
-        await insertBalanceToSellersDb(withDrawalAmount);
+        withDrawRequest = false;
+        // appointment balances become 0 after the balance is inserted to seller db
+        // await resetAppointmentBalance();
 
     } catch (e, stack) {
       await reportErrorToCrashlytics(e, stack, reason: 'withdrawal request error');
     }
   }
 
-  Future<void> insertBalanceToSellersDb(final withDrawalAmount) async{
-    try {
-      DocumentReference <Map<String,dynamic>> insertBl = firestore.collection('Users').doc(currentuser);
-      DocumentSnapshot<Map<String,dynamic>> seller =  await firestore.collection('Users')
-      .doc(currentuser)
-      .get();
-      
-      if (seller.exists && seller.data()!.containsKey('sellerDetails')) {
-        await insertBl.update({'sellerDetails.sellerWithdrawal':withDrawalAmount});
-      } 
-      setState(() {});
+  // Future<void> resetAppointmentBalance() async {
+  //   try {
+  //     QuerySnapshot<Map<String,dynamic>> querySnapshot = await firestore.collection('Users')
+  //       .doc(currentuser)
+  //       .collection('appointmentseller')
+  //       .where('appointmentDetails.verificationState', isEqualTo: 'verified')
+  //       .get();
 
-    } catch (e,stack) {
-      await reportErrorToCrashlytics(e, stack,reason: 'seller withdrawal error for user $currentuser');
+  //       for (var doc in querySnapshot.docs) {
+  //         final data = doc.data();
+  //       }
+  //   } catch (e,stack) {
+  //     await reportErrorToCrashlytics(e, stack, reason: 'balance is not resetted $currentuser');
+  //   }
+  // }
+
+  Future<void> insertBalanceToSellersDb(final withDrawalAmount) async {
+  try {
+    DocumentReference<Map<String, dynamic>> insertBl = firestore.collection('Users').doc(currentuser);
+
+    DocumentSnapshot<Map<String, dynamic>> seller = await insertBl.get();
+
+    if (seller.exists && seller.data()!.containsKey('sellerDetails')) {
+      await insertBl.update({
+        'sellerDetails.sellerWithdrawal': FieldValue.increment(withDrawalAmount),
+      });
+    } else {
+      // if sellerDetails or field doesn't exist, initialize it
+      await insertBl.set({
+        'sellerDetails': {
+          'sellerWithdrawal': withDrawalAmount,
+        }
+      }, SetOptions(merge: true));
     }
+
+    // setState(() {});
+  } catch (e, stack) {
+    await reportErrorToCrashlytics(
+      e,
+      stack,
+      reason: 'seller withdrawal error for user $currentuser',
+    );
   }
+}
+
 
   
   Future<void> _getBalance() async {
@@ -150,7 +196,7 @@ class _EarningsPageState extends State<EarningsPage> {
         final data = doc.data();
         final appointmentDetails = data['appointmentDetails'];
         if (appointmentDetails != null) {
-          final price = appointmentDetails['price'];
+          final price = appointmentDetails['sellerEarning'];
           if (price is int || price is double) {
             total += price;
           } else if (price is String) {
