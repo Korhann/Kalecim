@@ -1,7 +1,7 @@
 Yapılacaklar
 
 - Kaleciler için açıklama özelliği. +
-- Kalecinin db sine kazanacağı tutar da girilsin (randevu da da) +
+- Kalecinin db sine kazanacağı tutar da girilsin (randevu da) +
 - Eğer iban kopyala yapışıtır yapılmış ise baştaki TR yi çıkar +
 - Para çekim için talep oluştur butonu, ödemeleri daha kolay takip edebilmek için -
 - Olduğun günün halısahaları 12 den sonra açık kalıyor (şuan saat 00:45 ve saatler açık pazar için)
@@ -9,5 +9,8 @@ Yapılacaklar
 - Kalecilerin iban girmesi için ilan açanlara pushNotification gönderme. -
 
 
-Kontrol edilecekler:
-- Randevu isteği düzgün çalışıyor mu -
+Para çekim talebi mantığı 
+- Kazançlarım sayfasında çekim talebi oluştur butonu
+- Butona basınca tüm sellerEarnings ler sıfırlanıyor ve fiyat bilgisi beklenen tutar kullanıcı bilgilerinde sellerWithdrawal olarak birikiyor
+- Eğer sellerEarnings lerin toplamı 0 ise butona basılmıyor
+- Kullanıcıya para gönderildikten sonra sellerWithdrawal sıfırlanıyor

@@ -31,6 +31,74 @@ class SellerIbanPageState extends State<SellerIbanPage> {
 
   final String _ibanPattern = r'^TR\d{2} \d{4} \d{4} \d{4} \d{4} \d{4} \d{2}$';
 
+  String currentUser = FirebaseAuth.instance.currentUser!.uid;
+  late String initialIbanNo = '';
+  late String initialName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    initData();
+  }
+
+  Future<void> initData() async {
+    final results = await Future.wait([
+      getInitialIbanNo(),
+      getInitialName()
+    ]);
+  }
+
+  Future<String> getInitialIbanNo() async {
+  try {
+    final doc = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(currentUser)
+      .get();
+
+    if (doc.exists) {
+      final data = doc.data();
+      final ibanDetails = data?['ibanDetails'];
+      if (ibanDetails != null && ibanDetails['ibanNo'] != null) {
+        initialIbanNo = ibanDetails['ibanNo'];
+        _ibanController.text = initialIbanNo;
+        return initialIbanNo;
+      }
+    }
+  } catch (e, stack) {
+    await reportErrorToCrashlytics(
+      e,
+      stack,
+      reason: 'selleraddpage getInitialName error for user $currentUser',
+    );
+  }
+  return '';
+}
+Future<String> getInitialName() async {
+  try {
+    final doc = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(currentUser)
+      .get();
+
+    if (doc.exists) {
+      final data = doc.data();
+      final ibanDetails = data?['ibanDetails'];
+      if (ibanDetails != null && ibanDetails['name'] != null) {
+        initialName = ibanDetails['name'];
+        _nameController.text = initialName;
+        return initialName;
+      }
+    }
+  } catch (e, stack) {
+    await reportErrorToCrashlytics(
+      e,
+      stack,
+      reason: 'selleraddpage getInitialName error for user $currentUser',
+    );
+  }
+  return '';
+}
+
 
   @override
   void dispose() {
