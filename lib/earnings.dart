@@ -17,18 +17,24 @@ class _EarningsPageState extends State<EarningsPage> {
   int balance = 0;
   num withDrawalBalance = 0;
   bool withDrawRequest = false;
+  
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   String currentuser = FirebaseAuth.instance.currentUser!.uid;
+
+  late Stream<num> getBalance;
+  late Stream<num> getWithdrawalbalance;
 
   @override
   void initState() {
     super.initState();
-    _getBalance();
-    _getWithDrawalbalance();
+    getBalance = _getBalance();
+    getWithdrawalbalance = _getWithDrawalbalance();
   }
 
   @override
-  Widget build(BuildContext context) {
+  
+  Widget build(
+  BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
     return Scaffold(
       appBar: AppBar(
@@ -61,17 +67,45 @@ class _EarningsPageState extends State<EarningsPage> {
                         padding: const EdgeInsets.only(left: 20, top: 20),
                         child: GlobalStyles.textStyle(text: 'Bakiye', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
                       ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(left: 20, top: 5),
+                      //   child: GlobalStyles.textStyle(text: '$balance TL', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
+                      // ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 20, top: 5),
-                        child: GlobalStyles.textStyle(text: '$balance TL', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
+                        padding: const EdgeInsets.only(left: 20,top: 20),
+                        child: StreamBuilder<num>(
+                          stream: getBalance,
+                          builder: (context,snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return SizedBox();
+                            } else {
+                              balance = snapshot.data!.toInt() ?? 0;
+                              return GlobalStyles.textStyle(text: '$balance TL', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white);
+                            }
+                          } 
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 20, top: 20),
                         child: GlobalStyles.textStyle(text: 'Çekim Taleplerim', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
                       ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(left: 20, top: 5),
+                      //   child: GlobalStyles.textStyle(text: '$withDrawalBalance TL', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
+                      // ),
                       Padding(
                         padding: const EdgeInsets.only(left: 20, top: 5),
-                        child: GlobalStyles.textStyle(text: '$withDrawalBalance TL', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
+                        child: StreamBuilder(
+                          stream: getWithdrawalbalance,
+                          builder: (context,snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return SizedBox();
+                            } else {
+                              withDrawalBalance = snapshot.data!.toInt() ?? 0;
+                              return GlobalStyles.textStyle(text: '$withDrawalBalance TL', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white);
+                            }
+                          } 
+                        ),
                       ),
                     ],
                   ),
@@ -182,53 +216,46 @@ class _EarningsPageState extends State<EarningsPage> {
 }
 
 
-  
-  Future<void> _getBalance() async {
-    try {
-      QuerySnapshot<Map<String,dynamic>> querySnapshot = await firestore.collection('Users')
-        .doc(currentuser)
-        .collection('appointmentseller')
-        .where('appointmentDetails.verificationState', isEqualTo: 'verified')
-        .get();
-
-      num total = 0;
-      for (var doc in querySnapshot.docs) {
-        final data = doc.data();
-        final appointmentDetails = data['appointmentDetails'];
-        if (appointmentDetails != null) {
-          final price = appointmentDetails['sellerEarning'];
-          if (price is int || price is double) {
-            total += price;
-          } else if (price is String) {
-            total += num.tryParse(price) ?? 0;
+  Stream<num> _getBalance() {
+  return firestore
+      .collection('Users')
+      .doc(currentuser)
+      .collection('appointmentseller')
+      .where('appointmentDetails.verificationState', isEqualTo: 'verified')
+      .snapshots()
+      .map((querySnapshot) {
+        num total = 0;
+        for (var doc in querySnapshot.docs) {
+          final data = doc.data();
+          final appointmentDetails = data['appointmentDetails'];
+          if (appointmentDetails != null) {
+            final price = appointmentDetails['sellerEarning'];
+            if (price is int || price is double) {
+              total += price;
+            } else if (price is String) {
+              total += num.tryParse(price) ?? 0;
+            }
           }
         }
-      }
-      setState(() {
-        balance = total.toInt();
+        return total;
       });
-    } catch (e, stack) {
-      await reportErrorToCrashlytics(
-        e,
-        stack,
-        reason: 'earnings _getBalance error',
-      );
-    }
-  }
-
-  Future<void> _getWithDrawalbalance() async{
-    try {
-      DocumentSnapshot<Map<String,dynamic>> sellerDetails =  await firestore.collection('Users')
+}
+  
+  Stream<num> _getWithDrawalbalance() {
+      return firestore.collection('Users')
       .doc(currentuser)
-      .get();
-      
-      if (sellerDetails.exists && sellerDetails.data()!.containsKey('sellerDetails')) {
-        withDrawalBalance = sellerDetails['sellerDetails.sellerWithdrawal'];
-      } 
-      setState(() {});
-
-    } catch (e,stack) {
-      await reportErrorToCrashlytics(e, stack,reason: 'seller withdrawal error for user $currentuser');
-    }
+      .snapshots()
+      .map((docSnapshot) {
+        if (docSnapshot.exists && docSnapshot.data()!.containsKey('sellerDetails')) {
+          final sellerDetails = docSnapshot.data()!['sellerDetails'];
+          final balance = sellerDetails['sellerWithdrawal'];
+          if (balance is int || balance is double) {
+            return balance as num;
+          } else if (balance is String) {
+            return num.tryParse(balance) ?? 0;
+          }
+        }
+        return 0;
+      });
   }
 }

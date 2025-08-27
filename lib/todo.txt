@@ -15,3 +15,8 @@ Para çekim talebi mantığı
 - Butona basınca tüm sellerEarnings ler sıfırlanıyor ve fiyat bilgisi beklenen tutar kullanıcı bilgilerinde sellerWithdrawal olarak birikiyor
 - Eğer sellerEarnings lerin toplamı 0 ise butona basılmıyor
 - Kullanıcıya para gönderildikten sonra sellerWithdrawal sıfırlanıyor
+
+
+earningspage
+- kontrol et -
+- yarın sakın ai toolu kullanma
