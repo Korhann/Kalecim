@@ -67,10 +67,6 @@ class _EarningsPageState extends State<EarningsPage> {
                         padding: const EdgeInsets.only(left: 20, top: 20),
                         child: GlobalStyles.textStyle(text: 'Bakiye', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(left: 20, top: 5),
-                      //   child: GlobalStyles.textStyle(text: '$balance TL', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
-                      // ),
                       Padding(
                         padding: const EdgeInsets.only(left: 20,top: 20),
                         child: StreamBuilder<num>(
@@ -89,10 +85,6 @@ class _EarningsPageState extends State<EarningsPage> {
                         padding: const EdgeInsets.only(left: 20, top: 20),
                         child: GlobalStyles.textStyle(text: 'Çekim Taleplerim', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(left: 20, top: 5),
-                      //   child: GlobalStyles.textStyle(text: '$withDrawalBalance TL', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
-                      // ),
                       Padding(
                         padding: const EdgeInsets.only(left: 20, top: 5),
                         child: StreamBuilder(
@@ -162,29 +154,10 @@ class _EarningsPageState extends State<EarningsPage> {
           }
         }
         withDrawRequest = false;
-        // appointment balances become 0 after the balance is inserted to seller db
-        // await resetAppointmentBalance();
-
     } catch (e, stack) {
       await reportErrorToCrashlytics(e, stack, reason: 'withdrawal request error');
     }
   }
-
-  // Future<void> resetAppointmentBalance() async {
-  //   try {
-  //     QuerySnapshot<Map<String,dynamic>> querySnapshot = await firestore.collection('Users')
-  //       .doc(currentuser)
-  //       .collection('appointmentseller')
-  //       .where('appointmentDetails.verificationState', isEqualTo: 'verified')
-  //       .get();
-
-  //       for (var doc in querySnapshot.docs) {
-  //         final data = doc.data();
-  //       }
-  //   } catch (e,stack) {
-  //     await reportErrorToCrashlytics(e, stack, reason: 'balance is not resetted $currentuser');
-  //   }
-  // }
 
   Future<void> insertBalanceToSellersDb(final withDrawalAmount) async {
   try {
