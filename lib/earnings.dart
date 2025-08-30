@@ -68,7 +68,7 @@ class _EarningsPageState extends State<EarningsPage> {
                         child: GlobalStyles.textStyle(text: 'Bakiye', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 20,top: 20),
+                        padding: const EdgeInsets.only(left: 20,top: 10),
                         child: StreamBuilder<num>(
                           stream: getBalance,
                           builder: (context,snapshot) {
@@ -86,7 +86,7 @@ class _EarningsPageState extends State<EarningsPage> {
                         child: GlobalStyles.textStyle(text: 'Çekim Taleplerim', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 20, top: 5),
+                        padding: const EdgeInsets.only(left: 20, top: 10),
                         child: StreamBuilder(
                           stream: getWithdrawalbalance,
                           builder: (context,snapshot) {

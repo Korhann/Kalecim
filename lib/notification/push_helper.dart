@@ -131,6 +131,7 @@ class PushHelper {
   static Future<void> updateOneSignal() async {
     Timer(const Duration(seconds: 5), () async {
       String? email = FirebaseAuth.instance.currentUser?.email;
+      print('email is $email');
       if (email != null) {
         await OneSignal.login(FirebaseAuth.instance.currentUser!.email!);
 

@@ -16,7 +16,6 @@ void main() async {
         name: 'KiralikKaleci',
         options: DefaultFirebaseOptions.currentPlatform,
     );
-    print('Firebase Project ID: ${Firebase.app().options.projectId}');
     }
   }
 
