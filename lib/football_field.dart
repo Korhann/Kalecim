@@ -697,7 +697,7 @@ class FootballField {
     FootballField(
       city: 'İstanbul',
       district: 'Beyoğlu',
-      fieldName: ['Beyoğlu Star Halı Saha','Fetih Spor Halı Saha']
+      fieldName: ['Beyoğlu Star Halı Saha','Fetih Spor Halı Saha','Hasköy Halı Saha']
     ),
     FootballField(
       city: 'İstanbul',
@@ -722,12 +722,12 @@ class FootballField {
     FootballField(
       city: 'İstanbul',
       district: 'Esenyurt',
-      fieldName: ['Gaziler Halı Saha','Esenyurt Allstar Halı Saha','Kıraç Euro Futbol Halı Saha','Gözde Halı Saha','Bizim Vadi Halı Saha','EFT Halı Saha','Kaya Halı Saha','Esenyurt Yeşi Vadi Halı Saha','Armada Halı Saha','Esenyurt Fabi Halı Saha','Debey Halı Saha']
+      fieldName: ['Gaziler Halı Saha','Esenyurt Allstar Halı Saha','Kıraç Euro Futbol Halı Saha','Gözde Halı Saha','Bizim Vadi Halı Saha','EFT Halı Saha','Kaya Halı Saha','Esenyurt Yeşi Vadi Halı Saha','Armada Halı Saha','Esenyurt Fabi Halı Saha','Debey Halı Saha','EFT Halı Saha']
     ),
     FootballField(
       city: 'İstanbul',
       district: 'Eyüpsultan',
-      fieldName: ['Rami Halı Saha','Eyüp Halı Saha','Akşemsettin SK Halı Saha','Eyüp Halı Saha','Alibeyköy Öztürkler Halı Saha','Pierre Loti Spor Tesisleri Halı Saha','Giresun Emeksan Spor Kulübü Halı Saha','Öz Alibeyköy Spor Kulübü Halı Saha','Alibeyköy Spor Kulübü Halı Saha']
+      fieldName: ['Rami Halı Saha','Eyüp Halı Saha','Akşemsettin SK Halı Saha','Eyüp Halı Saha','Alibeyköy Öztürkler Halı Saha','Pierre Loti Spor Tesisleri Halı Saha','Giresun Emeksan Spor Kulübü Halı Saha','Öz Alibeyköy Spor Kulübü Halı Saha','Alibeyköy Spor Kulübü Halı Saha','Güzeltepe Halı Saha']
     ),
     FootballField(
       city: 'İstanbul',
@@ -737,7 +737,7 @@ class FootballField {
     FootballField(
       city: 'İstanbul',
       district: 'Gaziosmanpaşa',
-      fieldName: ['Özkartal Arena Halı Saha','Beşyüzevler Halı Saha','Küçükköy EML Halı Saha','Validesuyu Halı Saha','Albayrak Halı Saha']
+      fieldName: ['Özkartal Arena Halı Saha','Beşyüzevler Halı Saha','Küçükköy EML Halı Saha','Validesuyu Halı Saha','Albayrak Halı Saha','Beşyüzevler Halı saha']  
     ),
     FootballField(
       city: 'İstanbul',
@@ -762,7 +762,7 @@ class FootballField {
     FootballField(
       city: 'İstanbul',
       district: 'Küçükçekmece',
-      fieldName: ['Dörtler Halı Saha','Futbol Center Halı Saha','Efor Halı Saha','İst.Atakent SK Halı Saha','Nihat Yüceur Spor Kompleksi Halı Saha','Birlik Halı Saha','Seçkin Marakana Halı Saha','Fevzi Çakmak Halı Saha','Seçkin Marakana 2 Halı Saha','Hayat Park Halı Saha','Kanarya Stadı Halı Saha','Metin Oktay Stadı','İfa Stadyumu']
+      fieldName: ['Dörtler Halı Saha','Futbol Center Halı Saha','Efor Halı Saha','İst.Atakent SK Halı Saha','Nihat Yüceur Spor Kompleksi Halı Saha','Birlik Halı Saha','Seçkin Marakana Halı Saha','Fevzi Çakmak Halı Saha','Seçkin Marakana 2 Halı Saha','Hayat Park Halı Saha','Kanarya Stadı Halı Saha','Metin Oktay Stadı','İfa Stadyumu','İkiTelli Halı Saha']
     ),
     FootballField(
       city: 'İstanbul',
@@ -802,7 +802,7 @@ class FootballField {
     FootballField(
       city: 'İstanbul',
       district: 'Sultanbeyli',
-      fieldName: ['Cihan Halı Saha','Merkez Arena Halı Saha','Alaz Spor Tesisi','Sultanbeyli Tellioğlu Halı Saha','Ülker Halı Saha','Sultanbeyli Yıldırım Halı Saha','Nur Center Halı Saha']
+      fieldName: ['Cihan Halı Saha','Merkez Arena Halı Saha','Alaz Spor Tesisi','Sultanbeyli Tellioğlu Halı Saha','Ülker Halı Saha','Sultanbeyli Yıldırım Halı Saha','Nur Center Halı Saha', 'Yılmazlar Halı Saha']
     ),
     FootballField(
       city: 'İstanbul',

@@ -76,10 +76,8 @@ void addKeepersToOneSignal() async{
     .get();
 
 if (userDoc.exists && userDoc.data()?['sellerDetails'] != null) {
-  print('is tag added');
   await OneSignal.User.addTagWithKey('isKeeper', 'true');
 } else {
-  print('tag not added');
   await OneSignal.User.addTagWithKey('isKeeper', 'false');
 }
 }

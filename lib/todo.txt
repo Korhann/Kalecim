@@ -4,4 +4,4 @@ Yapılacaklar
 - Olduğun günün halısahaları 12 den sonra açık kalıyor (şuan saat 00:45 ve saatler açık pazar için) -
 - Kalecilerin iban girmesi için ilan açanlara pushNotification gönderme. +(kontrol edilecek yinede)
 - production için crashlytics etkinleştirme +
-- Eklenen halısahalara göz at. -
+- Eklenen halısahalara göz at. +
