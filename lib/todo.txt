@@ -1,5 +1,6 @@
 Yapılacaklar
 
+- !!!!!yeni branch aç ve ios taki herşeyi yeni branch e yükle -
 - production için crashlytics etkinleştirme
 - Para çekim için talep oluştur butonu, ödemeleri daha kolay takip edebilmek için -
 - Olduğun günün halısahaları 12 den sonra açık kalıyor (şuan saat 00:45 ve saatler açık pazar için) -
