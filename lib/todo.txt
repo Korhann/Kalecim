@@ -1,7 +1,18 @@
 Yapılacaklar
 
-- selleraddpage ilan düzenle yapınca halı sahalar gözükmüyor ? (genelde çalışıyor)
-- Olduğun günün halısahaları 12 den sonra açık kalıyor (şuan saat 00:45 ve saatler açık pazar için) -
-- Kalecilerin iban girmesi için ilan açanlara pushNotification gönderme. +(kontrol edilecek yinede)
-- production için crashlytics etkinleştirme +
-- Eklenen halısahalara göz at. +
+- Pazartesi olunca haftasonu saatleri açık kalıyor - (ilanı verdiğin zaman ile alakalı olabilir)
+- Bazılarının çarşambadan itibaren, bazılarının cumadan sonra , bazılarının cumartesi pazar açık kalıyor sadece ve bu saat mantığı pazar geceden itibaren garip çalışıyor,
+haftaiçeleri bir sıkıntı yok
+- Saatleri pazar gece 3 gibi yenileyebilirsin, mantığını düşün -
+
+
+- Haftalık randevu silinince kaleci çekim talebi yapamadan oradaki parası gidiyor (ÖNEMLİ) + (test et saat 5 te yenileniyor)
+
+
+Mantık
+- Eğer çekim talebi butonuna basılmamışsa o hafta sellerEarning değeri yenilenmeyecek !!
+
+
+Değişiklikler
+- Kaleciler için açıklama özelliği getirildi
+- Randevu yenilenme saati değiştirildi

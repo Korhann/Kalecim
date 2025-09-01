@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:kiralik_kaleci/selleraddpage.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
@@ -144,20 +145,48 @@ class _EarningsPageState extends State<EarningsPage> {
           final appointmentDetails = data['appointmentDetails'];
           if (appointmentDetails != null) {
             final sellerEarnings = appointmentDetails['sellerEarning'];
+            // bunu yapmamın sebebi pazar günü kullanıcı bakiyesini çekmez ise randevu sıfırlanıyor, onu takip etmem lazım
+            await doc.reference.update({
+              'appointmentDetails.isWithdrawalButtonPressed':true
+            });
             if (withDrawRequest == true && (sellerEarnings is int || sellerEarnings is double || sellerEarnings is num)) {
               withDrawalAmount += sellerEarnings;
-              await insertBalanceToSellersDb(withDrawalAmount);
               await doc.reference.update({
                 'appointmentDetails.sellerEarning': 0
               });
             } 
           }
         }
+        if (withDrawalAmount > 0) {
+          await insertBalanceToSellersDb(withDrawalAmount);
+        }
         withDrawRequest = false;
     } catch (e, stack) {
       await reportErrorToCrashlytics(e, stack, reason: 'withdrawal request error');
     }
   }
+
+  // Future<void> changeButtonPressedbool() async {
+  //   try {
+  //     QuerySnapshot<Map<String,dynamic>> querySnapshot = await firestore.collection('Users')
+  //       .doc(currentuser)
+  //       .collection('appointmentseller')
+  //       .where('appointmentDetails.verificationState', isEqualTo: 'verified')
+  //       .get();
+
+  //       for (var doc in querySnapshot.docs) {
+  //         final data = doc.data();
+  //         final appointmentDetails = data['appointmentDetails'];
+  //         if (appointmentDetails != null) {
+  //           await doc.reference.update(
+  //             'appointmentD'
+  //           )
+  //         }
+  //       }
+  //   } catch (e,stack) {
+  //     await reportErrorToCrashlytics(e, stack, reason: 'earningspage button pressed error');
+  //   }
+  // }
 
   Future<void> insertBalanceToSellersDb(final withDrawalAmount) async {
   try {

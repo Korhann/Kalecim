@@ -401,6 +401,8 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
   }
   
   void dayChecker(int i, int currentDayIndex, final now, String startTime, String dayHourKey, String takenby, String day, String title, List<String> hourTitles, bool isNightHour, bool istaken, List<String> hours) {
+    print('i is $i');
+    print('current day index is $currentDayIndex');
     if (isNightHour) {
       // Mark as taken if istaken is true
       if (istaken) {

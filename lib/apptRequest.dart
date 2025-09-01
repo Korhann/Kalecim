@@ -400,7 +400,8 @@ class _ApptRequestState extends State<ApptRequest> {
     'endTime': endTime,
     'isPastDay': 'false',
     'status': 'pending',
-    'isSeen' : false
+    'isSeen' : false,
+    'isWithdrawalButtonPressed': false
   };
   
     // Add appointment details to Firestore to the seller account
