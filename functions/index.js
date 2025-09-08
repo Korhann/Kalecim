@@ -8,9 +8,9 @@ admin.initializeApp();
 
 setGlobalOptions({ region: 'europe-west2' });
 
-// Pazartesi öğlen 5-6 arası çalışıyor
+// Pazartesi gece 4 te çalışıyor
 exports.resetAppointments = onSchedule(
-  { schedule: 'every Monday 17:00', timeZone: 'Europe/Istanbul' },
+  { schedule: 'every Monday 04:00', timeZone: 'Europe/Istanbul' },
   async () => {
     try {
       const usersRef = admin.firestore().collection('Users');
@@ -51,9 +51,19 @@ exports.resetAppointments = onSchedule(
         });
 
         appointmentsSeller.forEach((doc) => {
-          batch.delete(doc.ref);
-          batchCounter++;
+          const data = doc.data();
+          const details = data.appointmentDetails;
+          // Only update if isWithdrawalButtonPressed is true
+          if (details && details.isWithdrawalButtonPressed === true) {
+            batch.delete(doc.ref);
+            batchCounter++;
+          } 
         });
+
+        // appointmentsSeller.forEach((doc) => {
+        //   batch.delete(doc.ref);
+        //   batchCounter++;
+        // });
 
         // Commit batch every 500 writes to avoid Firestore limits
         if (batchCounter >= 500) {

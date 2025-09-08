@@ -1,7 +1,7 @@
 name: kiralik_kaleci
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.0+11
+version: 1.0.0+14
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -10,72 +10,72 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.2
-  google_fonts: ^6.2.1
-  firebase_auth: ^5.3.4
-  firebase_core: ^3.13.1
-  google_sign_in: ^6.1.6
-  cloud_firestore: ^5.6.3
-  get: ^4.6.6
-  google_nav_bar: ^5.0.6
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.3.1
+  firebase_auth: ^6.0.1
+  firebase_core: ^4.0.0
+  google_sign_in: ^7.1.1
+  cloud_firestore: ^6.0.0
+  get: ^4.7.2
+  google_nav_bar: ^5.0.7
   line_icons: ^2.0.3
   persistent_bottom_nav_bar: ^6.2.1
-  bottom_navy_bar: ^6.0.0
-  toggle_switch: ^2.1.0
+  bottom_navy_bar: ^6.1.0
+  toggle_switch: ^2.3.0
   #flutter_credit_card: ^4.0.1
-  image_picker: ^1.0.7
+  image_picker: ^1.2.0
   another_carousel_pro: ^1.0.2
-  carousel_slider: ^5.0.0
-  dart_date: ^1.3.2
-  firebase_storage: ^12.3.7
-  dropdown_textfield: ^1.0.8
-  flutter_chat_ui: ^1.6.12
+  carousel_slider: ^5.1.1
+  dart_date: ^1.5.3
+  firebase_storage: ^13.0.0
+  dropdown_textfield: ^1.2.0
+  flutter_chat_ui: ^2.9.0
   district_picker_turkey_map: ^0.1.10
   intl: 0.20.2
-  shared_preferences: ^2.3.4
-  url_launcher: ^6.3.1
+  shared_preferences: ^2.5.3
+  url_launcher: ^6.3.2
   flutter_email_sender: ^7.0.0
-  path_provider: ^2.0.15
-  http: ^1.4.0
-  html: ^0.15.5
+  path_provider: ^2.1.5
+  http: ^1.5.0
+  html: ^0.15.6
   beautiful_soup_dart: ^0.3.0
   hive: ^2.2.3
   hive_generator: ^2.0.1
-  build_runner: ^2.4.14
+  build_runner: ^2.5.4
   hive_flutter: ^1.1.0
   flutter_background_service: ^5.1.0
-  socket_io_client: ^3.0.2
-  onesignal_flutter: ^5.2.9
+  socket_io_client: ^3.1.2
+  onesignal_flutter: ^5.3.4
   uuid: ^4.5.1 
-  device_preview: ^1.2.0
+  device_preview: ^1.3.1
   mockito: ^5.4.5
-  firebase_core_platform_interface: ^5.4.0
-  flutter_platform_widgets: ^8.0.0
+  firebase_core_platform_interface: ^6.0.0
+  flutter_platform_widgets: ^9.0.0
   quickalert: ^1.1.0
-  connectivity_plus: ^6.1.3
-  internet_connection_checker_plus: ^2.7.0
+  connectivity_plus: ^6.1.5
+  internet_connection_checker_plus: ^2.7.2
   flutter_image_compress: ^2.4.0
   cached_network_image: ^3.4.1
   internet_connection_checker: ^3.0.1
-  rename_app: ^1.6.2
+  rename_app: ^1.6.5
   shimmer: ^3.0.0
   flutter_keyboard_visibility: ^6.0.0
   banner_carousel: ^1.2.1
   rxdart: ^0.28.0
   flutter_screenutil: ^5.9.3
-  firebase_analytics: ^11.4.5
+  firebase_analytics: ^12.0.0
   "iyzipay": 0.0.1+15
   network_info_plus: ^6.1.4
-  firebase_ai: ^2.0.0
+  firebase_ai: ^3.1.0
   webview_flutter: ^4.13.0
-  firebase_crashlytics: ^4.3.6
+  firebase_crashlytics: ^5.0.0
   flutter_launcher_icons: ^0.14.4
 
   
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   #integration_test:
   # sdk: flutter
 

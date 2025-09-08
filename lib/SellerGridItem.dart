@@ -17,7 +17,8 @@ class SellerGridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var fullName = sellerDetails['sellerFullName'] ?? "Bilinmeyen";
-    var imageUrl = sellerDetails['imageUrls'][0] ?? "";
+    var imageUrls = sellerDetails['imageUrls'] as List<dynamic>? ?? [];
+    var imageUrl = imageUrls.isNotEmpty ? imageUrls[0] : "";
     var city = sellerDetails['city'] ?? "";
     var district = sellerDetails['district'] ?? "";
 

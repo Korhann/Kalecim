@@ -1001,7 +1001,7 @@ class _ShowGigState extends State<showGig> {
             overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
             style: GoogleFonts.inter(
               fontSize: 14,
-              fontWeight: FontWeight.w200,
+              fontWeight: FontWeight.w300,
               color: userorseller ? Colors.white : Colors.black,
             ),
             textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),

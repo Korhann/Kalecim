@@ -1,6 +1,5 @@
-import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:kiralik_kaleci/firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,6 +17,8 @@ void main() async {
         name: 'KiralikKaleci-dev',
         options: DefaultFirebaseOptions.currentPlatform,
     );
+    // debug modunda crash test etmek için
+    await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
     }
   }
 

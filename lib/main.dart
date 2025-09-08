@@ -42,7 +42,7 @@ Future<void> initializeApp() async {
   OneSignal.initialize("de08ba6c-7f05-4304-90ac-a3c3c1f6b94d");
   await PushHelper.updateOneSignal();
 
-  //addKeepersToOneSignal();
+  addKeepersToOneSignal();
 
   // firebase crashlytics
   FlutterError.onError = (errorDetails) {
@@ -68,19 +68,19 @@ Future<String?> getUserType() async {
   return prefs.getString('userType'); // Retrieve user type
 } 
 
-// void addKeepersToOneSignal() async{
-//   final user = await FirebaseAuth.instance.currentUser;
-//   final userDoc = await FirebaseFirestore.instance
-//     .collection('Users')
-//     .doc(user!.uid)
-//     .get();
+void addKeepersToOneSignal() async{
+  final user = await FirebaseAuth.instance.currentUser;
+  final userDoc = await FirebaseFirestore.instance
+    .collection('Users')
+    .doc(user!.uid)
+    .get();
 
-// if (userDoc.exists && userDoc.data()?['sellerDetails'] != null) {
-//   OneSignal.User.addTag("isKeeper", "true");
-// } else {
-//   OneSignal.User.addTag("isKeeper", "false");
-// }
-// }
+if (userDoc.exists && userDoc.data()?['sellerDetails'] != null) {
+  await OneSignal.User.addTagWithKey('isKeeper', 'true');
+} else {
+  await OneSignal.User.addTagWithKey('isKeeper', 'false');
+}
+}
 
 
 

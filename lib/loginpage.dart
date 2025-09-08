@@ -68,7 +68,7 @@ class _LogInState extends State<LogIn> {
   bool _invalidcred = false;
 
   // Initialize google
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  // final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   bool _obsecureText = true;
 
@@ -106,23 +106,23 @@ class _LogInState extends State<LogIn> {
     }
   }
 
-  Future<UserCredential?> signInWithGoogle() async {
-    try {
-      final FirebaseAuth _auth = FirebaseAuth.instance;
-      final GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
-      final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount!.authentication;
+  // Future<UserCredential?> signInWithGoogle() async {
+  //   try {
+  //     final FirebaseAuth _auth = FirebaseAuth.instance;
+  //     final GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
+  //     final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount!.authentication;
 
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleSignInAuthentication.accessToken,
-        idToken: googleSignInAuthentication.idToken,
-      );
+  //     final AuthCredential credential = GoogleAuthProvider.credential(
+  //       accessToken: googleSignInAuthentication.accessToken,
+  //       idToken: googleSignInAuthentication.idToken,
+  //     );
 
-      return await _auth.signInWithCredential(credential);
-    } catch (e, stack) {
-      await reportErrorToCrashlytics(e, stack, reason: 'Google sign in failed');
-    }
-    return null;
-  }
+  //     return await _auth.signInWithCredential(credential);
+  //   } catch (e, stack) {
+  //     await reportErrorToCrashlytics(e, stack, reason: 'Google sign in failed');
+  //   }
+  //   return null;
+  // }
 
   void forgetPassword() {
     Navigator.push(

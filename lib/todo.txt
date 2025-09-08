@@ -1,16 +1,18 @@
 Yapılacaklar
 
-- Kaleciler için açıklama özelliği. +
-- Kalecinin db sine kazanacağı tutar da girilsin (randevu da) +
-- Eğer iban kopyala yapışıtır yapılmış ise baştaki TR yi çıkar +
-- Para çekim için talep oluştur butonu, ödemeleri daha kolay takip edebilmek için -
-- Olduğun günün halısahaları 12 den sonra açık kalıyor (şuan saat 00:45 ve saatler açık pazar için)
-- Eklenen halısahalara göz at. -
-- Kalecilerin iban girmesi için ilan açanlara pushNotification gönderme. -
+- Pazartesi olunca haftasonu saatleri açık kalıyor - (ilanı verdiğin zaman ile alakalı olabilir)
+- Bazılarının çarşambadan itibaren, bazılarının cumadan sonra , bazılarının cumartesi pazar açık kalıyor sadece ve bu saat mantığı pazar geceden itibaren garip çalışıyor,
+haftaiçeleri bir sıkıntı yok
+- Saatleri pazar gece 3 gibi yenileyebilirsin, mantığını düşün -
 
 
-Para çekim talebi mantığı 
-- Kazançlarım sayfasında çekim talebi oluştur butonu
-- Butona basınca tüm sellerEarnings ler sıfırlanıyor ve fiyat bilgisi beklenen tutar kullanıcı bilgilerinde sellerWithdrawal olarak birikiyor
-- Eğer sellerEarnings lerin toplamı 0 ise butona basılmıyor
-- Kullanıcıya para gönderildikten sonra sellerWithdrawal sıfırlanıyor
+- Haftalık randevu silinince kaleci çekim talebi yapamadan oradaki parası gidiyor (ÖNEMLİ) + (test et saat 5 te yenileniyor)
+
+
+Mantık
+- Eğer çekim talebi butonuna basılmamışsa o hafta sellerEarning değeri yenilenmeyecek !!
+
+
+Değişiklikler
+- Kaleciler için açıklama özelliği getirildi
+- Randevu yenilenme saati değiştirildi

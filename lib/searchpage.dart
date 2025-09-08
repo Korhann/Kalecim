@@ -443,11 +443,11 @@ class _SellerGrid extends StatelessWidget {
           itemBuilder: (context, index) {
             var sellerDetails = docs[index]['sellerDetails'];
             var sellerUid = docs[index].id;
-        
             return SellerGridItem(
               sellerDetails: sellerDetails,
               sellerUid: sellerUid,
               onTap: (uid) => onCardTap(context, sellerDetails, uid),
+              // onTap: (uid) => print('uid of the seller is $uid'),
             );
           },
         );
