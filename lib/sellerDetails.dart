@@ -401,8 +401,6 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
   }
   
   void dayChecker(int i, int currentDayIndex, final now, String startTime, String dayHourKey, String takenby, String day, String title, List<String> hourTitles, bool isNightHour, bool istaken, List<String> hours) {
-    print('i is $i');
-    print('current day index is $currentDayIndex');
     if (isNightHour) {
       // Mark as taken if istaken is true
       if (istaken) {
@@ -1003,7 +1001,7 @@ class _ShowGigState extends State<showGig> {
             overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
             style: GoogleFonts.inter(
               fontSize: 14,
-              fontWeight: FontWeight.w200,
+              fontWeight: FontWeight.w300,
               color: userorseller ? Colors.white : Colors.black,
             ),
             textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),

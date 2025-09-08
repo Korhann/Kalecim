@@ -144,10 +144,14 @@ class _SellerAddPageState extends State<SellerAddPage> {
     getInitialDistrict(),
     getInitialFields(),
     getInitialDayHours(),
-    getInitialGig()
+    getInitialGig(),
+    getInitialImages(),
   ]);
 
   districtFromDb = results[3] as String;
+  final List<String> initialImageUrls = results[7] as List<String>;
+  imageFileList = initialImageUrls.map((url) => XFile(url)).toList();
+  
   setState(() {
     selectedDistrict = districtFromDb;
     isLoading = false;
@@ -239,7 +243,9 @@ class _SellerAddPageState extends State<SellerAddPage> {
                     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
                     if (image != null) {
                       setState(() {
-                        imageFileList.add(image);
+                        imageFileList
+                        ..clear()
+                        ..add(image);
                       });
                     }
                   },
@@ -837,23 +843,29 @@ class _SellerAddPageState extends State<SellerAddPage> {
   List<String> imageUrls = [];
   if (imageFileList.isNotEmpty) {
     for (XFile imageFile in imageFileList) {
-      try {
-        File file = File(imageFile.path);
-        String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-        Reference ref = FirebaseStorage.instance.ref().child('images/$fileName.jpg');
-        UploadTask uploadTask = ref.putFile(file);
-        TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
-        String imageUrl = await taskSnapshot.ref.getDownloadURL();
-        imageUrls.add(imageUrl);
-      } catch (e, stack) {
-        await reportErrorToCrashlytics(
-          e,
-          stack,
-          reason: 'selleraddpage _uploadImagesToStorage error',
-        );
+      if (imageFile.path.startsWith('http')) {
+        // Already uploaded image, just add the URL
+        imageUrls.add(imageFile.path);
+      } else {
+        try {
+          File file = File(imageFile.path);
+          String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+          Reference ref = FirebaseStorage.instance.ref().child('images/$fileName.jpg');
+          UploadTask uploadTask = ref.putFile(file);
+          TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
+          String imageUrl = await taskSnapshot.ref.getDownloadURL();
+          imageUrls.add(imageUrl);
+        } catch (e, stack) {
+          await reportErrorToCrashlytics(
+            e,
+            stack,
+            reason: 'selleraddpage _uploadImagesToStorage error',
+          );
+        }
       }
     }
   } else {
+    // No images selected, use default image
     imageUrls.add(defaultImageUrl);
   }
   return imageUrls;
@@ -875,6 +887,30 @@ class _SellerAddPageState extends State<SellerAddPage> {
       rethrow;
     }
   }
+
+  Future<List<String>> getInitialImages() async {
+  try {
+    final doc = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(currentUser)
+        .get();
+
+    if (doc.exists) {
+      final data = doc.data();
+      final sellerDetails = data?['sellerDetails'];
+      if (sellerDetails != null && sellerDetails['imageUrls'] != null) {
+        return List<String>.from(sellerDetails['imageUrls']);
+      }
+    }
+  } catch (e, stack) {
+    await reportErrorToCrashlytics(
+      e,
+      stack,
+      reason: 'selleraddpage getInitialImages error for user $currentUser',
+    );
+  }
+  return [];
+}
 
   Future<String> getInitialName() async {
   try {
@@ -1232,6 +1268,7 @@ class _PickImageGalleryState extends State<PickImageGallery> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1328,10 +1365,9 @@ class _PickImageGalleryState extends State<PickImageGallery> {
                                 },
                               );
                             },
-                            child: Image.file(
-                              File(widget.imageFileList[index].path),
-                              fit: BoxFit.fitHeight,
-                            ),
+                            child: widget.imageFileList[index].path.startsWith('http')
+                            ? Image.network(widget.imageFileList[index].path, fit: BoxFit.fitHeight)
+                            : Image.file(File(widget.imageFileList[index].path), fit: BoxFit.fitHeight),
                           ),
                         ),
                         Positioned(
