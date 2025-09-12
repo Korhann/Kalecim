@@ -472,72 +472,119 @@ class BeSellerOrUser extends StatefulWidget {
 class _BeSellerOrUserState extends State<BeSellerOrUser> {
   @override
   Widget build(BuildContext context) {
+    final double toggleWidth = MediaQuery.of(context).size.width * 0.25;
+    final double badgeSize = 18;
+
     return Container(
-                color: Colors.white,
-                height: MediaQuery.sizeOf(context).height * 0.070,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Kaleci Ol",
-                        style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.w500,),
-                        textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
-                      ),
-                      ToggleSwitch(
-                        minHeight: MediaQuery.sizeOf(context).height * 0.045,
-                        minWidth:  MediaQuery.of(context).size.width * 0.25,
-                        cornerRadius: 20.0,
-                        activeBgColors: [
-                          [Colors.green[800]!],
-                          [Colors.red[800]!]
-                        ],
-                        activeFgColor: Colors.white,
-                        inactiveBgColor: Colors.grey,
-                        inactiveFgColor: Colors.white,
-                        initialLabelIndex: 0,
-                        totalSwitches: 2,
-                        labels: const ['Kullanıcı', 'Kaleci'],
-                        radiusStyle: true,
-                        onToggle: (index) async{
-                          // case 0 aynı sayfada kalacak case 1 satıcı sayfasına geçecek
-                          switch (index) {
-                            // aynı sayfada kal
-                            case 0:
-                              return;
-                            // satıcı sayfasına geç
-                            case 1:
-                              try {
-                      if (await InternetConnection().hasInternetAccess) {
-                        userorseller = true;
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SellerMainPage(index: 2,)
-                          )
-                        );
-                        break;
-                      } else {
-                        Showalert(context: context, text: 'Ooops...').showErrorAlert();
-                        setState(() {
-                          index = 0;
-                        });
-                      }
-                    } catch (e, stack) {
-                      await reportErrorToCrashlytics(
-                        e,
-                        stack,
-                        reason: 'profilepage BeSellerOrUser onToggle error',
-                      );
-                    }
+      color: Colors.white,
+      height: MediaQuery.sizeOf(context).height * 0.070,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Kaleci Ol",
+              style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.w500,),
+              textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+            ),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                ToggleSwitch(
+                  minHeight: MediaQuery.sizeOf(context).height * 0.045,
+                  minWidth: toggleWidth,
+                  cornerRadius: 20.0,
+                  activeBgColors: [
+                    [Colors.green[800]!],
+                    [Colors.red[800]!]
+                  ],
+                  activeFgColor: Colors.white,
+                  inactiveBgColor: Colors.grey,
+                  inactiveFgColor: Colors.white,
+                  initialLabelIndex: 0,
+                  totalSwitches: 2,
+                  labels: const ['Kullanıcı', 'Kaleci'],
+                  radiusStyle: true,
+                  onToggle: (index) async {
+                    switch (index) {
+                      case 0:
+                        return;
+                      case 1:
+                        try {
+                          if (await InternetConnection().hasInternetAccess) {
+                            userorseller = true;
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SellerMainPage(index: 2,)
+                              )
+                            );
+                            break;
+                          } else {
+                            Showalert(context: context, text: 'Ooops...').showErrorAlert();
+                            setState(() {
+                              index = 0;
+                            });
                           }
-                        },
-                      ),
-                    ],
+                        } catch (e, stack) {
+                          await reportErrorToCrashlytics(
+                            e,
+                            stack,
+                            reason: 'profilepage BeSellerOrUser onToggle error',
+                          );
+                        }
+                    }
+                  },
+                ),
+                // Badge overlay for "Kaleci"
+                Positioned(
+                  // Position the badge at the top right of the "Kaleci" label
+                  right: 6, 
+                  top: -8,
+                  child: StreamBuilder<int>(
+                    stream: getUnreadCount(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData || snapshot.data == 0) return const SizedBox();
+                      return Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: BoxConstraints(
+                          minWidth: badgeSize,
+                          minHeight: badgeSize,
+                        ),
+                        child: Text(
+                          '${snapshot.data}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    },
                   ),
                 ),
-              );
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  Stream<int> getUnreadCount() {
+    final String currentUser = FirebaseAuth.instance.currentUser!.uid;
+    return FirebaseFirestore.instance
+        .collection('Users')
+        .doc(currentUser)
+        .collection('appointmentseller')
+        .where('appointmentDetails.status', isEqualTo: 'pending')
+        .where('appointmentDetails.isSeen', isEqualTo: false)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
   }
 }
 

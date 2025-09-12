@@ -172,7 +172,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   if (hourTaken == false && isPast == false) {
                     // if the payment is succesfull
                     bool isSuccess = await _processPayment();
-                    await sendNotificationToSeller();
+                    // await sendNotificationToSeller();
                     if (isSuccess) {
                       await _markHourTaken();
                       await Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
@@ -407,6 +407,7 @@ Future<bool> waitForPaymentStatus(String docId) async {
       .update({
         'appointmentDetails.paymentStatus' : 'done'
       });
+      await sendNotificationToSeller();
       return true;
     } catch (e) {
       print('Error updating payment status $e');

@@ -331,7 +331,8 @@ class _ApptRequestState extends State<ApptRequest> {
       final snapshot = await _firestore.collection('Users').doc(widget.sellerUid).get();
       if (snapshot.exists) {
         final sellerData = snapshot.data();
-        sellerFullName = await sellerData!['fullName'];
+        final sellerDetails = sellerData!['sellerDetails'] as Map<String,dynamic>;
+        sellerFullName = sellerDetails['sellerFullName'] ?? '';
       }
 
       Map<String,dynamic> appointmentDetails = {

@@ -1,18 +1,9 @@
 Yapılacaklar
 
-- Pazartesi olunca haftasonu saatleri açık kalıyor - (ilanı verdiğin zaman ile alakalı olabilir)
-- Bazılarının çarşambadan itibaren, bazılarının cumadan sonra , bazılarının cumartesi pazar açık kalıyor sadece ve bu saat mantığı pazar geceden itibaren garip çalışıyor,
-haftaiçeleri bir sıkıntı yok
-- Saatleri pazar gece 3 gibi yenileyebilirsin, mantığını düşün -
-
-
-- Haftalık randevu silinince kaleci çekim talebi yapamadan oradaki parası gidiyor (ÖNEMLİ) + (test et saat 5 te yenileniyor)
-
-
-Mantık
-- Eğer çekim talebi butonuna basılmamışsa o hafta sellerEarning değeri yenilenmeyecek !!
-
-
-Değişiklikler
-- Kaleciler için açıklama özelliği getirildi
-- Randevu yenilenme saati değiştirildi
+- Hücresel veri ile ödeme yapamıyor bazı telefonlar !
+- Satıcıya randevu bildirimi gelince, bildirime tıkladıktan sonra direkt satıcı randevu sayfasına yönlendir +
+- Satıcı randevu bildirimini satıcı profil sayfasında bir bildirim olarak göster +
+- ödeme başarılı değilken bile başarılı bildirimi gönderiliyor +
+- şifre yenileme çalışmıyor (kendi domainimi bağlıyorum) -
+- ApptRequest de kullanıcı adı yerine sellerDetails daki adı gönder +(kontrol et)
+- sellerDetails da ilk olan halısahayı seçili yap -

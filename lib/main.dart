@@ -70,9 +70,10 @@ Future<String?> getUserType() async {
 
 void addKeepersToOneSignal() async{
   final user = await FirebaseAuth.instance.currentUser;
-  final userDoc = await FirebaseFirestore.instance
+  if (user != null) {
+    final userDoc = await FirebaseFirestore.instance
     .collection('Users')
-    .doc(user!.uid)
+    .doc(user.uid)
     .get();
 
 if (userDoc.exists && userDoc.data()?['sellerDetails'] != null) {
@@ -80,6 +81,7 @@ if (userDoc.exists && userDoc.data()?['sellerDetails'] != null) {
 } else {
   await OneSignal.User.addTagWithKey('isKeeper', 'false');
 }
+  }
 }
 
 

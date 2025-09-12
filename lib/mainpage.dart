@@ -121,17 +121,48 @@ Widget build(BuildContext context) {
                 ),
               ),
               BottomNavyBarItem(
-                icon: const Icon(
-                  Icons.person,
-                  color: Colors.black,
-                ),
-                title:  Text(
-                  'Profil',
-                  style: GoogleFonts.inter(
-                    color: Colors.black
-                  ),
-                ),
+  icon: Stack(
+    children: [
+      const Icon(
+        Icons.person,
+        color: Colors.black,
+      ),
+      // Add the badge using StreamBuilder
+      StreamBuilder<int>(
+        stream: getSellerUnreadCount(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData || snapshot.data == 0) return const SizedBox();
+          return Positioned(
+            right: 0,
+            top: -5,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
               ),
+              constraints: const BoxConstraints(minWidth: 10, minHeight: 10),
+              child: Text(
+                '${snapshot.data}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        },
+      ),
+    ],
+  ),
+  title: Text(
+    'Profil',
+    style: GoogleFonts.inter(
+      color: Colors.black,
+    ),
+  ),
+),
             ],
           ),
         );
@@ -192,5 +223,17 @@ Widget build(BuildContext context) {
     await reportErrorToCrashlytics(e, stack, reason: 'Message counter failed');
   }
 }
+
+Stream<int> getSellerUnreadCount() {
+    final String currentUser = FirebaseAuth.instance.currentUser!.uid;
+    return FirebaseFirestore.instance
+        .collection('Users')
+        .doc(currentUser)
+        .collection('appointmentseller')
+        .where('appointmentDetails.status', isEqualTo: 'pending')
+        .where('appointmentDetails.isSeen', isEqualTo: false)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
+  }
 
 }
