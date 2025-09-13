@@ -172,7 +172,6 @@ class _PaymentPageState extends State<PaymentPage> {
                   if (hourTaken == false && isPast == false) {
                     // if the payment is succesfull
                     bool isSuccess = await _processPayment();
-                    // await sendNotificationToSeller();
                     if (isSuccess) {
                       await _markHourTaken();
                       await Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();

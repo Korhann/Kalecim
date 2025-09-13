@@ -242,6 +242,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
 
                                   SizedBox(height: height * 0.005),
 
+                                  // burada kullanıcı saha seçmemiş ise ilk sahayı ata
                                   SellerFields(
                                     selectedField: _selectedField ?? widget.sellerDetails['fields'][0],
                                     sellerDetails: widget.sellerDetails,
@@ -1393,7 +1394,7 @@ class PaymentButton extends StatelessWidget {
                           if (selectedDay == null || selectedHour == null || selectedField == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Saat, gün ve saha seçiniz'),
+                                content: Text('Saat veya saha seçiniz'),
                                 backgroundColor: Colors.red,
                               )
                             );
