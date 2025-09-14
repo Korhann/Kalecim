@@ -43,7 +43,7 @@ class PushHelper {
       String? notificationToken = userData['notificationToken'];
       if (notificationToken != null) {
         sendPush(
-          text: 'Ödeme yapınız',
+          text: 'Kalecin maçı onayladı! Ödeme yapmanı bekliyor!',
           id: notificationToken,
           data :{
             'page': 'payment',

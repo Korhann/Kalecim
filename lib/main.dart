@@ -148,7 +148,6 @@ void setupNotificationListener() {
 
     if (page != null) {
       BuildContext? context = MyApp.navigatorKey.currentContext;
-
       if (context != null) {
         switch (page) {
           case "payment":
@@ -179,6 +178,7 @@ void setupNotificationListener() {
             break;
           case "appointment":
             if (ModalRoute.of(context)?.settings.name != "/appointmentsPage") {
+              print('in this page rn');
               // alıcı sayfasında çağırınca alıcı olarak algılıyor
               userorseller = true;
               Navigator.push(

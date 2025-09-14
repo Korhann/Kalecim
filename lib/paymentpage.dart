@@ -167,8 +167,12 @@ class _PaymentPageState extends State<PaymentPage> {
                 onPressed: () async {
                   bool phoneError = await checkPhoneNo();
                   await checkIfDayPast();
-                  bool? hourTaken = await checkIfHourTaken();
-                  bool isPast = await checkIfHourPast();
+                  final results = await Future.wait([
+                    checkIfHourTaken(),
+                    checkIfHourPast(),
+                  ]);
+                  bool? hourTaken = results[0];
+                  bool isPast = results[1];
                   if (hourTaken == false && isPast == false) {
                     // if the payment is succesfull
                     bool isSuccess = await _processPayment();

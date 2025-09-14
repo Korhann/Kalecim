@@ -1,7 +1,7 @@
 Yapılacaklar
 
 - Hücresel veri ile ödeme yapamıyor bazı telefonlar !
-- Satıcıya randevu bildirimi gelince, bildirime tıkladıktan sonra direkt satıcı randevu sayfasına yönlendir +
+- Satıcıya randevu bildirimi gelince, bildirime tıkladıktan sonra direkt satıcı randevu sayfasına yönlendir -
 - Satıcı randevu bildirimini satıcı profil sayfasında bir bildirim olarak göster +
 - ödeme başarılı değilken bile başarılı bildirimi gönderiliyor +
 - şifre yenileme çalışmıyor (kendi domainimi bağlıyorum) -

@@ -773,11 +773,12 @@ class CheckDaysPastSeller {
 
     bool shouldMarkAsPast = false;
 
-    if (inputDayIndex < currentDayIndex) {
-      final isPastHour = isStartTimePast(now,startTime,nightHours);
-      if (isPastHour) {
-        shouldMarkAsPast = true;
-      }
+    if (inputDayIndex < currentDayIndex && !nightHours) {
+      // final isPastHour = isStartTimePast(now,startTime,nightHours);
+      // if (isPastHour) {
+      //   shouldMarkAsPast = true;
+      // }
+      shouldMarkAsPast = true;
       // burada aynı gün sadece saatlere bakıp geçmiş mi diye anlıyor
     } else if (inputDayIndex == currentDayIndex && !nightHours) {
       final isPastHour = isStartTimePast(now,startTime, nightHours);
@@ -851,11 +852,12 @@ class CheckDaysPastUser {
 
     bool shouldMarkAsPast = false;
 
-    if (inputDayIndex < currentDayIndex) {
-      final isPastHour = isStartTimePast(now,startTime,nightHours);
-      if (isPastHour) {
-        shouldMarkAsPast = true;
-      }
+    if (inputDayIndex < currentDayIndex && !nightHours) {
+      // final isPastHour = isStartTimePast(now,startTime,nightHours);
+      // if (isPastHour) {
+      //   shouldMarkAsPast = true;
+      // }
+      shouldMarkAsPast = true;
     } else if (inputDayIndex == currentDayIndex && !nightHours) {
       final isPastHour = isStartTimePast(now,startTime,nightHours);
       if (isPastHour) {
