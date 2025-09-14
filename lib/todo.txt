@@ -6,4 +6,4 @@ Yapılacaklar
 - ödeme başarılı değilken bile başarılı bildirimi gönderiliyor +
 - şifre yenileme çalışmıyor (kendi domainimi bağlıyorum) -
 - ApptRequest de kullanıcı adı yerine sellerDetails deki adı gönder +(kontrol et)
-- sellerDetails da ilk olan halısahayı seçili yap -
+- sellerDetails da ilk olan halısahayı seçili yap +
