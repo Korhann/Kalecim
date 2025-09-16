@@ -414,12 +414,33 @@ class _ApptRequestState extends State<ApptRequest> {
         'appointmentDetails': appointmentDetails,
       });
   
-    await _firestore
-    .collection('Users')
-    .doc(currentuser)
-    .collection('appointmentbuyer')
-    .doc(buyerDocId)
-    .update({'appointmentDetails.sellerDocId' : sellerDocRef.id});
+    if (buyerDocId.isNotEmpty) {
+      try {
+        await _firestore
+          .collection('Users')
+          .doc(currentuser)
+          .collection('appointmentbuyer')
+          .doc(buyerDocId)
+            .set({
+              'appointmentDetails': {
+                'sellerDocId': sellerDocRef.id
+              }
+            }, SetOptions(merge: true));
+      } catch (e, stack) {
+        await reportErrorToCrashlytics(
+          e,
+          stack,
+          reason: 'apptRequest: Failed to set sellerDocId for buyerDocId: $buyerDocId',
+        );
+      }
+    } else {
+      await reportErrorToCrashlytics(
+        Exception("buyerDocId is empty, cannot update appointmentbuyer document."),
+        StackTrace.current,
+        reason: 'apptRequest: buyerDocId empty after appointmentBuyer',
+      );
+    }
+
   } catch (e,stack) {
     await reportErrorToCrashlytics(
       e,

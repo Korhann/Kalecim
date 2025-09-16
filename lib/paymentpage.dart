@@ -62,6 +62,7 @@ class _PaymentPageState extends State<PaymentPage> {
     // TODO: implement initState
     super.initState();
     getPaymentInformation();
+    final String? buyerUid = widget.buyerUid ?? FirebaseAuth.instance.currentUser?.uid;
   }
 
   @override
@@ -176,6 +177,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   if (hourTaken == false && isPast == false) {
                     // if the payment is succesfull
                     bool isSuccess = await _processPayment();
+                    print('issuccess is $isSuccess');
                     if (isSuccess) {
                       await _markHourTaken();
                       await Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
@@ -189,11 +191,15 @@ class _PaymentPageState extends State<PaymentPage> {
                       }
                       // if the payment is declined
                     } else {
-                      if (phoneError == false) {
-                        if (mounted) {
+                      // if (phoneError == false) {
+                      //   if (mounted) {
+                      //     print('here for error');
+                      //     await Showalert(context: context, text: 'Ooopps...').showErrorAlert();
+                      //   }
+                      // }
+                      if (mounted) {
                           await Showalert(context: context, text: 'Ooopps...').showErrorAlert();
                         }
-                      }
                     }
                   } else {
                     if (hourTaken && isPast == false) {
@@ -327,6 +333,16 @@ class _PaymentPageState extends State<PaymentPage> {
     setState(() {
       isPaymentLoading = true;
     });
+    // print(buyerName);
+    // print(buyerLastName);
+    // print(buyerEmail);
+    // print(buyerPhoneNo);
+    // print(buyerPrice.toString());
+    // print(buyerIpNo);
+    // print(widget.sellerUid);
+    // print(widget.buyerUid);
+    // print(widget.sellerDocId);
+    // print(widget.buyerDocId);
     final response = await http.post(
       Uri.parse('https://europe-west2-kiralikkaleci-21f26.cloudfunctions.net/api/checkout-form'),
       headers: {'Content-Type': 'application/json'},
@@ -343,6 +359,7 @@ class _PaymentPageState extends State<PaymentPage> {
         'buyerDocId': widget.buyerDocId, 
       }),
     );
+    print(response.statusCode);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final paymentPageUrl = data['paymentPageUrl'];
@@ -582,7 +599,7 @@ Future<bool> waitForPaymentStatus(String docId) async {
       print('Error getting phone no $e');
     }
   }
-  Future<bool> checkPhoneNo() async{
+  Future<bool> checkPhoneNo() async {
     try {
       DocumentSnapshot snapshot = await _firestore.collection('Users').doc(currentuser).get();
       var data = snapshot.data() as Map<String,dynamic>;

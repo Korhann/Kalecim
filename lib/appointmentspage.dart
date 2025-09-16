@@ -979,7 +979,7 @@ class paymentButton extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>PaymentPage(
+            builder: (context) => PaymentPage(
               sellerUid:appointmentDetails['selleruid'],
               sellerDocId: appointmentDetails['sellerDocId'],
               buyerUid: currentUser,
