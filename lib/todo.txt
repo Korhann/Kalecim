@@ -1,4 +1,6 @@
 Yapılacaklar
 
 
-- Alıcının db sine sellerDocId yi yüklemediği için arada o yüzden ödemede sorun var !
+- randevuları taleplerini sıralı yap -
+- sellerDetails onay mesajı çıkmıyor ekrana bazen veya beklemede kalıyo -
+- ödeme sayfası hücresel ile yapmıyor -

@@ -781,12 +781,12 @@ class CheckDaysPastSeller {
       shouldMarkAsPast = true;
       // burada aynı gün sadece saatlere bakıp geçmiş mi diye anlıyor
     } else if (inputDayIndex == currentDayIndex && !nightHours) {
-      final isPastHour = isStartTimePast(now,startTime, nightHours);
+      final isPastHour = isStartTimePast(now,startTime);
       if (isPastHour) {
         shouldMarkAsPast = true;
       }
     } else if (nightHours) {
-      final isPastHour = isStartTimePast(now,startTime,nightHours);
+      final isPastHour = isStartTimePast(now,startTime);
       if (isPastHour) {
         shouldMarkAsPast = true;
       }
@@ -841,10 +841,11 @@ class CheckDaysPastUser {
     ];
 
     final now = DateTime.now().toUtc().add(const Duration(hours: 3));
-    final int currentDayIndex = now.weekday - 1; // Monday is 1
+    final int currentDayIndex = now.weekday - 1;
     final int inputDayIndex = orderedDays.indexOf(day);
 
-    bool nightHours = isNightHour(startTime) && (currentDayIndex == inputDayIndex); 
+    // buraya sadece gece giriyor
+    bool nightHours = isNightHour(startTime) && (currentDayIndex == inputDayIndex + 1);
 
     if (inputDayIndex == -1) {
       throw ArgumentError('Invalid day name: $day');
@@ -853,18 +854,14 @@ class CheckDaysPastUser {
     bool shouldMarkAsPast = false;
 
     if (inputDayIndex < currentDayIndex && !nightHours) {
-      // final isPastHour = isStartTimePast(now,startTime,nightHours);
-      // if (isPastHour) {
-      //   shouldMarkAsPast = true;
-      // }
       shouldMarkAsPast = true;
     } else if (inputDayIndex == currentDayIndex && !nightHours) {
-      final isPastHour = isStartTimePast(now,startTime,nightHours);
+      final isPastHour = isStartTimePast(now,startTime);
       if (isPastHour) {
         shouldMarkAsPast = true;
       }
     } else if (nightHours) {
-      final isPastHour = isStartTimePast(now,startTime,nightHours);
+      final isPastHour = isStartTimePastNightHours(now,startTime);
       if (isPastHour) {
         shouldMarkAsPast = true;
       }
@@ -898,7 +895,7 @@ bool isNightHour(String startTime) {
   return startTime == '00:00' || startTime == '01:00' || startTime == '02:00' || startTime == '03:00';
 }
 
-bool isStartTimePast(DateTime now, String startTime, bool isNightHour) {
+bool isStartTimePast(DateTime now, String startTime) {
   final nowInMinutes = now.hour * 60 + now.minute;
 
   final parts = startTime.split(':');
@@ -906,12 +903,22 @@ bool isStartTimePast(DateTime now, String startTime, bool isNightHour) {
   final startMinute = int.parse(parts[1]);
   final startInMinutes = startHour * 60 + startMinute;
 
-  // Gece saati ise ertesi günmüş gibi davranıyor
-  if (isNightHour) return false;
+  //Gece saati ise ertesi günmüş gibi davranıyor
+  // if (isNightHour) return false;
 
   return nowInMinutes >= startInMinutes;
 }
 
+bool isStartTimePastNightHours(DateTime now, String startTime) {
+  final nowInMinutes = now.hour * 60 + now.minute;
+
+  final parts = startTime.split(':');
+  final startHour = int.parse(parts[0]);
+  final startMinute = int.parse(parts[1]);
+  final startInMinutes = startHour * 60 + startMinute;
+
+  return nowInMinutes >= startInMinutes;
+}
 
 
 class iconDayHour extends StatelessWidget {
