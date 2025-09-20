@@ -242,6 +242,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
 
                                   SizedBox(height: height * 0.005),
 
+                                  // burada kullanıcı saha seçmemiş ise ilk sahayı ata
                                   SellerFields(
                                     selectedField: _selectedField ?? widget.sellerDetails['fields'][0],
                                     sellerDetails: widget.sellerDetails,
@@ -1371,12 +1372,12 @@ class PaymentButton extends StatelessWidget {
 
   final String? selectedDay;
   final String? selectedHour;
-  final String? selectedField;
+  String? selectedField;
   final String? currentUserUid;
   final String sellerUid;
   final Map<String,dynamic> sellerDetails;
 
-  const PaymentButton({
+  PaymentButton({
     super.key,
     required this.selectedDay,
     required this.selectedHour,
@@ -1390,10 +1391,13 @@ class PaymentButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
                         onPressed: () {
-                          if (selectedDay == null || selectedHour == null || selectedField == null) {
+                          if (selectedField == null || selectedField!.isEmpty) {
+                            selectedField = sellerDetails['fields'][0];
+                          }
+                          if (selectedDay == null || selectedHour == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Saat, gün ve saha seçiniz'),
+                                content: Text('Saat veya saha seçiniz'),
                                 backgroundColor: Colors.red,
                               )
                             );

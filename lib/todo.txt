@@ -1,18 +1,7 @@
 Yapılacaklar
 
-- Pazartesi olunca haftasonu saatleri açık kalıyor - (ilanı verdiğin zaman ile alakalı olabilir)
-- Bazılarının çarşambadan itibaren, bazılarının cumadan sonra , bazılarının cumartesi pazar açık kalıyor sadece ve bu saat mantığı pazar geceden itibaren garip çalışıyor,
-haftaiçeleri bir sıkıntı yok
-- Saatleri pazar gece 3 gibi yenileyebilirsin, mantığını düşün -
 
-
-- Haftalık randevu silinince kaleci çekim talebi yapamadan oradaki parası gidiyor (ÖNEMLİ) + (test et saat 5 te yenileniyor)
-
-
-Mantık
-- Eğer çekim talebi butonuna basılmamışsa o hafta sellerEarning değeri yenilenmeyecek !!
-
-
-Değişiklikler
-- Kaleciler için açıklama özelliği getirildi
-- Randevu yenilenme saati değiştirildi
+- randevuları taleplerini sıralı yap -
+- sellerDetails onay mesajı çıkmıyor ekrana bazen veya beklemede kalıyo -
+- ödeme sayfası hücresel ile yapmıyor -
+- crashlytics i anla -

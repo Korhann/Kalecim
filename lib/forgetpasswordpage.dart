@@ -47,8 +47,10 @@ class _ForgetPasswordState extends State<ForgetPassword> {
     try {
       final textResetController = resetController.text.trim();
       await FirebaseAuth.instance.sendPasswordResetEmail(email: textResetController);
+
       if (mounted) {
         Navigator.of(context).pop();
+        resetController.clear();
         ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Email gönderildi')),
       );

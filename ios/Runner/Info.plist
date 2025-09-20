@@ -55,5 +55,12 @@
 	<string></string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app only uses approximate location to determine your country for analytics and improving service.</string>
+
+	<!-- Allow HTTPS requests to all domains (needed for some cellular connections) -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

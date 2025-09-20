@@ -70,9 +70,10 @@ Future<String?> getUserType() async {
 
 void addKeepersToOneSignal() async{
   final user = await FirebaseAuth.instance.currentUser;
-  final userDoc = await FirebaseFirestore.instance
+  if (user != null) {
+    final userDoc = await FirebaseFirestore.instance
     .collection('Users')
-    .doc(user!.uid)
+    .doc(user.uid)
     .get();
 
 if (userDoc.exists && userDoc.data()?['sellerDetails'] != null) {
@@ -80,6 +81,7 @@ if (userDoc.exists && userDoc.data()?['sellerDetails'] != null) {
 } else {
   await OneSignal.User.addTagWithKey('isKeeper', 'false');
 }
+  }
 }
 
 
@@ -146,7 +148,6 @@ void setupNotificationListener() {
 
     if (page != null) {
       BuildContext? context = MyApp.navigatorKey.currentContext;
-
       if (context != null) {
         switch (page) {
           case "payment":
@@ -177,6 +178,7 @@ void setupNotificationListener() {
             break;
           case "appointment":
             if (ModalRoute.of(context)?.settings.name != "/appointmentsPage") {
+              print('in this page rn');
               // alıcı sayfasında çağırınca alıcı olarak algılıyor
               userorseller = true;
               Navigator.push(

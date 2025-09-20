@@ -35,7 +35,7 @@ flutter run --flavor prod -t lib/main_prod.dart --dart-define=FLAVOR=prod
 flutter run --flavor stage -t lib/main_stage.dart --dart-define=FLAVOR=stage
 */
 
-/*
+/*s
 for ios 
 flutter run --flavor dev -t lib/main_dev.dart  
 flutter run --flavor stage -t lib/main_stage.dart

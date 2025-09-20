@@ -75,17 +75,47 @@ Widget build(BuildContext context) {
             containerHeight: height * 0.050,
             items: [
               BottomNavyBarItem(
-                icon: const Icon(
-                  Icons.home,
-                  color: Colors.black
-                ),
-                title: Text(
-                  'Ana Sayfa',
-                  style: GoogleFonts.inter(
-                    color: Colors.black
-                  ),
-                ),
+  icon: Stack(
+    children: [
+      const Icon(
+        Icons.home,
+        color: Colors.black,
+      ),
+      StreamBuilder<int>(
+        stream: getUnreadCount(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData || snapshot.data == 0) return const SizedBox();
+          return Positioned(
+            right: 0,
+            top: -5,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
               ),
+              constraints: const BoxConstraints(minWidth: 10, minHeight: 10),
+              child: Text(
+                '${snapshot.data}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        },
+      ),
+    ],
+  ),
+  title: Text(
+    'Ana Sayfa',
+    style: GoogleFonts.inter(
+      color: Colors.black,
+    ),
+  ),
+),
               BottomNavyBarItem(
                 icon: Stack(
                 children: [
@@ -121,17 +151,48 @@ Widget build(BuildContext context) {
                 ),
               ),
               BottomNavyBarItem(
-                icon: const Icon(
-                  Icons.person,
-                  color: Colors.black,
-                ),
-                title:  Text(
-                  'Profil',
-                  style: GoogleFonts.inter(
-                    color: Colors.black
-                  ),
-                ),
+  icon: Stack(
+    children: [
+      const Icon(
+        Icons.person,
+        color: Colors.black,
+      ),
+      // Add the badge using StreamBuilder
+      StreamBuilder<int>(
+        stream: getSellerUnreadCount(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData || snapshot.data == 0) return const SizedBox();
+          return Positioned(
+            right: 0,
+            top: -5,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
               ),
+              constraints: const BoxConstraints(minWidth: 10, minHeight: 10),
+              child: Text(
+                '${snapshot.data}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        },
+      ),
+    ],
+  ),
+  title: Text(
+    'Profil',
+    style: GoogleFonts.inter(
+      color: Colors.black,
+    ),
+  ),
+),
             ],
           ),
         );
@@ -191,6 +252,31 @@ Widget build(BuildContext context) {
   } catch (e, stack) {
     await reportErrorToCrashlytics(e, stack, reason: 'Message counter failed');
   }
+}
+
+Stream<int> getSellerUnreadCount() {
+    final String currentUser = FirebaseAuth.instance.currentUser!.uid;
+    return FirebaseFirestore.instance
+        .collection('Users')
+        .doc(currentUser)
+        .collection('appointmentseller')
+        .where('appointmentDetails.status', isEqualTo: 'pending')
+        .where('appointmentDetails.isSeen', isEqualTo: false)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
+  }
+
+  Stream<int> getUnreadCount() {
+  final String currentUser = FirebaseAuth.instance.currentUser!.uid;
+  return FirebaseFirestore.instance
+      .collection('Users')
+      .doc(currentUser)
+      .collection('appointmentbuyer')
+      .where('appointmentDetails.status', whereIn: ['approved', 'rejected'])
+      .where('appointmentDetails.paymentStatus', isEqualTo: 'waiting')
+      .where('appointmentDetails.isSeen', isEqualTo: false)
+      .snapshots()
+      .map((snapshot) => snapshot.docs.length);
 }
 
 }
