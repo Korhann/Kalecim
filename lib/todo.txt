@@ -4,3 +4,4 @@ Yapılacaklar
 - randevuları taleplerini sıralı yap -
 - sellerDetails onay mesajı çıkmıyor ekrana bazen veya beklemede kalıyo -
 - ödeme sayfası hücresel ile yapmıyor -
+- crashlytics i anla -

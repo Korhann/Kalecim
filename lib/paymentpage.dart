@@ -190,12 +190,12 @@ class _PaymentPageState extends State<PaymentPage> {
                       }
                       // if the payment is declined
                     } else {
-                      // if (phoneError == false) {
-                      //   if (mounted) {
-                      //     print('here for error');
-                      //     await Showalert(context: context, text: 'Ooopps...').showErrorAlert();
-                      //   }
-                      // }
+                      if (phoneError == false) {
+                        if (mounted) {
+                          print('here for error');
+                          await Showalert(context: context, text: 'Ooopps...').showErrorAlert();
+                        }
+                      }
                       if (mounted) {
                           await Showalert(context: context, text: 'Ooopps...').showErrorAlert();
                         }
@@ -358,6 +358,7 @@ class _PaymentPageState extends State<PaymentPage> {
         'buyerDocId': widget.buyerDocId, 
       }),
     );
+    print('the status code is ${response.statusCode}');
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final paymentPageUrl = data['paymentPageUrl'];
