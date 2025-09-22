@@ -347,7 +347,8 @@ class _ApptRequestState extends State<ApptRequest> {
       'isPastDay': 'false',
       'status': 'pending',
       'paymentStatus' : 'waiting',
-      'isSeen' : false
+      'isSeen' : false,
+      'timestamp': FieldValue.serverTimestamp()
     };
 
     DocumentReference buyerDocRef = await _firestore.collection('Users')
@@ -402,7 +403,8 @@ class _ApptRequestState extends State<ApptRequest> {
     'isPastDay': 'false',
     'status': 'pending',
     'isSeen' : false,
-    'isWithdrawalButtonPressed': false
+    'isWithdrawalButtonPressed': false,
+    'timestamp': FieldValue.serverTimestamp()
   };
   
     // Add appointment details to Firestore to the seller account

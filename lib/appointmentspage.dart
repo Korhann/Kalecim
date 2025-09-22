@@ -282,6 +282,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
     .collection('Users')
     .doc(currentuser)
     .collection(userorseller ? 'appointmentseller' : 'appointmentbuyer')
+    .orderBy('appointmentDetails.timestamp', descending: true)
     .snapshots();
 }
 

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -13,7 +14,9 @@ import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
 import 'package:http/http.dart' as http;
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
+import 'package:logging/logging.dart';
 import 'package:network_info_plus/network_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class PaymentPage extends StatefulWidget {
@@ -56,6 +59,8 @@ class _PaymentPageState extends State<PaymentPage> {
   late String buyerPhoneNo;
 
   late String token;
+
+  final log = Logger('MyClassName');
 
   @override
   void initState() {
@@ -177,6 +182,9 @@ class _PaymentPageState extends State<PaymentPage> {
                   if (hourTaken == false && isPast == false) {
                     // if the payment is succesfull
                     bool isSuccess = await _processPayment();
+                    // log.fine('Got the result $isSuccess');
+                    // await processResult(isSuccess);
+
                     if (isSuccess) {
                       await _markHourTaken();
                       await Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
@@ -192,13 +200,13 @@ class _PaymentPageState extends State<PaymentPage> {
                     } else {
                       if (phoneError == false) {
                         if (mounted) {
-                          print('here for error');
+                          await Showalert(context: context, text: 'Ooopps...').showErrorAlert();
+                        }
+                      } else {
+                        if (mounted) {
                           await Showalert(context: context, text: 'Ooopps...').showErrorAlert();
                         }
                       }
-                      if (mounted) {
-                          await Showalert(context: context, text: 'Ooopps...').showErrorAlert();
-                        }
                     }
                   } else {
                     if (hourTaken && isPast == false) {
@@ -248,6 +256,19 @@ class _PaymentPageState extends State<PaymentPage> {
       ),
     );
   }
+//   Future<void> processResult(bool res) async {
+//   print('here');
+//   final directory = await getApplicationDocumentsDirectory();
+//   print(directory.path);
+//   final file = File('${directory.path}/payment_result.txt');
+//   final now = DateTime.now();
+//   final outcome = res ? 'SUCCESS' : 'FAILURE';
+//   await file.writeAsString(
+//     '${now.toIso8601String()} - Payment outcome: $outcome\n',
+//     mode: FileMode.append,
+//   );
+// }
+
   Widget _selectedField() {
     return Text(
       widget.selectedField!,
@@ -332,16 +353,6 @@ class _PaymentPageState extends State<PaymentPage> {
     setState(() {
       isPaymentLoading = true;
     });
-    //  print(buyerName);
-    //  print(buyerLastName);
-    //  print(buyerEmail);
-    //  print(buyerPhoneNo);
-    //  print(buyerPrice.toString());
-    //  print(buyerIpNo);
-    //  print(widget.sellerUid);
-    //  print(widget.buyerUid);
-    //  print(widget.sellerDocId);
-    //  print(widget.buyerDocId);
     final response = await http.post(
       Uri.parse('https://europe-west2-kiralikkaleci-21f26.cloudfunctions.net/api/checkout-form'),
       headers: {'Content-Type': 'application/json'},
@@ -358,7 +369,6 @@ class _PaymentPageState extends State<PaymentPage> {
         'buyerDocId': widget.buyerDocId, 
       }),
     );
-    print('the status code is ${response.statusCode}');
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final paymentPageUrl = data['paymentPageUrl'];
@@ -392,7 +402,11 @@ class _PaymentPageState extends State<PaymentPage> {
       return false;
     }
   } catch (e, stack) {
-    await reportErrorToCrashlytics(e, stack, reason:'Payment failed for buyerId: ${widget.buyerUid}, buyerDocId: ${widget.buyerDocId}');
+    await FirebaseCrashlytics.instance.recordError(
+      e, stack,
+      reason: 'Payment exception on mobile data: ip=$buyerIpNo',
+      fatal: false,
+    );
   }
   return false;
 }
@@ -565,16 +579,17 @@ Future<bool> waitForPaymentStatus(String docId) async {
         buyerEmail = userDoc['email'];
         await getSellerPrice();
         await getPhoneNo();
-        getIpNo();
+        await getIpNo();
       }
     } catch (e){
       print('Error getting payment info $e');
     }
   }
-  void getIpNo() async{
+  Future<void> getIpNo() async{
     final info = NetworkInfo();
     final wifiIP = await info.getWifiIP();
     buyerIpNo = wifiIP ?? '0.0.0.0';
+    await FirebaseCrashlytics.instance.log('Network info: wifiIP=$wifiIP, used=$buyerIpNo');
   }
   Future<void> getSellerPrice() async {
     try {

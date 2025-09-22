@@ -54,7 +54,7 @@ exports.resetAppointments = onSchedule(
           const data = doc.data();
           const details = data.appointmentDetails;
           // Only update if isWithdrawalButtonPressed is true
-          if (details && details.isWithdrawalButtonPressed === true) {
+          if (details && details.isWithdrawalButtonPressed === true && details.verificationState === 'verified') {
             batch.delete(doc.ref);
             batchCounter++;
           } 
