@@ -15,6 +15,7 @@ import 'package:kiralik_kaleci/paymentpage.dart';
 import 'package:kiralik_kaleci/sellermainpage.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:upgrader/upgrader.dart';
 import 'appointmentspage.dart';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -84,6 +85,19 @@ if (userDoc.exists && userDoc.data()?['sellerDetails'] != null) {
   }
 }
 
+class UpgradePrompt extends StatelessWidget {
+  const UpgradePrompt({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: UpgradeAlert(
+    dialogStyle: UpgradeDialogStyle.cupertino,
+    child: Center(child: Text('Checking...')),
+  ),
+    );
+  }
+}
 
 
 class MyApp extends StatelessWidget {
@@ -94,7 +108,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,

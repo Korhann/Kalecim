@@ -13,7 +13,9 @@ import 'package:kiralik_kaleci/sellermainpage.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'globals.dart';
+
 
 //todo: Saat 00:00 ı geçmiş olarak alıyor aynı gün içindeyse
 
@@ -357,10 +359,13 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
       } else {
         print('document snapshot does not exist');
       }
-
-      setState(() {
-        appointments[index]['appointmentDetails']['status'] = 'approved';
-      });
+      if (mounted) {
+        if (index >= 0 && index < appointments.length) {
+          setState(() {
+            appointments[index]['appointmentDetails']['status'] = 'approved';
+          });
+        }
+      }
     } catch (e, stack) {
       await reportErrorToCrashlytics(
         e,
@@ -407,9 +412,11 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
       }
 
       if (mounted) {
-        setState(() {
-          appointments[index]['appointmentDetails']['status'] = 'rejected';
-        });
+        if (index >= 0 && index < appointments.length) {
+          setState(() {
+            appointments[index]['appointmentDetails']['status'] = 'rejected';
+          });
+        }
       }
     } catch (e, stack) {
       await reportErrorToCrashlytics(
@@ -766,7 +773,7 @@ class CheckDaysPastSeller {
     final int currentDayIndex = now.weekday - 1; // Monday = 0
     final int inputDayIndex = orderedDays.indexOf(day);
 
-    bool nightHours = isNightHour(startTime) && (currentDayIndex == inputDayIndex); 
+    bool nightHours = isNightHour(startTime) && (currentDayIndex == inputDayIndex + 1); 
 
     if (inputDayIndex == -1) {
       throw ArgumentError('Invalid day name: $day');
@@ -775,19 +782,15 @@ class CheckDaysPastSeller {
     bool shouldMarkAsPast = false;
 
     if (inputDayIndex < currentDayIndex && !nightHours) {
-      // final isPastHour = isStartTimePast(now,startTime,nightHours);
-      // if (isPastHour) {
-      //   shouldMarkAsPast = true;
-      // }
       shouldMarkAsPast = true;
       // burada aynı gün sadece saatlere bakıp geçmiş mi diye anlıyor
-    } else if (inputDayIndex == currentDayIndex && !nightHours) {
+    } else if (inputDayIndex == currentDayIndex && !isNightHour(startTime)) {
       final isPastHour = isStartTimePast(now,startTime);
       if (isPastHour) {
         shouldMarkAsPast = true;
       }
     } else if (nightHours) {
-      final isPastHour = isStartTimePast(now,startTime);
+      final isPastHour = isStartTimePastNightHours(now,startTime);
       if (isPastHour) {
         shouldMarkAsPast = true;
       }
@@ -856,7 +859,7 @@ class CheckDaysPastUser {
 
     if (inputDayIndex < currentDayIndex && !nightHours) {
       shouldMarkAsPast = true;
-    } else if (inputDayIndex == currentDayIndex && !nightHours) {
+    } else if (inputDayIndex == currentDayIndex && !isNightHour(startTime)) {
       final isPastHour = isStartTimePast(now,startTime);
       if (isPastHour) {
         shouldMarkAsPast = true;

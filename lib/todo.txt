@@ -6,6 +6,9 @@ Yapılacaklar
 
 Bugün
 
-- hücresel sorununu çöz -
+- randevu mantığı düzgün çalışmıyor +
+- kullanıcıların uygulamanın güncel versionunu kullandığından emin ol -
+- bildirimleri kontrol et geliyor mu diye -
+- randevu düzenle de saate basınca ve çıkıp geri basınca iki kere yüklüyor -
+- halısaha önerilerini ekle +
 - anroid e mail gönder -
-- store logs in the device -

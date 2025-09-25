@@ -17,6 +17,7 @@ import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/userorseller.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -42,6 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    printAppVersion();
     try {
       saveUserType('user');
       userorseller = false;
@@ -54,6 +56,15 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
   }
+
+  Future<void> printAppVersion() async {
+  final info = await PackageInfo.fromPlatform();
+  print('App version: ${info.version}'); // e.g., "1.0.3"
+  print('Build number: ${info.buildNumber}'); // e.g., "5"
+  if (info.version.toString() != '2.1') {
+    Showalert(context: context, text: 'En iyi özelliklerden faydalanmak için lütfen güncelleme yapın').showUpgradeAlert();
+  }
+}
 
   @override
   Widget build(BuildContext context) {
