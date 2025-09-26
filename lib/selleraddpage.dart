@@ -430,115 +430,6 @@ class _SellerAddPageState extends State<SellerAddPage> {
                     }
                   ),
                 ),
-                // Padding(
-                //   padding: const EdgeInsets.symmetric(horizontal: 5),
-                //   child: SingleChildScrollView(
-                //     scrollDirection: Axis.horizontal,
-                //     child: Row(
-                //       children: [
-                //         const SizedBox(width: 10),
-                //           Column(
-                //             children: [
-                //               Text(
-                //                 "Pazartesi",
-                //                 style: GoogleFonts.inter(
-                //                   fontSize: 16,
-                //                   fontWeight: FontWeight.w500,
-                //                   color: Colors.white
-                //                 ),
-                //               ),
-                //               Amenities(key: mondayKey ,day: 'Pazartesi',),
-                //             ],
-                //         ),
-                //         const SizedBox(width: 10),
-                //         Column(
-                //           children: [
-                //             Text(
-                //               "Salı",
-                //               style: GoogleFonts.inter(
-                //                 fontSize: 16,
-                //                 fontWeight: FontWeight.w500,
-                //                 color: Colors.white
-                //               ),
-                //             ),
-                //             Amenities(key: tuesdayKey ,day: 'Salı')
-                //           ],
-                //         ),
-                //         const SizedBox(width: 10),
-                //         Column(
-                //           children: [
-                //             Text(
-                //               "Çarşamba",
-                //               style: GoogleFonts.inter(
-                //                 fontSize: 16,
-                //                 fontWeight: FontWeight.w500,
-                //                 color: Colors.white
-                //               ),
-                //             ),
-                //             Amenities(key: wednesdayKey ,day: 'Çarşamba')
-                //           ],
-                //         ),
-                //         const SizedBox(width: 10),
-                //         Column(
-                //           children: [
-                //             Text(
-                //               "Perşembe",
-                //               style: GoogleFonts.inter(
-                //                 fontSize: 16,
-                //                 fontWeight: FontWeight.w500,
-                //                 color: Colors.white
-                //               ),
-                //             ),
-                //             Amenities(key: thursdayKey ,day: 'Perşembe',)
-                //           ],
-                //         ),
-                //         const SizedBox(width: 10),
-                //         Column(
-                //           children: [
-                //             Text(
-                //               "Cuma",
-                //               style: GoogleFonts.inter(
-                //                 fontSize: 16,
-                //                 fontWeight: FontWeight.w500,
-                //                 color: Colors.white
-                //               ),
-                //             ),
-                //             Amenities(key: fridayKey ,day: 'Cuma')
-                //           ],
-                //         ),
-                //         const SizedBox(width: 10),
-                //         Column(
-                //           children: [
-                //             Text(
-                //               "Cumartesi",
-                //               style: GoogleFonts.inter(
-                //                 fontSize: 16,
-                //                 fontWeight: FontWeight.w500,
-                //                 color: Colors.white
-                //               ),
-                //             ),
-                //              Amenities(key: saturdayKey ,day: 'Cumartesi')
-                //           ],
-                //         ),
-                //         const SizedBox(width: 10),
-                //         Column(
-                //           children: [
-                //             Text(
-                //               "Pazar",
-                //               style: GoogleFonts.inter(
-                //                 fontSize: 16,
-                //                 fontWeight: FontWeight.w500,
-                //                 color: Colors.white
-                //               ),
-                //             ),
-                //             Amenities(key: sundayKey ,day: 'Pazar')
-                //           ],
-                //         ),
-                //         const SizedBox(width: 5),
-                //       ],
-                //     ),
-                //   ),
-                // ), 
                 
                 const SizedBox(height: 20),
                 Padding(
@@ -592,10 +483,14 @@ class _SellerAddPageState extends State<SellerAddPage> {
                               _clearImageandText();
                             }
                           } else {
-                            Showalert(context: context, text: 'Ooops...').showErrorAlert();
+                            if (mounted) {
+                              Showalert(context: context, text: 'Ooops...').showErrorAlert();
+                            }
                           }
                         } catch (e) {
-                          Showalert(context: context, text: 'Tüm alanları doldurduğunuza emin misiniz?').showErrorAlert();
+                          if (mounted) {
+                            Showalert(context: context, text: 'Tüm alanları doldurduğunuza emin misiniz?').showErrorAlert();
+                          }
                         }
                       },
                       child: GlobalStyles.textStyle(text: 'Onayla', context: context, size: 24, fontWeight: FontWeight.w600, color: Colors.white),
@@ -804,18 +699,24 @@ class _SellerAddPageState extends State<SellerAddPage> {
             _AmenitiesState.selectedHoursByDay.clear();
           });
 
-          Navigator.of(context).pop();
-          Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => SellerSuccessPage()));
+          if (context.mounted) {
+            Navigator.of(context).pop();
+            Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => SellerSuccessPage()));
+          }
         }
         return true;
       } catch (e, stack) {
-        Navigator.of(context).pop();
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
         await reportErrorToCrashlytics(
           e,
           stack,
           reason: 'selleraddpage _insertSellerDetails error for user $currentUser',
         );
-        Showalert(context: context, text: 'Ooops...').showErrorAlert();
+        if (context.mounted) {
+          Showalert(context: context, text: 'Ooops...').showErrorAlert();
+        }
         return false;
       }
     } else {
@@ -1154,6 +1055,7 @@ class _AmenitiesState extends State<Amenities> {
    @override
   void initState() {
     super.initState();
+    selectedHoursByDay[widget.day] = [];
     if (!selectedHoursByDay.containsKey(widget.day)) {
       selectedHoursByDay[widget.day] = [];
     }
@@ -1174,8 +1076,8 @@ class _AmenitiesState extends State<Amenities> {
     }
   }
 }
-
   }
+
 
 
 void onCheckTap(CheckContainerModel container) {

@@ -168,12 +168,14 @@ class _ApptRequestState extends State<ApptRequest> {
                       await sendRequest();
                       await navigateToHomePage();
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Aynı saat için birden fazla talep gönderemezsiniz'),
                           backgroundColor: Colors.red,
                         )
                       );
+                      }
                     }
                     Future.delayed(const Duration(seconds: 5), () {
                       if (mounted) {

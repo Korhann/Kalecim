@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +14,9 @@ import 'package:kiralik_kaleci/mainpage.dart';
 import 'package:kiralik_kaleci/notification/push_helper.dart';
 import 'package:kiralik_kaleci/paymentpage.dart';
 import 'package:kiralik_kaleci/sellermainpage.dart';
+import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:upgrader/upgrader.dart';
 import 'appointmentspage.dart';
@@ -105,7 +108,6 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key, required this.userType});
   static final navigatorKey = GlobalKey<NavigatorState>();
 
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -130,7 +132,30 @@ class _HomeRouterState extends State<HomeRouter> {
   void initState() {
     super.initState();
     _loadUserType();
+    checkForceUpdate(context);
   }
+
+  Future<void> checkForceUpdate(BuildContext context) async {
+  final remoteConfig = FirebaseRemoteConfig.instance;
+  await remoteConfig.setConfigSettings(RemoteConfigSettings(
+  fetchTimeout: const Duration(seconds: 10),
+  minimumFetchInterval: const Duration(seconds: 0), // Always fetch latest for testing
+));
+  await remoteConfig.fetchAndActivate();
+
+  final requiredVersion = remoteConfig.getString('appversion'); // Remote Config variable
+  final info = await PackageInfo.fromPlatform();
+  final currentVersion = info.version;
+  print(currentVersion);
+  print(requiredVersion);
+
+  if (requiredVersion.isNotEmpty && currentVersion != requiredVersion) {
+    if (context.mounted) {
+      Showalert(context: context, text: 'En iyi özelliklerden faydalanmak için lütfen güncelleme yapın').showUpgradeAlert();
+    }
+  }
+}
+
 
   Future<void> _loadUserType() async {
     final prefs = await SharedPreferences.getInstance();
