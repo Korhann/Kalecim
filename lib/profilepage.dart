@@ -59,21 +59,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-//   Future<void> checkForceUpdate(BuildContext context) async {
-//   final remoteConfig = FirebaseRemoteConfig.instance;
-//   await remoteConfig.fetchAndActivate();
-
-//   final requiredVersion = remoteConfig.getString('appversion'); // Remote Config variable
-//   final info = await PackageInfo.fromPlatform();
-//   final currentVersion = info.version;
-
-//   if (requiredVersion.isNotEmpty && currentVersion != requiredVersion) {
-//     if (mounted) {
-//       Showalert(context: context, text: 'En iyi özelliklerden faydalanmak için lütfen güncelleme yapın').showUpgradeAlert();
-//     }
-//   }
-// }
-
 
   @override
   Widget build(BuildContext context) {

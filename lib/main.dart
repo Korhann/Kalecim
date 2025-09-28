@@ -146,8 +146,6 @@ class _HomeRouterState extends State<HomeRouter> {
   final requiredVersion = remoteConfig.getString('appversion'); // Remote Config variable
   final info = await PackageInfo.fromPlatform();
   final currentVersion = info.version;
-  print(currentVersion);
-  print(requiredVersion);
 
   if (requiredVersion.isNotEmpty && currentVersion != requiredVersion) {
     if (context.mounted) {
