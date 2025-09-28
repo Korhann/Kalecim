@@ -168,12 +168,14 @@ class _ApptRequestState extends State<ApptRequest> {
                       await sendRequest();
                       await navigateToHomePage();
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Aynı saat için birden fazla talep gönderemezsiniz'),
                           backgroundColor: Colors.red,
                         )
                       );
+                      }
                     }
                     Future.delayed(const Duration(seconds: 5), () {
                       if (mounted) {
@@ -347,7 +349,8 @@ class _ApptRequestState extends State<ApptRequest> {
       'isPastDay': 'false',
       'status': 'pending',
       'paymentStatus' : 'waiting',
-      'isSeen' : false
+      'isSeen' : false,
+      'timestamp': FieldValue.serverTimestamp()
     };
 
     DocumentReference buyerDocRef = await _firestore.collection('Users')
@@ -402,7 +405,8 @@ class _ApptRequestState extends State<ApptRequest> {
     'isPastDay': 'false',
     'status': 'pending',
     'isSeen' : false,
-    'isWithdrawalButtonPressed': false
+    'isWithdrawalButtonPressed': false,
+    'timestamp': FieldValue.serverTimestamp()
   };
   
     // Add appointment details to Firestore to the seller account

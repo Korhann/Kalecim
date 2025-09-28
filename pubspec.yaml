@@ -1,7 +1,7 @@
 name: kiralik_kaleci
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.0+18
+version: 1.0.0+21
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -70,6 +70,10 @@ dependencies:
   webview_flutter: ^4.13.0
   firebase_crashlytics: ^5.0.0
   flutter_launcher_icons: ^0.14.4
+  logging: ^1.3.0
+  package_info_plus: ^9.0.0
+  upgrader: ^12.1.0
+  firebase_remote_config: ^6.0.2
 
   
 dev_dependencies:

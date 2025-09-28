@@ -10,8 +10,10 @@ import 'package:kiralik_kaleci/filterpage.dart';
 import 'package:kiralik_kaleci/globals.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
+import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'sellerDetails.dart';
 import 'sharedvalues.dart';
 
@@ -50,7 +52,6 @@ class _GetUserDataState extends State<GetUserData> {
     _fetchSellers();
     _scrollController.addListener(_onScroll);
     userorseller = false;
-    
   }
 
   @override

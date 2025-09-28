@@ -672,7 +672,7 @@ class FootballField {
     FootballField(
       city: 'İstanbul',
       district: 'Başakşehir',
-      fieldName: ['Başakşehir Ergün Penbe Halı Saha','Euro Futbol Halı Saha','Ekol Halı Saha','Başak Kapalı Halı Saha','Başakşehir Spor Parkı Halı Saha','Güvercintepe Spor Parkı Halı Saha','Ayazma İMKB Halı Saha','Başakşehir SK. Halı Saha','Borsa İstanbul Halı Saha','Aktaş Halı Saha','Aymakoop Kapalı Halı Saha','Red White Halı Saha']
+      fieldName: ['Başakşehir Ergün Penbe Halı Saha','Euro Futbol Halı Saha','Ekol Halı Saha','Başak Kapalı Halı Saha','Başakşehir Spor Parkı Halı Saha','Güvercintepe Spor Parkı Halı Saha','Ayazma İMKB Halı Saha','Başakşehir SK. Halı Saha','Borsa İstanbul Halı Saha','Aktaş Halı Saha','Aymakoop Kapalı Halı Saha','Red White Halı Saha','Başakşehir Kapalı Halı Saha']
     ),
     FootballField(
       city: 'İstanbul',
@@ -692,7 +692,7 @@ class FootballField {
     FootballField(
       city: 'İstanbul',
       district: 'Beylikdüzü',
-      fieldName: ['Beylikdüzü Siteler Halı Saha','For Life Sport Center','Yakuplu Burak Halı Saha','Gürpınar Arena Halı Saha','Erhaya Spor Halı Saha','Beylikdüzü Allstar Halı Saha','Playdrome Halı Saha','Erbabi Halı Saha','Marina Halı Saha','Serter Halı Saha','Modern Halı Saha']
+      fieldName: ['Beylikdüzü Siteler Halı Saha','For Life Sport Center','Yakuplu Burak Halı Saha','Gürpınar Arena Halı Saha','Erhaya Spor Halı Saha','Beylikdüzü Allstar Halı Saha','Playdrome Halı Saha','Erbabi Halı Saha','Marina Halı Saha','Serter Halı Saha','Modern Halı Saha','World Point Halı Saha']
     ),
     FootballField(
       city: 'İstanbul',
@@ -742,7 +742,7 @@ class FootballField {
     FootballField(
       city: 'İstanbul',
       district: 'Güngören',
-      fieldName: ['Güngören Oktay Halı Saha 1','Güngören Oktay Halı Saha','Lider Spor Tesisleri Halı Saha','Şampiyon90 Halı Saha']
+      fieldName: ['Güngören Oktay Halı Saha 1','Güngören Oktay Halı Saha','Lider Spor Tesisleri Halı Saha','Şampiyon90 Halı Saha','Güneştepe Millet Bahçesi Halı Saha']
     ),
     FootballField(
       city: 'İstanbul',

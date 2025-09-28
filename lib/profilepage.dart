@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -17,7 +18,9 @@ import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/userorseller.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -42,6 +45,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    //checkForceUpdate(context);
     try {
       saveUserType('user');
       userorseller = false;
@@ -54,6 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
