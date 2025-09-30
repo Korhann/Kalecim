@@ -41,20 +41,12 @@ class _SellerProfilePageState extends State<SellerProfilePage> {
   @override
   void initState() {
     super.initState();
-    printAppVersion();
     getUserDetails();
     saveUserType('seller');
     PushHelper.updateOneSignal();
     userorseller = true;
     
   }
-
-  Future<void> printAppVersion() async {
-  final info = await PackageInfo.fromPlatform();
-  if (info.version.toString() != '2.0') {
-    Showalert(context: context, text: 'En iyi özelliklerden faydalanmak için lütfen güncelleme yapın').showUpgradeAlert();
-  }
-}
 
   @override
   Widget build(BuildContext context) {
