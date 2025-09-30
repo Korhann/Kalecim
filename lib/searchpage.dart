@@ -448,7 +448,6 @@ class _SellerGrid extends StatelessWidget {
               sellerDetails: sellerDetails,
               sellerUid: sellerUid,
               onTap: (uid) => onCardTap(context, sellerDetails, uid),
-              // onTap: (uid) => print('uid of the seller is $uid'),
             );
           },
         );

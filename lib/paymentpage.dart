@@ -182,11 +182,9 @@ class _PaymentPageState extends State<PaymentPage> {
                   if (hourTaken == false && isPast == false) {
                     // if the payment is succesfull
                     bool isSuccess = await _processPayment();
-                    // log.fine('Got the result $isSuccess');
-                    // await processResult(isSuccess);
-
                     if (isSuccess) {
                       await _markHourTaken();
+                      await rentedUsers(widget.sellerUid);
                       await Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
                       await Future.delayed(Duration(seconds: 1));
                       if (mounted) {
@@ -256,18 +254,6 @@ class _PaymentPageState extends State<PaymentPage> {
       ),
     );
   }
-//   Future<void> processResult(bool res) async {
-//   print('here');
-//   final directory = await getApplicationDocumentsDirectory();
-//   print(directory.path);
-//   final file = File('${directory.path}/payment_result.txt');
-//   final now = DateTime.now();
-//   final outcome = res ? 'SUCCESS' : 'FAILURE';
-//   await file.writeAsString(
-//     '${now.toIso8601String()} - Payment outcome: $outcome\n',
-//     mode: FileMode.append,
-//   );
-// }
 
   Widget _selectedField() {
     return Text(
@@ -641,7 +627,16 @@ Future<bool> waitForPaymentStatus(String docId) async {
     }
     return false;
   }
+
+  Future<void> rentedUsers(String? sellerUid) async {
+    await _firestore.collection('Users')
+    .doc(sellerUid)
+    .collection('rentedUsers')
+    .doc(currentuser)
+    .set({});
+  }
 }
+
 
 
 class WebPage extends StatefulWidget {

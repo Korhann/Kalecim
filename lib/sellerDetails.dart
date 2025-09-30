@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kiralik_kaleci/comment_section.dart';
 import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
 import 'package:kiralik_kaleci/globals.dart';
 import 'package:kiralik_kaleci/messagepage.dart';
@@ -352,6 +353,20 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                       ],
                                     ),
                                   ),
+                                  CommentInputBox(),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Text(
+                                            "Yorumlar",
+                                            style: GoogleFonts.inter(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                              color: userorseller ? Colors.white : Colors.black,
+                                            ),
+                                            textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+                                          ),
+                                  ),
+                                        CommentSection()
                                 ],
                               ),
                             ),
@@ -591,6 +606,168 @@ bool isPastNightHours(DateTime now, String startTime) {
   final startInMinutes = startHour * 60 + startMinute;
 
   return nowInMinutes >= startInMinutes;
+}
+
+class CommentInputBox extends StatefulWidget {
+  const CommentInputBox({super.key});
+
+  @override
+  State<CommentInputBox> createState() => _CommentInputBoxState();
+}
+
+class _CommentInputBoxState extends State<CommentInputBox> {
+  final TextEditingController _commentController = TextEditingController();
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitComment() async {
+    if (_commentController.text.trim().isEmpty) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      // Here you can add your logic to save the comment to Firebase
+      // For now, we'll just simulate a delay
+      await Future.delayed(const Duration(seconds: 1));
+      
+      // Clear the text field after successful submission
+      _commentController.clear();
+      
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Yorumunuz başarıyla gönderildi'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Yorum gönderilirken hata oluştu'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: userorseller ? sellergrey : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.grey.shade300,
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Yorum yap',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: userorseller ? Colors.white : Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _commentController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: 'Yorumunuzu buraya yazın...',
+                hintStyle: TextStyle(
+                  color: userorseller ? Colors.white70 : Colors.grey,
+                  fontSize: 14,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.blue),
+                ),
+                filled: true,
+                fillColor: userorseller ? sellergrey.withOpacity(0.5) : Colors.grey.shade50,
+                contentPadding: const EdgeInsets.all(12),
+              ),
+              style: TextStyle(
+                color: userorseller ? Colors.white : Colors.black,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: _isSubmitting ? null : () {
+                    _commentController.clear();
+                  },
+                  child: Text(
+                    'Temizle',
+                    style: TextStyle(
+                      color: userorseller ? Colors.white70 : Colors.grey,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: _isSubmitting ? null : _submitComment,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text('Gönder'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 
@@ -1102,7 +1279,7 @@ class DayHourListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: heigth*0.6,
+      height: heigth*0.37,
       width: double.infinity,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
