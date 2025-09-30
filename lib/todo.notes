@@ -1,12 +1,8 @@
 
 Yapılacaklar:
 
-[√] kullanıcıların uygulamanın güncel versionunu kullandığından emin ol 
-[√] randevu mantığı düzgün çalışmıyor 
-[√] bildirimleri kontrol et geliyor mu diye 
-[√] randevu düzenle de saate basınca ve çıkıp geri basınca iki kere yüklüyor 
-[√] halısaha önerilerini ekle 
-[!] domain sorununu çöz
-[!] anroid nasıl halledeceğine bak
+[ ] Kaleciler için yorum özelliği
+[ ] Kaleciler için puanlama özelliği
+[ ] Kalecilerin kart renginin gelen yorumlara göre değişmesi
 
 
