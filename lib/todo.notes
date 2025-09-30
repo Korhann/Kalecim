@@ -8,8 +8,9 @@ Yapılacaklar:
 
 - YORUM VE PUANLAMA ÖZELLİĞİ
 [√] Kalecinin db sine kiralayanlar diye liste oluştur, eğer biri kiralamışsa alıcı uid'sini oraya ekle
-[ ] Yorum yazma kutusu
-[ ] Sadece kiralayanlar yorum ve puanlama yapabilsin
+[√] Yorum yazma kutusu
+[!] Yorumlara timestamp de ekle
+[ ] Sadece kiralayanlar yorum ve puanlama yapabilsin (not eklerken kiralama yapmadıysanız not ekleyemezsiniz yazısı yap)
 [ ] Puanlamaların ortalamsını sellerGridItem de göster
 [ ] Maç saati geçtikten sonra randevularım da puanla ve yorum yap diye bir bölüm oluştur
 

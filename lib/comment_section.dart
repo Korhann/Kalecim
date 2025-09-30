@@ -3,13 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:kiralik_kaleci/comment_model.dart';
 
 class CommentSection extends StatefulWidget {
-  const CommentSection({super.key});
+  final String sellerUid;
+  const CommentSection({
+    super.key,
+    required this.sellerUid
+  });
 
   @override
   State<CommentSection> createState() => _CommentSectionState();
 }
 
 class _CommentSectionState extends State<CommentSection> {
+  // burada bilgileri db den çek
   List<Comment_model> comments = [
     Comment_model(author: 'Korhan Demir', content: 'Çok iyi kaleci!!'),
     Comment_model(author: 'Mehmet Bilgiç', content: 'Kurtarışları mükemmel'),

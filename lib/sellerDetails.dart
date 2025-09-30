@@ -62,6 +62,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
 
   bool isLoading = true;
   final String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
+  String? currentUserName; 
   bool isEmpty = false;
   late Future<void> _daysNameFuture;
   List<String> hours = []; 
@@ -71,8 +72,34 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
   void initState() {
     super.initState();
     _daysNameFuture = _getDaysName(widget.sellerUid);
-    //hasGig = checkIfSellerHasGig();
+    startInitFunctions();
   }
+
+  void startInitFunctions() async {
+    await getUserName();
+  }
+
+  Future<void> getUserName() async {
+  try {
+    if (currentUserUid != null) {
+      DocumentSnapshot<Map<String, dynamic>> doc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(currentUserUid!)
+          .get();
+      
+      var userData = doc.data();
+      if (userData != null && userData.containsKey('fullName')) {
+        currentUserName = userData['fullName'];
+      }
+    }
+  } catch (e, stack) {
+    reportErrorToCrashlytics(
+      e,
+      stack,
+      reason: 'getUserName error for user $currentUserUid',
+    );
+  }
+}
 
   bool checkIfSellerHasGig() {
     try {
@@ -353,7 +380,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                       ],
                                     ),
                                   ),
-                                  CommentInputBox(),
+                                  CommentInputBox(sellerUid: widget.sellerUid, currentUserUid: currentUserUid, currentUserName: currentUserName),
                                   Padding(
                                     padding: const EdgeInsets.only(left: 10),
                                     child: Text(
@@ -366,7 +393,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                             textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
                                           ),
                                   ),
-                                        CommentSection()
+                                        CommentSection(sellerUid: widget.sellerUid)
                                 ],
                               ),
                             ),
@@ -609,7 +636,15 @@ bool isPastNightHours(DateTime now, String startTime) {
 }
 
 class CommentInputBox extends StatefulWidget {
-  const CommentInputBox({super.key});
+  final String sellerUid;
+  final String? currentUserUid;
+  final String? currentUserName;
+  const CommentInputBox({
+    super.key,
+    required this.sellerUid,
+    required this.currentUserUid,
+    required this.currentUserName
+  });
 
   @override
   State<CommentInputBox> createState() => _CommentInputBoxState();
@@ -634,8 +669,7 @@ class _CommentInputBoxState extends State<CommentInputBox> {
 
     try {
       // Here you can add your logic to save the comment to Firebase
-      // For now, we'll just simulate a delay
-      await Future.delayed(const Duration(seconds: 1));
+      await addComment(widget.currentUserName, _commentController.text);
       
       // Clear the text field after successful submission
       _commentController.clear();
@@ -658,6 +692,26 @@ class _CommentInputBoxState extends State<CommentInputBox> {
       setState(() {
         _isSubmitting = false;
       });
+    }
+  }
+
+  Future<void> addComment(final String? author, final String content) async {
+    try {
+      await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(widget.sellerUid)
+        .collection('rentedUsers')
+        .doc(widget.currentUserUid)
+        .set({
+          'author': author,
+          'senderName': content
+        });
+    } catch (e,stack) {
+      await reportErrorToCrashlytics(
+      e,
+      stack,
+      reason: 'getUserName error for user ${widget.currentUserUid}',
+    );
     }
   }
 
