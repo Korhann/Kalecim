@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kiralik_kaleci/comment_model.dart';
@@ -13,16 +14,60 @@ class CommentSection extends StatefulWidget {
   State<CommentSection> createState() => _CommentSectionState();
 }
 
+
 class _CommentSectionState extends State<CommentSection> {
   // burada bilgileri db den çek
-  List<Comment_model> comments = [
-    Comment_model(author: 'Korhan Demir', content: 'Çok iyi kaleci!!'),
-    Comment_model(author: 'Mehmet Bilgiç', content: 'Kurtarışları mükemmel'),
-    Comment_model(author: 'Deniz Demir', content: 'sjfslfjajfla')
-  ];
+  List<Comment_model> comments = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchComments();
+  }
+
+   Future<void> fetchComments() async {
+    try {
+      // Your Firebase fetch logic here
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(widget.sellerUid)
+          .collection('rentedUsers')
+          .where('comment', isNotEqualTo: null)
+          .orderBy('timestamp', descending: true)
+          .get();
+
+      List<Comment_model> fetchedComments = [];
+      for (var doc in querySnapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        if (data['comment'] != null && data['comment'].toString().trim().isNotEmpty) {
+          fetchedComments.add(
+            Comment_model(author: data['author'] ?? 'Anonymous', content: data['comment'] ?? '', serverTimestamp: data['timestamp'])
+          );
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          comments = fetchedComments;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching comments: $e');
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
       return ListView.builder(
         itemCount: comments.length,
         shrinkWrap: true,
@@ -85,7 +130,7 @@ class CommentWidget extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '2 saat önce', // You can add timestamp to your model
+                      formatTimestamp(comment.serverTimestamp), 
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontSize: 12,
@@ -108,4 +153,46 @@ class CommentWidget extends StatelessWidget {
       ),
     );
   }
+  String formatTimestamp(dynamic timestamp) {
+  if (timestamp == null) return 'Bilinmeyen zaman';
+  
+  DateTime commentTime;
+  
+  // Handle different timestamp types
+  if (timestamp is Timestamp) {
+    commentTime = timestamp.toDate();
+  } else if (timestamp is DateTime) {
+    commentTime = timestamp;
+  } else if (timestamp is String) {
+    try {
+      commentTime = DateTime.parse(timestamp);
+    } catch (e) {
+      return 'Geçersiz tarih';
+    }
+  } else {
+    return 'Geçersiz tarih';
+  }
+  
+  final now = DateTime.now();
+  final difference = now.difference(commentTime);
+  
+  if (difference.inMinutes < 1) {
+    return 'Şimdi';
+  } else if (difference.inMinutes < 60) {
+    return '${difference.inMinutes} dakika önce';
+  } else if (difference.inHours < 24) {
+    return '${difference.inHours} saat önce';
+  } else if (difference.inDays < 7) {
+    return '${difference.inDays} gün önce';
+  } else if (difference.inDays < 30) {
+    final weeks = (difference.inDays / 7).floor();
+    return '$weeks hafta önce';
+  } else if (difference.inDays < 365) {
+    final months = (difference.inDays / 30).floor();
+    return '$months ay önce';
+  } else {
+    final years = (difference.inDays / 365).floor();
+    return '$years yıl önce';
+  }
+}
 }

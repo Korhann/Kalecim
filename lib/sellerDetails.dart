@@ -684,7 +684,7 @@ class _CommentInputBoxState extends State<CommentInputBox> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Yorum gönderilirken hata oluştu'),
+          content: Text('Sadece kiralama yapanlar yorum gönderebilir !'),
           backgroundColor: Colors.red,
         ),
       );
@@ -704,7 +704,8 @@ class _CommentInputBoxState extends State<CommentInputBox> {
         .doc(widget.currentUserUid)
         .set({
           'author': author,
-          'senderName': content
+          'comment': content,
+          'timestamp': FieldValue.serverTimestamp()
         });
     } catch (e,stack) {
       await reportErrorToCrashlytics(
