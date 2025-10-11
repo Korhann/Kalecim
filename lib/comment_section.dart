@@ -16,66 +16,79 @@ class CommentSection extends StatefulWidget {
 
 
 class _CommentSectionState extends State<CommentSection> {
-  // burada bilgileri db den çek
-  List<Comment_model> comments = [];
-  bool isLoading = true;
-
   @override
-  void initState() {
-    super.initState();
-    fetchComments();
-  }
-
-   Future<void> fetchComments() async {
-    try {
-      // Your Firebase fetch logic here
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
           .collection('Users')
           .doc(widget.sellerUid)
           .collection('rentedUsers')
           .where('comment', isNotEqualTo: null)
           .orderBy('timestamp', descending: true)
-          .get();
+          //.limit(1)
+          .snapshots(), // Use .snapshots() for real-time updates
+      builder: (context, snapshot) {
+        // Handle loading state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-      List<Comment_model> fetchedComments = [];
-      for (var doc in querySnapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
-        if (data['comment'] != null && data['comment'].toString().trim().isNotEmpty) {
-          fetchedComments.add(
-            Comment_model(author: data['author'] ?? 'Anonymous', content: data['comment'] ?? '', serverTimestamp: data['timestamp'])
+        // Handle error state
+        if (snapshot.hasError) {
+          print('Error fetching comments: ${snapshot.error}');
+          return Center(
+            child: Text(
+              'Yorumlar yüklenirken hata oluştu',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+            ),
           );
         }
-      }
 
-      if (mounted) {
-        setState(() {
-          comments = fetchedComments;
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      print('Error fetching comments: $e');
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
-  }
+        // Handle empty data
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(
+                'Henüz yorum yapılmamış',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          );
+        }
 
-  @override
-  Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-      return ListView.builder(
-        itemCount: comments.length,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemBuilder: (context,index) {
-          return CommentWidget(comment: comments[index]);
-        },
-      );
+        // Process the data
+        List<Comment_model> comments = [];
+        for (var doc in snapshot.data!.docs) {
+          final data = doc.data() as Map<String, dynamic>;
+          if (data['comment'] != null && data['comment'].toString().trim().isNotEmpty) {
+            comments.add(
+              Comment_model(
+                author: data['author'] ?? 'Anonymous',
+                content: data['comment'] ?? '',
+                serverTimestamp: data['timestamp'],
+              ),
+            );
+          }
+        }
+
+        // Return the ListView
+        return ListView.builder(
+          itemCount: comments.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            return CommentWidget(comment: comments[index]);
+          },
+        );
+      },
+    );
   }
 }
 
@@ -108,11 +121,11 @@ class CommentWidget extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: Colors.blue.shade100,
+                backgroundColor: Colors.green.shade100,
                 child: Text(
                   comment.author.isNotEmpty ? comment.author[0].toUpperCase() : 'U',
                   style: TextStyle(
-                    color: Colors.blue.shade700,
+                    color: Colors.green.shade700,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -154,7 +167,9 @@ class CommentWidget extends StatelessWidget {
     );
   }
   String formatTimestamp(dynamic timestamp) {
-  if (timestamp == null) return 'Bilinmeyen zaman';
+  if (timestamp == null) {
+    return 'Şimdi'; // Return "now" instead of "unknown time" for null timestamps
+  }
   
   DateTime commentTime;
   
@@ -170,7 +185,7 @@ class CommentWidget extends StatelessWidget {
       return 'Geçersiz tarih';
     }
   } else {
-    return 'Geçersiz tarih';
+    return 'Şimdi'; // Return "now" for any unrecognized type
   }
   
   final now = DateTime.now();

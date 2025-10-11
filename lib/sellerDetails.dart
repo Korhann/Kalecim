@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:core';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kiralik_kaleci/comment_section.dart';
@@ -62,44 +64,33 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
 
   bool isLoading = true;
   final String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
-  String? currentUserName; 
   bool isEmpty = false;
   late Future<void> _daysNameFuture;
   List<String> hours = []; 
-  //bool hasGig = false;
+  Future<bool>? checkUserRentedBefore;
+  TextStyle linkStyle = TextStyle(color: Colors.green);
 
   @override
   void initState() {
     super.initState();
     _daysNameFuture = _getDaysName(widget.sellerUid);
-    startInitFunctions();
+    checkUserRentedBefore = checkIfUserInRentedUsers();
   }
 
-  void startInitFunctions() async {
-    await getUserName();
-  }
+  Future<bool> checkIfUserInRentedUsers() async{
+    try {
+      DocumentSnapshot<Map<String,dynamic>> documentSnapshot = await FirebaseFirestore.instance
+    .collection('Users')
+    .doc(widget.sellerUid)
+    .collection('rentedUsers')
+    .doc(currentUserUid)
+    .get();
 
-  Future<void> getUserName() async {
-  try {
-    if (currentUserUid != null) {
-      DocumentSnapshot<Map<String, dynamic>> doc = await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(currentUserUid!)
-          .get();
-      
-      var userData = doc.data();
-      if (userData != null && userData.containsKey('fullName')) {
-        currentUserName = userData['fullName'];
-      }
+    return documentSnapshot.exists;
+    } catch (e) {
+      return false;
     }
-  } catch (e, stack) {
-    reportErrorToCrashlytics(
-      e,
-      stack,
-      reason: 'getUserName error for user $currentUserUid',
-    );
   }
-}
 
   bool checkIfSellerHasGig() {
     try {
@@ -380,18 +371,51 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                       ],
                                     ),
                                   ),
-                                  CommentInputBox(sellerUid: widget.sellerUid, currentUserUid: currentUserUid, currentUserName: currentUserName),
+                                  FutureBuilder<bool>(
+                                    future: checkUserRentedBefore,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return const SizedBox.shrink(); // Don't show anything while loading
+                                      }
+                                      if (snapshot.hasError) {
+                                        return const SizedBox.shrink(); // Don't show on error
+                                      }
+                                      // Only show comment box if user has rented before
+                                      if (snapshot.hasData && snapshot.data == true) {
+                                        return CommentInputBox(
+                                          sellerUid: widget.sellerUid, 
+                                          currentUserUid: currentUserUid
+                                        );
+                                      }
+                                      // Don't show comment box if user hasn't rented
+                                      return const SizedBox.shrink();
+                                    }
+                                  ),
                                   Padding(
                                     padding: const EdgeInsets.only(left: 10),
-                                    child: Text(
-                                            "Yorumlar",
-                                            style: GoogleFonts.inter(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w600,
-                                              color: userorseller ? Colors.white : Colors.black,
-                                            ),
-                                            textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          "Yorumlar",
+                                          style: GoogleFonts.inter(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                            color: userorseller ? Colors.white : Colors.black,
                                           ),
+                                          textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+                                        ),
+                                        const SizedBox(width: 20),
+                                        RichText(
+                                          text: TextSpan(
+                                            text: 'Diğer yorumları gör',
+                                            style: linkStyle,
+                                            recognizer: TapGestureRecognizer()..onTap = () {
+                                              
+                                            }
+                                          )
+                                        )
+                                      ],
+                                    )
                                   ),
                                         CommentSection(sellerUid: widget.sellerUid)
                                 ],
@@ -638,12 +662,10 @@ bool isPastNightHours(DateTime now, String startTime) {
 class CommentInputBox extends StatefulWidget {
   final String sellerUid;
   final String? currentUserUid;
-  final String? currentUserName;
   const CommentInputBox({
     super.key,
     required this.sellerUid,
     required this.currentUserUid,
-    required this.currentUserName
   });
 
   @override
@@ -653,6 +675,41 @@ class CommentInputBox extends StatefulWidget {
 class _CommentInputBoxState extends State<CommentInputBox> {
   final TextEditingController _commentController = TextEditingController();
   bool _isSubmitting = false;
+  String? currentUserName;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    startInitFunctions();
+  }
+
+  void startInitFunctions() async {
+    await getUserName();
+  }
+
+  Future<void> getUserName() async {
+  try {
+    if (widget.currentUserUid != null) {
+      DocumentSnapshot<Map<String, dynamic>> doc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(widget.currentUserUid!)
+          .get();
+      
+      var userData = doc.data();
+      if (userData != null && userData.containsKey('fullName')) {
+        currentUserName = userData['fullName'];
+      }
+    }
+  } catch (e, stack) {
+    reportErrorToCrashlytics(
+      e,
+      stack,
+      reason: 'getUserName error for user ${widget.currentUserUid}',
+    );
+  }
+}
+
 
   @override
   void dispose() {
@@ -668,11 +725,19 @@ class _CommentInputBoxState extends State<CommentInputBox> {
     });
 
     try {
-      // Here you can add your logic to save the comment to Firebase
-      await addComment(widget.currentUserName, _commentController.text);
-      
-      // Clear the text field after successful submission
+      // if the user is rented then can make a comment
+      bool isRented = await checkIfRented();
+      if (!isRented) {
+        ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Sadece kiralama yapanlar yorum gönderebilir !'),
+          backgroundColor: Colors.red,
+        ),
+      );
       _commentController.clear();
+      } else {
+        await addComment(currentUserName!, _commentController.text);
+        _commentController.clear();
       
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -681,10 +746,11 @@ class _CommentInputBoxState extends State<CommentInputBox> {
           backgroundColor: Colors.green,
         ),
       );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Sadece kiralama yapanlar yorum gönderebilir !'),
+          content: Text('Yorum gönderilirken bir hata oluştu!'),
           backgroundColor: Colors.red,
         ),
       );
@@ -695,7 +761,7 @@ class _CommentInputBoxState extends State<CommentInputBox> {
     }
   }
 
-  Future<void> addComment(final String? author, final String content) async {
+  Future<void> addComment(final String author, final String content) async {
     try {
       await FirebaseFirestore.instance
         .collection('Users')
@@ -713,6 +779,24 @@ class _CommentInputBoxState extends State<CommentInputBox> {
       stack,
       reason: 'getUserName error for user ${widget.currentUserUid}',
     );
+    }
+  }
+
+  // checks if the user is rented the keeper before, for the permission to comment
+  Future<bool> checkIfRented() async{
+    try {
+      DocumentSnapshot<Map<String,dynamic>> doc = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(widget.sellerUid)
+      .collection('rentedUsers')
+      .doc(widget.currentUserUid)
+      .get();
+
+      return doc.exists;
+
+    } catch (e,stack) {
+      await reportErrorToCrashlytics(e, stack,reason: 'error checking rented users ${widget.currentUserUid}');
+      return false;
     }
   }
 
@@ -1021,44 +1105,6 @@ class _showImageState extends State<showImage> {
     },
   );
 }
-
-  // void _toggleFavorite(Map<String, dynamic> sellerDetails, String sellerUid) async {
-  //   final String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
-  //   try {
-  //     if (currentUserUid != null && currentUserUid.isNotEmpty) {
-  //     if (_isFavorited) {
-  //       // Remove from favorites
-  //       QuerySnapshot snapshot = await FirebaseFirestore.instance
-  //           .collection('Users')
-  //           .doc(currentUserUid)
-  //           .collection('favourites')
-  //           .where('sellerUid', isEqualTo: sellerUid)
-  //           .get();
-  //       for (var doc in snapshot.docs) {
-  //         await doc.reference.delete();
-  //         print('its deleted');
-  //       }
-  //       setState(() {
-  //         _isFavorited = false;
-  //       });
-  //     } else {
-  //       // Add to favorites
-  //       sellerDetails['sellerUid'] = sellerUid;
-  //       await FirebaseFirestore.instance
-  //           .collection('Users')
-  //           .doc(currentUserUid)
-  //           .collection('favourites')
-  //           .add(sellerDetails);
-  //       setState(() {
-  //         _isFavorited = true;
-  //         print('added again');
-  //       });
-  //     }
-  //   }
-  //   } catch (e, stack) {
-  //     await reportErrorToCrashlytics(e, stack, reason: 'SellerDetails _toggleFavorite error for user $currentUserUid');
-  //   }
-  // }
 
   Future<void> _showMyDialog() async {
   if (Platform.isIOS) {

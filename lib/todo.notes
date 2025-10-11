@@ -10,12 +10,17 @@ Yapılacaklar:
 [√] Kalecinin db sine kiralayanlar diye liste oluştur, eğer biri kiralamışsa alıcı uid'sini oraya ekle
 [√] Yorum yazma kutusu
 [√] Yorumlara timestamp de ekle
-[ ] Sadece kiralayanlar yorum ve puanlama yapabilsin (not eklerken kiralama yapmadıysanız not ekleyemezsiniz yazısı yap)
+[√] Sadece kiralayanlar yorum ve puanlama yapabilsin (not eklerken kiralama yapmadıysanız not ekleyemezsiniz yazısı yap)
 [ ] Puanlamaların ortalamasını sellerGridItem de göster
 [ ] Maç saati geçtikten sonra randevularım da puanla ve yorum yap diye bir bölüm oluştur
-[ ] iki farklı kullanıcı ile yorum eklemeyi dene
-[ ] Yorum eklerken bazen author null olarak ekliyor
+[√] iki farklı kullanıcı ile yorum eklemeyi dene
+[√] Yorum eklerken bazen author null olarak ekliyor
 
 
 - KART RENGİ
 [ ] Yorumu ve puanlamayı yapdıktan sonra düşün
+
+
+- YORUM GELİŞTİRME
+[√] Kullanıcı daha önceden kiralamış ise yorum yap kutusu gözükecek
+[ ] Sadece son yorum gözükecek ve yorumları göre basılınca yorumlar sayfasına yönlendirilecek
