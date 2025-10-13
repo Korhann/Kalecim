@@ -1,9 +1,13 @@
 
 Yapılacaklar:
 
-[ ] Kaleciler için yorum özelliği
+[√] Kaleciler için yorum özelliği
 [ ] Kaleciler için puanlama özelliği
 [ ] Kalecilerin kart renginin gelen yorumlara göre değişmesi
+[ ] Mesajlaşırken mesajı iki kere gönderiyor
+[ ] Hizmet bedeli %3 ekle
+[ ] Pazar günleri randevu ne koşulda yenilenmediğine bak
+[ ] Bazı resimler tüm alanı kaplayacağına dikdörtgen oluyor
 
 
 - YORUM VE PUANLAMA ÖZELLİĞİ
@@ -23,4 +27,10 @@ Yapılacaklar:
 
 - YORUM GELİŞTİRME
 [√] Kullanıcı daha önceden kiralamış ise yorum yap kutusu gözükecek
-[ ] Sadece son yorum gözükecek ve yorumları göre basılınca yorumlar sayfasına yönlendirilecek
+[√] Sadece son yorum gözükecek ve yorumları göre basılınca yorumlar sayfasına yönlendirilecek
+
+
+- PUANLAMA MANTIĞI
+[ ] Kullanıcıların puanlamalarını db ye ekle
+[ ] SellerDetails'deki yıldızlarda, kullanıcıların puanlama ortalamasını al ve göster
+[ ] Maçlardan sonra kullanıcının puanlamasını ve belki yorum yapmasını zorunlu yap

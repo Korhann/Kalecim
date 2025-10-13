@@ -6,8 +6,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating/flutter_rating.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kiralik_kaleci/comment_section.dart';
+import 'package:kiralik_kaleci/commentspage.dart';
 import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
 import 'package:kiralik_kaleci/globals.dart';
 import 'package:kiralik_kaleci/messagepage.dart';
@@ -67,8 +69,10 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
   bool isEmpty = false;
   late Future<void> _daysNameFuture;
   List<String> hours = []; 
+
   Future<bool>? checkUserRentedBefore;
   TextStyle linkStyle = TextStyle(color: Colors.green);
+
 
   @override
   void initState() {
@@ -371,26 +375,6 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                       ],
                                     ),
                                   ),
-                                  FutureBuilder<bool>(
-                                    future: checkUserRentedBefore,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return const SizedBox.shrink(); // Don't show anything while loading
-                                      }
-                                      if (snapshot.hasError) {
-                                        return const SizedBox.shrink(); // Don't show on error
-                                      }
-                                      // Only show comment box if user has rented before
-                                      if (snapshot.hasData && snapshot.data == true) {
-                                        return CommentInputBox(
-                                          sellerUid: widget.sellerUid, 
-                                          currentUserUid: currentUserUid
-                                        );
-                                      }
-                                      // Don't show comment box if user hasn't rented
-                                      return const SizedBox.shrink();
-                                    }
-                                  ),
                                   Padding(
                                     padding: const EdgeInsets.only(left: 10),
                                     child: Row(
@@ -405,19 +389,68 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                           textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
                                         ),
                                         const SizedBox(width: 20),
-                                        RichText(
-                                          text: TextSpan(
-                                            text: 'Diğer yorumları gör',
-                                            style: linkStyle,
-                                            recognizer: TapGestureRecognizer()..onTap = () {
-                                              
+                                        StreamBuilder<QuerySnapshot>(
+                                          stream: FirebaseFirestore.instance
+                                              .collection('Users')
+                                              .doc(widget.sellerUid)
+                                              .collection('rentedUsers')
+                                              .where('comment', isNotEqualTo: null)
+                                              .snapshots(),
+                                          builder: (context, snapshot) {
+                                            int commentCount = 0;
+                                            
+                                            if (snapshot.hasData) {
+                                              // Count only documents that have non-empty comments
+                                              commentCount = snapshot.data!.docs.where((doc) {
+                                                final data = doc.data() as Map<String, dynamic>;
+                                                return data['comment'] != null && data['comment'].toString().trim().isNotEmpty;
+                                              }).length;
                                             }
-                                          )
-                                        )
+                                            
+                                            return RichText(
+                                              text: TextSpan(
+                                                text: '$commentCount yorumu gör',
+                                                style: linkStyle,
+                                                recognizer: TapGestureRecognizer()..onTap = () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => CommentsPage(sellerUid: widget.sellerUid,checkIfRented: checkUserRentedBefore)
+                                                    )
+                                                  );
+                                                }
+                                              )
+                                            );
+                                          },
+                                        ),
+                                        // denemek için puanlamayı yap buraya
+                                        //const SizedBox(width: 20),
+                                        const Spacer(),
+                                        Ratings()
                                       ],
                                     )
                                   ),
-                                        CommentSection(sellerUid: widget.sellerUid)
+                                  CommentSection(sellerUid: widget.sellerUid),
+                                  FutureBuilder<bool>(
+                                    future: checkUserRentedBefore,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return const SizedBox.shrink(); // Don't show anything while loading
+                                      }
+                                      if (snapshot.hasError) {
+                                        return const SizedBox.shrink(); // Don't show on error
+                                      }
+                                      // Only show comment box if user has rented before
+                                      if (snapshot.hasData && snapshot.data == true) {
+                                        return SimpleCommentBox(
+                                          sellerUid: widget.sellerUid,
+                                          checkIfRented: checkUserRentedBefore,
+                                        );
+                                      }
+                                      // Don't show comment box if user hasn't rented
+                                      return const SizedBox.shrink();
+                                    }
+                                  ),
                                 ],
                               ),
                             ),
@@ -659,248 +692,356 @@ bool isPastNightHours(DateTime now, String startTime) {
   return nowInMinutes >= startInMinutes;
 }
 
-class CommentInputBox extends StatefulWidget {
-  final String sellerUid;
-  final String? currentUserUid;
-  const CommentInputBox({
-    super.key,
-    required this.sellerUid,
-    required this.currentUserUid,
-  });
+// class CommentInputBox extends StatefulWidget {
+//   final String sellerUid;
+//   final String? currentUserUid;
+//   const CommentInputBox({
+//     super.key,
+//     required this.sellerUid,
+//     required this.currentUserUid,
+//   });
+
+//   @override
+//   State<CommentInputBox> createState() => _CommentInputBoxState();
+// }
+
+// class _CommentInputBoxState extends State<CommentInputBox> {
+//   final TextEditingController _commentController = TextEditingController();
+//   bool _isSubmitting = false;
+//   String? currentUserName;
+
+//   @override
+//   void initState() {
+//     // TODO: implement initState
+//     super.initState();
+//     startInitFunctions();
+//   }
+
+//   void startInitFunctions() async {
+//     await getUserName();
+//   }
+
+//   Future<void> getUserName() async {
+//   try {
+//     if (widget.currentUserUid != null) {
+//       DocumentSnapshot<Map<String, dynamic>> doc = await FirebaseFirestore.instance
+//           .collection('Users')
+//           .doc(widget.currentUserUid!)
+//           .get();
+      
+//       var userData = doc.data();
+//       if (userData != null && userData.containsKey('fullName')) {
+//         currentUserName = userData['fullName'];
+//       }
+//     }
+//   } catch (e, stack) {
+//     reportErrorToCrashlytics(
+//       e,
+//       stack,
+//       reason: 'getUserName error for user ${widget.currentUserUid}',
+//     );
+//   }
+// }
+
+
+//   @override
+//   void dispose() {
+//     _commentController.dispose();
+//     super.dispose();
+//   }
+
+//   Future<void> _submitComment() async {
+//     if (_commentController.text.trim().isEmpty) return;
+
+//     setState(() {
+//       _isSubmitting = true;
+//     });
+
+//     try {
+//       // if the user is rented then can make a comment
+//       bool isRented = await checkIfRented();
+//       if (!isRented) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(
+//           content: Text('Sadece kiralama yapanlar yorum gönderebilir !'),
+//           backgroundColor: Colors.red,
+//         ),
+//       );
+//       _commentController.clear();
+//       } else {
+//         await addComment(currentUserName!, _commentController.text);
+//         _commentController.clear();
+      
+//       // Show success message
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(
+//           content: Text('Yorumunuz başarıyla gönderildi'),
+//           backgroundColor: Colors.green,
+//         ),
+//       );
+//       }
+//     } catch (e) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(
+//           content: Text('Yorum gönderilirken bir hata oluştu!'),
+//           backgroundColor: Colors.red,
+//         ),
+//       );
+//     } finally {
+//       setState(() {
+//         _isSubmitting = false;
+//       });
+//     }
+//   }
+
+//   Future<void> addComment(final String author, final String content) async {
+//     try {
+//       await FirebaseFirestore.instance
+//         .collection('Users')
+//         .doc(widget.sellerUid)
+//         .collection('rentedUsers')
+//         .doc(widget.currentUserUid)
+//         .set({
+//           'author': author,
+//           'comment': content,
+//           'timestamp': FieldValue.serverTimestamp()
+//         });
+//     } catch (e,stack) {
+//       await reportErrorToCrashlytics(
+//       e,
+//       stack,
+//       reason: 'getUserName error for user ${widget.currentUserUid}',
+//     );
+//     }
+//   }
+
+//   // checks if the user is rented the keeper before, for the permission to comment
+//   Future<bool> checkIfRented() async{
+//     try {
+//       DocumentSnapshot<Map<String,dynamic>> doc = await FirebaseFirestore.instance
+//       .collection('Users')
+//       .doc(widget.sellerUid)
+//       .collection('rentedUsers')
+//       .doc(widget.currentUserUid)
+//       .get();
+
+//       return doc.exists;
+
+//     } catch (e,stack) {
+//       await reportErrorToCrashlytics(e, stack,reason: 'error checking rented users ${widget.currentUserUid}');
+//       return false;
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+//       child: Container(
+//         padding: const EdgeInsets.all(12),
+//         decoration: BoxDecoration(
+//           color: userorseller ? sellergrey : Colors.white,
+//           borderRadius: BorderRadius.circular(12),
+//           border: Border.all(
+//             color: Colors.grey.shade300,
+//             width: 1,
+//           ),
+//           boxShadow: [
+//             BoxShadow(
+//               color: Colors.black.withOpacity(0.05),
+//               blurRadius: 4,
+//               offset: const Offset(0, 2),
+//             ),
+//           ],
+//         ),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Text(
+//               'Yorum yap',
+//               style: GoogleFonts.inter(
+//                 fontSize: 14,
+//                 fontWeight: FontWeight.w500,
+//                 color: userorseller ? Colors.white : Colors.black87,
+//               ),
+//             ),
+//             const SizedBox(height: 8),
+//             TextField(
+//               controller: _commentController,
+//               maxLines: 3,
+//               decoration: InputDecoration(
+//                 hintText: 'Yorumunuzu buraya yazın...',
+//                 hintStyle: TextStyle(
+//                   color: userorseller ? Colors.white70 : Colors.grey,
+//                   fontSize: 14,
+//                 ),
+//                 border: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(8),
+//                   borderSide: BorderSide(color: Colors.grey.shade300),
+//                 ),
+//                 enabledBorder: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(8),
+//                   borderSide: BorderSide(color: Colors.grey.shade300),
+//                 ),
+//                 focusedBorder: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(8),
+//                   borderSide: const BorderSide(color: Colors.blue),
+//                 ),
+//                 filled: true,
+//                 fillColor: userorseller ? sellergrey.withOpacity(0.5) : Colors.grey.shade50,
+//                 contentPadding: const EdgeInsets.all(12),
+//               ),
+//               style: TextStyle(
+//                 color: userorseller ? Colors.white : Colors.black,
+//                 fontSize: 14,
+//               ),
+//             ),
+//             const SizedBox(height: 8),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.end,
+//               children: [
+//                 TextButton(
+//                   onPressed: _isSubmitting ? null : () {
+//                     _commentController.clear();
+//                   },
+//                   child: Text(
+//                     'Temizle',
+//                     style: TextStyle(
+//                       color: userorseller ? Colors.white70 : Colors.grey,
+//                     ),
+//                   ),
+//                 ),
+//                 const SizedBox(width: 8),
+//                 ElevatedButton(
+//                   onPressed: _isSubmitting ? null : _submitComment,
+//                   style: ElevatedButton.styleFrom(
+//                     backgroundColor: Colors.blue,
+//                     foregroundColor: Colors.white,
+//                     shape: RoundedRectangleBorder(
+//                       borderRadius: BorderRadius.circular(8),
+//                     ),
+//                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+//                   ),
+//                   child: _isSubmitting
+//                       ? const SizedBox(
+//                           width: 16,
+//                           height: 16,
+//                           child: CircularProgressIndicator(
+//                             strokeWidth: 2,
+//                             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+//                           ),
+//                         )
+//                       : const Text('Gönder'),
+//                 ),
+//               ],
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
+class Ratings extends StatefulWidget {
+  const Ratings({super.key});
 
   @override
-  State<CommentInputBox> createState() => _CommentInputBoxState();
+  State<Ratings> createState() => _RatingsState();
 }
 
-class _CommentInputBoxState extends State<CommentInputBox> {
-  final TextEditingController _commentController = TextEditingController();
-  bool _isSubmitting = false;
-  String? currentUserName;
+class _RatingsState extends State<Ratings> {
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    startInitFunctions();
-  }
-
-  void startInitFunctions() async {
-    await getUserName();
-  }
-
-  Future<void> getUserName() async {
-  try {
-    if (widget.currentUserUid != null) {
-      DocumentSnapshot<Map<String, dynamic>> doc = await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(widget.currentUserUid!)
-          .get();
-      
-      var userData = doc.data();
-      if (userData != null && userData.containsKey('fullName')) {
-        currentUserName = userData['fullName'];
-      }
-    }
-  } catch (e, stack) {
-    reportErrorToCrashlytics(
-      e,
-      stack,
-      reason: 'getUserName error for user ${widget.currentUserUid}',
-    );
-  }
-}
-
-
-  @override
-  void dispose() {
-    _commentController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submitComment() async {
-    if (_commentController.text.trim().isEmpty) return;
-
-    setState(() {
-      _isSubmitting = true;
-    });
-
-    try {
-      // if the user is rented then can make a comment
-      bool isRented = await checkIfRented();
-      if (!isRented) {
-        ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sadece kiralama yapanlar yorum gönderebilir !'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      _commentController.clear();
-      } else {
-        await addComment(currentUserName!, _commentController.text);
-        _commentController.clear();
-      
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Yorumunuz başarıyla gönderildi'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Yorum gönderilirken bir hata oluştu!'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      setState(() {
-        _isSubmitting = false;
-      });
-    }
-  }
-
-  Future<void> addComment(final String author, final String content) async {
-    try {
-      await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(widget.sellerUid)
-        .collection('rentedUsers')
-        .doc(widget.currentUserUid)
-        .set({
-          'author': author,
-          'comment': content,
-          'timestamp': FieldValue.serverTimestamp()
-        });
-    } catch (e,stack) {
-      await reportErrorToCrashlytics(
-      e,
-      stack,
-      reason: 'getUserName error for user ${widget.currentUserUid}',
-    );
-    }
-  }
-
-  // checks if the user is rented the keeper before, for the permission to comment
-  Future<bool> checkIfRented() async{
-    try {
-      DocumentSnapshot<Map<String,dynamic>> doc = await FirebaseFirestore.instance
-      .collection('Users')
-      .doc(widget.sellerUid)
-      .collection('rentedUsers')
-      .doc(widget.currentUserUid)
-      .get();
-
-      return doc.exists;
-
-    } catch (e,stack) {
-      await reportErrorToCrashlytics(e, stack,reason: 'error checking rented users ${widget.currentUserUid}');
-      return false;
-    }
-  }
+  // puanlama için
+  double rating = 0;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: userorseller ? sellergrey : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.grey.shade300,
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: StarRating(
+        size: 20.0,
+                                          rating: rating,
+                                          color: Colors.yellow,
+                                          allowHalfRating: true,
+                                          starCount: 5,
+                                          onRatingChanged: (rating) => setState(() {
+                                            this.rating = rating;
+                                          })
+                                        ),
+    );
+  }
+}
+
+class SimpleCommentBox extends StatelessWidget {
+  final String sellerUid;
+  final Future<bool>? checkIfRented;
+  
+  const SimpleCommentBox({
+    super.key,
+    required this.sellerUid,
+    required this.checkIfRented,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: userorseller ? sellergrey : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.grey.shade300,
+          width: 1,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CommentsPage(
+                sellerUid: sellerUid,
+                checkIfRented: checkIfRented,
+              )
+            )
+          );
+        },
+        child: Row(
           children: [
-            Text(
-              'Yorum yap',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: userorseller ? Colors.white : Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _commentController,
-              maxLines: 3,
-              decoration: InputDecoration(
-                hintText: 'Yorumunuzu buraya yazın...',
-                hintStyle: TextStyle(
-                  color: userorseller ? Colors.white70 : Colors.grey,
-                  fontSize: 14,
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                  color: userorseller ? sellergrey.withOpacity(0.5) : Colors.grey.shade100,
+                  border: Border.all(color: Colors.grey.shade300),
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.blue),
-                ),
-                filled: true,
-                fillColor: userorseller ? sellergrey.withOpacity(0.5) : Colors.grey.shade50,
-                contentPadding: const EdgeInsets.all(12),
-              ),
-              style: TextStyle(
-                color: userorseller ? Colors.white : Colors.black,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: _isSubmitting ? null : () {
-                    _commentController.clear();
-                  },
-                  child: Text(
-                    'Temizle',
-                    style: TextStyle(
-                      color: userorseller ? Colors.white70 : Colors.grey,
-                    ),
+                child: Text(
+                  'Yorum yazın...',
+                  style: TextStyle(
+                    color: userorseller ? Colors.white70 : Colors.grey,
+                    fontSize: 14,
                   ),
                 ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _isSubmitting ? null : _submitComment,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  ),
-                  child: _isSubmitting
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : const Text('Gönder'),
-                ),
-              ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            CircleAvatar(
+              backgroundColor: Colors.blue,
+              child: Icon(
+                Icons.send, 
+                color: Colors.white, 
+                size: 20
+              ),
             ),
           ],
         ),

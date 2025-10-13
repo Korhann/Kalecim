@@ -25,7 +25,7 @@ class _CommentSectionState extends State<CommentSection> {
           .collection('rentedUsers')
           .where('comment', isNotEqualTo: null)
           .orderBy('timestamp', descending: true)
-          //.limit(1)
+          .limit(1)
           .snapshots(), // Use .snapshots() for real-time updates
       builder: (context, snapshot) {
         // Handle loading state
@@ -35,7 +35,6 @@ class _CommentSectionState extends State<CommentSection> {
 
         // Handle error state
         if (snapshot.hasError) {
-          print('Error fetching comments: ${snapshot.error}');
           return Center(
             child: Text(
               'Yorumlar yüklenirken hata oluştu',
@@ -101,7 +100,7 @@ class CommentWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
