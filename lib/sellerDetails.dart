@@ -237,10 +237,14 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                     child: showImage(imageUrl: imageUrl, sellerDetails: widget.sellerDetails, sellerUid: widget.sellerUid, width: width, height: height, whereFrom: widget.wherFrom,)
                                   ),
                                   SizedBox(height: height * 0.020),
-                                  
-                                  showNameSurname(sellerDetails: widget.sellerDetails),
 
-                                  // burada yanında puan ile birlikte ortalam rating i göster
+                                  Row(
+                                    children: [
+                                      showNameSurname(sellerDetails: widget.sellerDetails),
+                                      const Spacer(),
+                                      AverageRating(sellerUid: widget.sellerUid),
+                                    ],
+                                  ),
                                   
                                   SizedBox(height: height * 0.007),
                                   
@@ -428,7 +432,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                         // denemek için puanlamayı yap buraya
                                         //const SizedBox(width: 20),
                                         const Spacer(),
-                                        Ratings()
+                                        Ratings(sellerUid: widget.sellerUid, currentUserUid: currentUserUid!)
                                       ],
                                     )
                                   ),
@@ -946,7 +950,13 @@ bool isPastNightHours(DateTime now, String startTime) {
 
 
 class Ratings extends StatefulWidget {
-  const Ratings({super.key});
+  final String sellerUid;
+  final String currentUserUid;
+  const Ratings({
+    super.key,
+    required this.sellerUid,
+    required this.currentUserUid
+  });
 
   @override
   State<Ratings> createState() => _RatingsState();
@@ -962,14 +972,144 @@ class _RatingsState extends State<Ratings> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15),
       child: StarRating(
-        size: 19.0,
+        size: 25.0,
         rating: currentRating,
         color: Colors.yellow,
         allowHalfRating: true,
         starCount: 5,
         onRatingChanged: (currentRating) => setState(() {
           this.currentRating = currentRating;
+          // basınca 1 saniye yükleme barı oluştur ve puanlama yapılmıştır promptu çıkar
+          insertRating();
+          insertTotalandCountRating();
         })
+      ),
+    );
+  }
+  Future<void> insertRating() async{
+    await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(widget.sellerUid)
+      .collection('ratings')
+      .doc(widget.currentUserUid)
+      .set({
+        'raterUid': widget.currentUserUid,
+        'rating': currentRating,
+      });
+  }
+  Future<void> insertTotalandCountRating() async {
+  try {
+    // First, get all ratings for this seller
+    QuerySnapshot ratingsSnapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(widget.sellerUid)
+        .collection('ratings')
+        .get();
+
+    if (ratingsSnapshot.docs.isEmpty) return;
+
+    // Calculate total ratings and count
+    double totalRatings = 0;
+    int numberOfRatings = ratingsSnapshot.docs.length;
+
+    for (var doc in ratingsSnapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      totalRatings += (data['rating'] ?? 0).toDouble();
+    }
+
+    // Calculate average rating
+    double averageRating = totalRatings / numberOfRatings;
+
+    // Update the sellerDetails map with proper field syntax
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(widget.sellerUid)
+        .update({
+          'sellerDetails.ratinginfo.totalRatings': totalRatings,
+          'sellerDetails.ratinginfo.numberOfRatings': numberOfRatings,
+          'sellerDetails.ratinginfo.averageRating': averageRating, // Also store average for easy access
+        });
+
+  } catch (e, stack) {
+    await reportErrorToCrashlytics(
+      e,
+      stack,
+      reason: 'insertTotalandCountRating error for seller ${widget.sellerUid}',
+    );
+  }
+}
+}
+
+class AverageRating extends StatefulWidget {
+  final String sellerUid;
+  const AverageRating({
+    super.key,
+    required this.sellerUid
+  });
+
+  @override
+  State<AverageRating> createState() => _AverageRatingState();
+}
+
+class _AverageRatingState extends State<AverageRating> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Users')
+            .doc(widget.sellerUid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          double averageRating = 0;
+          int numberOfRatings = 0;
+
+          if (snapshot.hasData && snapshot.data!.exists) {
+            try {
+              final data = snapshot.data!.data() as Map<String, dynamic>;
+              
+              if (data.containsKey('sellerDetails')) {
+                Map<String, dynamic> sellerDetails = data['sellerDetails'];
+                
+                if (sellerDetails.containsKey('ratinginfo')) {
+                  Map<String, dynamic> ratinginfo = sellerDetails['ratinginfo'];
+                  averageRating = (ratinginfo['averageRating'] ?? 0).toDouble();
+                  numberOfRatings = ratinginfo['numberOfRatings'] ?? 0;
+                }
+              }
+            } catch (e, stack) {
+              reportErrorToCrashlytics(
+                e,
+                stack,
+                reason: 'AverageRating StreamBuilder error for seller ${widget.sellerUid}',
+              );
+            }
+          }
+
+          return Row(
+            children: [
+              StarRating(
+                size: 20.0,
+                rating: averageRating,
+                color: Colors.yellow,
+                allowHalfRating: true,
+                starCount: 5,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                numberOfRatings > 0 
+                    ? '${averageRating.toStringAsFixed(1)} ($numberOfRatings)'
+                    : 'Henüz puanlanmamış',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: userorseller ? Colors.white70 : Colors.black54,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
