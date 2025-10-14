@@ -432,7 +432,24 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                         // denemek için puanlamayı yap buraya
                                         //const SizedBox(width: 20),
                                         const Spacer(),
-                                        Ratings(sellerUid: widget.sellerUid, currentUserUid: currentUserUid!)
+                                        FutureBuilder<bool>(
+                                          future: checkUserRentedBefore,
+                                          builder: (context,snapshot) {
+                                            if (snapshot.connectionState == ConnectionState.waiting) {
+                                              return const SizedBox.shrink(); // Don't show anything while loading
+                                            }
+                                            if (snapshot.hasError) {
+                                              return const SizedBox.shrink(); // Don't show on error
+                                            }
+                                            if (snapshot.hasData && snapshot.data == true) {
+                                              return Ratings(
+                                                sellerUid: widget.sellerUid,
+                                                currentUserUid: currentUserUid!,
+                                              );
+                                            }
+                                            return const SizedBox.shrink();
+                                          }
+                                        )
                                       ],
                                     )
                                   ),
@@ -955,7 +972,7 @@ class Ratings extends StatefulWidget {
   const Ratings({
     super.key,
     required this.sellerUid,
-    required this.currentUserUid
+    required this.currentUserUid,
   });
 
   @override
@@ -966,6 +983,14 @@ class _RatingsState extends State<Ratings> {
 
   // puanlama için
   double currentRating = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    showInitialRating();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -986,7 +1011,39 @@ class _RatingsState extends State<Ratings> {
       ),
     );
   }
-  Future<void> insertRating() async{
+
+  Future<void> showInitialRating() async {
+    try {
+      // Check if user has already rated this seller
+      DocumentSnapshot<Map<String, dynamic>> ratingDoc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(widget.sellerUid)
+          .collection('ratings')
+          .doc(widget.currentUserUid)
+          .get();
+
+      if (ratingDoc.exists) {
+        final data = ratingDoc.data();
+        if (data != null && data.containsKey('rating')) {
+          setState(() {
+            currentRating = (data['rating'] ?? 0).toDouble();
+          });
+        }
+      } 
+    } catch (e, stack) {
+      await reportErrorToCrashlytics(
+        e,
+        stack,
+        reason: 'showInitialRating error for seller ${widget.sellerUid} and user ${widget.currentUserUid}',
+      );
+      // Keep currentRating as 0 on error
+      setState(() {
+        currentRating = 0;
+      });
+    }
+  }
+
+  Future<void> insertRating() async {
     await FirebaseFirestore.instance
       .collection('Users')
       .doc(widget.sellerUid)

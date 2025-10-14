@@ -105,6 +105,11 @@ class _EarningsPageState extends State<EarningsPage> {
                 ),
               ),
             ),
+            const SizedBox(height: 15),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: GlobalStyles.textStyle(text: 'Çekim talepleriniz 3 iş günü içerisinde hesabınıza aktarılacaktır', context: context, size: 12, fontWeight: FontWeight.w400, color: Colors.white),
+            ),
             const SizedBox(height: 50),
             Center(
               child: ElevatedButton(

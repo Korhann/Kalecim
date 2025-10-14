@@ -2,10 +2,11 @@
 Yapılacaklar:
 
 [√] Kaleciler için yorum özelliği
-[ ] Kaleciler için puanlama özelliği
-[ ] Kalecilerin kart renginin gelen yorumlara göre değişmesi
-[ ] Mesajlaşırken mesajı iki kere gönderiyor
-[ ] Hizmet bedeli %3 diye ekle ve para 3 iş günü içinde yatıcak diye de ekle
+[√] Kaleciler için puanlama özelliği
+[ ] Kalecilerin kart renginin puanlamalara göre değişmesi
+[x] Mesajlaşırken mesajı iki kere gönderiyor
+[√] Para 3 iş günü içinde yatıcak diye de ekle
+[ ] Hizmet bedeli %3 diye selleraddpage ye ekle ve %3 daha kes
 [ ] Pazar günleri randevu ne koşulda yenilenmediğine bak
 [ ] Bazı resimler tüm alanı kaplayacağına dikdörtgen oluyor
 [ ] Kullanıcı hesabı silince db deki bütün herşeyi de silinsin
@@ -17,7 +18,7 @@ Yapılacaklar:
 [√] Yorum yazma kutusu
 [√] Yorumlara timestamp de ekle
 [√] Sadece kiralayanlar yorum ve puanlama yapabilsin (not eklerken kiralama yapmadıysanız not ekleyemezsiniz yazısı yap)
-[ ] Puanlamaların ortalamasını sellerGridItem de göster
+[√] Puanlamaların ortalamasını sellerGridItem de göster
 [ ] Maç saati geçtikten sonra randevularım da puanla ve yorum yap diye bir bölüm oluştur
 [√] iki farklı kullanıcı ile yorum eklemeyi dene
 [√] Yorum eklerken bazen author null olarak ekliyor
@@ -33,8 +34,8 @@ Yapılacaklar:
 
 
 - PUANLAMA MANTIĞI
-[ ] Kullanıcıların puanlamalarını kaleci dbsine ye ekle
-[ ] Yukarıda yanında puan ile ortlama rating i göster, aşşağıda kiralamış ve puanlamamış ise puanlat, 
+[√] Kullanıcıların puanlamalarını kaleci dbsine ye ekle
+[√] Yukarıda yanında puan ile ortlama rating i göster, aşşağıda kiralamış ve puanlamamış ise puanlat, 
     puanlamış ise puanını göster
-[ ] Ortalamada kaç kişinin puanladığını da göster
-[ ] Maçlardan sonra kullanıcının puanlamasını ve belki yorum yapmasını zorunlu yap
+[√] Ortalamada kaç kişinin puanladığını da göster
+[!] Maçlardan sonra kullanıcının puanlamasını ve belki yorum yapmasını zorunlu yap
