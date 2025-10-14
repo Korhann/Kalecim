@@ -5,9 +5,11 @@ Yapılacaklar:
 [ ] Kaleciler için puanlama özelliği
 [ ] Kalecilerin kart renginin gelen yorumlara göre değişmesi
 [ ] Mesajlaşırken mesajı iki kere gönderiyor
-[ ] Hizmet bedeli %3 ekle
+[ ] Hizmet bedeli %3 diye ekle ve para 3 iş günü içinde yatıcak diye de ekle
 [ ] Pazar günleri randevu ne koşulda yenilenmediğine bak
 [ ] Bazı resimler tüm alanı kaplayacağına dikdörtgen oluyor
+[ ] Kullanıcı hesabı silince db deki bütün herşeyi de silinsin
+[!] Anroid i araştır nasıl olur diye
 
 
 - YORUM VE PUANLAMA ÖZELLİĞİ
@@ -32,5 +34,7 @@ Yapılacaklar:
 
 - PUANLAMA MANTIĞI
 [ ] Kullanıcıların puanlamalarını db ye ekle
-[ ] SellerDetails'deki yıldızlarda, kullanıcıların puanlama ortalamasını al ve göster
+[ ] Yukarıda yanında puan ile ortlama rating i göster, aşşağıda kiralamış ve puanlamamış ise puanlat, 
+    puanlamış ise puanını göster
+[ ] Ortalamada kaç kişinin puanladığını da göster
 [ ] Maçlardan sonra kullanıcının puanlamasını ve belki yorum yapmasını zorunlu yap

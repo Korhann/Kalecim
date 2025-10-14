@@ -239,6 +239,8 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                   SizedBox(height: height * 0.020),
                                   
                                   showNameSurname(sellerDetails: widget.sellerDetails),
+
+                                  // burada yanında puan ile birlikte ortalam rating i göster
                                   
                                   SizedBox(height: height * 0.007),
                                   
@@ -953,7 +955,7 @@ class Ratings extends StatefulWidget {
 class _RatingsState extends State<Ratings> {
 
   // puanlama için
-  double rating = 0;
+  double currentRating = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -961,14 +963,14 @@ class _RatingsState extends State<Ratings> {
       padding: EdgeInsets.symmetric(horizontal: 15),
       child: StarRating(
         size: 20.0,
-                                          rating: rating,
-                                          color: Colors.yellow,
-                                          allowHalfRating: true,
-                                          starCount: 5,
-                                          onRatingChanged: (rating) => setState(() {
-                                            this.rating = rating;
-                                          })
-                                        ),
+        rating: currentRating,
+        color: Colors.yellow,
+        allowHalfRating: true,
+        starCount: 5,
+        onRatingChanged: (currentRating) => setState(() {
+          this.currentRating = currentRating;
+        })
+      ),
     );
   }
 }
