@@ -962,7 +962,7 @@ class _RatingsState extends State<Ratings> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15),
       child: StarRating(
-        size: 20.0,
+        size: 19.0,
         rating: currentRating,
         color: Colors.yellow,
         allowHalfRating: true,

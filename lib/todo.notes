@@ -33,7 +33,7 @@ Yapılacaklar:
 
 
 - PUANLAMA MANTIĞI
-[ ] Kullanıcıların puanlamalarını db ye ekle
+[ ] Kullanıcıların puanlamalarını kaleci dbsine ye ekle
 [ ] Yukarıda yanında puan ile ortlama rating i göster, aşşağıda kiralamış ve puanlamamış ise puanlat, 
     puanlamış ise puanını göster
 [ ] Ortalamada kaç kişinin puanladığını da göster
