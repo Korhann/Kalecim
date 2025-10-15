@@ -8,11 +8,11 @@ import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 
 class CommentsPage extends StatefulWidget {
   final String sellerUid;
-  final Future<bool>? checkIfRented;
+  final Future<bool> checkIfSameUser;
   const CommentsPage({
     super.key,
     required this.sellerUid,
-    required this.checkIfRented
+    required this.checkIfSameUser
   });
 
   @override
@@ -102,7 +102,7 @@ class _CommentsPageState extends State<CommentsPage> {
             ),
           ),
           FutureBuilder<bool>(
-            future: widget.checkIfRented, // Use the passed future
+            future: widget.checkIfSameUser, // Use the passed future
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const SizedBox.shrink(); // Don't show anything while loading

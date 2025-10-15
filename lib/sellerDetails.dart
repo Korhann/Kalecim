@@ -70,7 +70,8 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
   late Future<void> _daysNameFuture;
   List<String> hours = []; 
 
-  Future<bool>? checkUserRentedBefore;
+  // Future<bool>? checkUserRentedBefore;
+  Future<bool>? checkIfSameUser;
   TextStyle linkStyle = TextStyle(color: Colors.green);
 
 
@@ -78,7 +79,12 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
   void initState() {
     super.initState();
     _daysNameFuture = _getDaysName(widget.sellerUid);
-    checkUserRentedBefore = checkIfUserInRentedUsers();
+    // checkUserRentedBefore = checkIfUserInRentedUsers();
+    checkIfSameUser = checkIfSameUserIsSeller();
+  }
+
+  Future<bool> checkIfSameUserIsSeller() async {
+    return widget.sellerUid != currentUserUid;
   }
 
   Future<bool> checkIfUserInRentedUsers() async{
@@ -421,7 +427,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) => CommentsPage(sellerUid: widget.sellerUid,checkIfRented: checkUserRentedBefore)
+                                                      builder: (context) => CommentsPage(sellerUid: widget.sellerUid, checkIfSameUser: checkIfSameUser!)
                                                     )
                                                   );
                                                 }
@@ -429,11 +435,10 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                             );
                                           },
                                         ),
-                                        // denemek için puanlamayı yap buraya
-                                        //const SizedBox(width: 20),
                                         const Spacer(),
+
                                         FutureBuilder<bool>(
-                                          future: checkUserRentedBefore,
+                                          future: checkIfSameUser,
                                           builder: (context,snapshot) {
                                             if (snapshot.connectionState == ConnectionState.waiting) {
                                               return const SizedBox.shrink(); // Don't show anything while loading
@@ -454,8 +459,9 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                     )
                                   ),
                                   CommentSection(sellerUid: widget.sellerUid),
+
                                   FutureBuilder<bool>(
-                                    future: checkUserRentedBefore,
+                                    future: checkIfSameUser,
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState == ConnectionState.waiting) {
                                         return const SizedBox.shrink(); // Don't show anything while loading
@@ -467,7 +473,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                       if (snapshot.hasData && snapshot.data == true) {
                                         return SimpleCommentBox(
                                           sellerUid: widget.sellerUid,
-                                          checkIfRented: checkUserRentedBefore,
+                                          checkIfSameUser: checkIfSameUser!,
                                         );
                                       }
                                       // Don't show comment box if user hasn't rented
@@ -1157,7 +1163,7 @@ class _AverageRatingState extends State<AverageRating> {
               Text(
                 numberOfRatings > 0 
                     ? '${averageRating.toStringAsFixed(1)} ($numberOfRatings)'
-                    : 'Henüz puanlanmamış',
+                    : '',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -1174,12 +1180,12 @@ class _AverageRatingState extends State<AverageRating> {
 
 class SimpleCommentBox extends StatelessWidget {
   final String sellerUid;
-  final Future<bool>? checkIfRented;
+  final Future<bool> checkIfSameUser;
   
   const SimpleCommentBox({
     super.key,
     required this.sellerUid,
-    required this.checkIfRented,
+    required this.checkIfSameUser
   });
 
   @override
@@ -1209,7 +1215,7 @@ class SimpleCommentBox extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => CommentsPage(
                 sellerUid: sellerUid,
-                checkIfRented: checkIfRented,
+                checkIfSameUser: checkIfSameUser,
               )
             )
           );

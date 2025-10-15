@@ -4,12 +4,15 @@ Yapılacaklar:
 [√] Kaleciler için yorum özelliği
 [√] Kaleciler için puanlama özelliği
 [ ] Kalecilerin kart renginin puanlamalara göre değişmesi
-[x] Mesajlaşırken mesajı iki kere gönderiyor
 [√] Para 3 iş günü içinde yatıcak diye de ekle
+[√] Chat,puanlama ve yorumu herkes yapabilicek
+[√] Kaleci kartlarında değerlendirme gözükecek
+[ ] Chat sayfasındaki yorum ui ini değiştir, yorum sonuna kadar gidiyo ekranın
+[ ] Mesajlaşmayı dene ve gözlemle
 [ ] Hizmet bedeli %3 diye selleraddpage ye ekle ve %3 daha kes
-[ ] Pazar günleri randevu ne koşulda yenilenmediğine bak
-[ ] Bazı resimler tüm alanı kaplayacağına dikdörtgen oluyor
 [ ] Kullanıcı hesabı silince db deki bütün herşeyi de silinsin
+[ ] Telefon numarası ile kayıt veya mail doğrulama kodu
+[ ] Bazı resimler tüm alanı kaplayacağına dikdörtgen oluyor
 [!] Anroid i araştır nasıl olur diye
 
 
@@ -35,7 +38,8 @@ Yapılacaklar:
 
 - PUANLAMA MANTIĞI
 [√] Kullanıcıların puanlamalarını kaleci dbsine ye ekle
-[√] Yukarıda yanında puan ile ortlama rating i göster, aşşağıda kiralamış ve puanlamamış ise puanlat, 
-    puanlamış ise puanını göster
+[√] Yukarıda yanında puan ile ortlama rating i göster, aşşağıda kiralamış ve puanlamamış ise puanlat, puanlamış ise puanını göster
 [√] Ortalamada kaç kişinin puanladığını da göster
 [!] Maçlardan sonra kullanıcının puanlamasını ve belki yorum yapmasını zorunlu yap
+
+
