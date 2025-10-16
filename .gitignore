@@ -49,3 +49,23 @@ app.*.map.json
 
 # Ignore Gradle build output directory
 build
+
+# iOS specific
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/App.framework
+ios/Runner.xcworkspace/
+ios/Runner.xcodeproj/project.xcworkspace/
+
+# macOS specific
+macos/Pods/
+macos/.symlinks/
+macos/Flutter/ephemeral/
+
+# Prevent platform build junk
+**/DerivedData/
+**/xcuserdata/
+
