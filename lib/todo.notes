@@ -7,12 +7,14 @@ Yapılacaklar:
 [√] Para 3 iş günü içinde yatıcak diye de ekle
 [√] Chat,puanlama ve yorumu herkes yapabilicek
 [√] Kaleci kartlarında değerlendirme gözükecek
-[ ] Chat sayfasındaki yorum ui ini değiştir, yorum sonuna kadar gidiyo ekranın
-[ ] Mesajlaşmayı dene ve gözlemle
-[ ] Hizmet bedeli %3 diye selleraddpage ye ekle ve %3 daha kes
-[ ] Kullanıcı hesabı silince db deki bütün herşeyi de silinsin
-[ ] Telefon numarası ile kayıt veya mail doğrulama kodu
+[√] Chat sayfasındaki yorum ui ini değiştir, yorum sonuna kadar gidiyo ekranın
+[√] Mesajlaşmayı dene ve gözlemle
+[x] Hizmet bedeli %3 diye selleraddpage ye ekle ve %3 daha kes
+[√] Hesap silme sorunsuz olana kadar denenicek
+[ ] Mail doğrulama kodu veya en kötü telefon numarası ile kayıt
 [ ] Bazı resimler tüm alanı kaplayacağına dikdörtgen oluyor
+[ ] Fİrebase could not verify domain sorunu
+[√] Android telefonda da dene çalışmıyor hatayı çöz
 [!] Anroid i araştır nasıl olur diye
 
 

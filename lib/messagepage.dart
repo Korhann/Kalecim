@@ -8,8 +8,9 @@ import 'sharedvalues.dart';
 
 
 class MessagePage extends StatefulWidget {
-
-  const MessagePage({super.key});
+  const MessagePage({
+    super.key,
+});
   @override
   State<MessagePage> createState() => _MessagePageState();
 }
@@ -25,6 +26,8 @@ class _MessagePageState extends State<MessagePage> {
   // dokunulan kullanıcının maili
   String? sellerEmail;
 
+  bool _hasText = false;
+
   final TextEditingController _messageController = TextEditingController();
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -33,6 +36,21 @@ class _MessagePageState extends State<MessagePage> {
   void initState() {
     super.initState();
     _getEmail(uid);
+    _messageController.addListener(() {
+      bool currentHasText = _messageController.text.isNotEmpty;
+      if (currentHasText != _hasText) {
+        setState(() {
+          _hasText = currentHasText;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void sendMessage() async {
@@ -130,20 +148,68 @@ Widget _buildMessageItem(DocumentSnapshot documentSnapshot) {
 }
 
 Widget _buildMessageInput() {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20),
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.1),
+          spreadRadius: 1,
+          blurRadius: 5,
+          offset: const Offset(0, -2),
+        ),
+      ],
+    ),
     child: Row(
       children: [
+        // Message input
         Expanded(
-          child: TextField(
-            controller: _messageController,
-            obscureText: false,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: TextField(
+              controller: _messageController,
+              maxLines: 4,
+              minLines: 1,
+              decoration: InputDecoration(
+                hintText: 'Mesajınızı yazın...',
+                hintStyle: TextStyle(
+                  color: Colors.grey[500],
+                  fontSize: 16,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                border: InputBorder.none,
+              ),
+              style: const TextStyle(fontSize: 16),
+            ),
           ),
         ),
-        // send button
-        IconButton(
-          onPressed: sendMessage,
-          icon: const Icon(Icons.arrow_upward),
+        
+        const SizedBox(width: 12),
+        
+        // Send button (reactive)
+        Container(
+          decoration: BoxDecoration(
+            color: _hasText
+                ? Theme.of(context).primaryColor 
+                : Colors.grey[400],
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            onPressed: _hasText ? sendMessage : null,
+            icon: const Icon(
+              Icons.send_rounded,
+              color: Colors.white,
+              size: 22,
+            ),
+          ),
         ),
       ],
     ),

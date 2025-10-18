@@ -1,4 +1,4 @@
-package com.example.kiralik_kaleci
+package com.kiralik.kaleci
 
 import io.flutter.embedding.android.FlutterActivity
 

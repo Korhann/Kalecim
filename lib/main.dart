@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -136,22 +137,26 @@ class _HomeRouterState extends State<HomeRouter> {
   }
 
   Future<void> checkForceUpdate(BuildContext context) async {
-  final remoteConfig = FirebaseRemoteConfig.instance;
-  await remoteConfig.setConfigSettings(RemoteConfigSettings(
-  fetchTimeout: const Duration(seconds: 10),
-  minimumFetchInterval: const Duration(seconds: 0), // Always fetch latest for testing
-));
-  await remoteConfig.fetchAndActivate();
+  // Only check for force update on iOS
+  if (Platform.isIOS) {
+    final remoteConfig = FirebaseRemoteConfig.instance;
+    await remoteConfig.setConfigSettings(RemoteConfigSettings(
+      fetchTimeout: const Duration(seconds: 10),
+      minimumFetchInterval: const Duration(seconds: 0), // Always fetch latest for testing
+    ));
+    await remoteConfig.fetchAndActivate();
 
-  final requiredVersion = remoteConfig.getString('appversion'); // Remote Config variable
-  final info = await PackageInfo.fromPlatform();
-  final currentVersion = info.version;
+    final requiredVersion = remoteConfig.getString('appversion'); // Remote Config variable
+    final info = await PackageInfo.fromPlatform();
+    final currentVersion = info.version;
 
-  if (requiredVersion.isNotEmpty && currentVersion != requiredVersion) {
-    if (context.mounted) {
-      Showalert(context: context, text: 'En iyi özelliklerden faydalanmak için lütfen güncelleme yapın').showUpgradeAlert();
+    if (requiredVersion.isNotEmpty && currentVersion != requiredVersion) {
+      if (context.mounted) {
+        Showalert(context: context, text: 'En iyi özelliklerden faydalanmak için lütfen güncelleme yapın').showUpgradeAlert();
+      }
     }
   }
+  // If not iOS (i.e., Android), do nothing
 }
 
 

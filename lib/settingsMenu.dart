@@ -160,26 +160,113 @@ class _SettingsMenuState extends State<SettingsMenu> {
     );
   }
 }
-  Future<void> deleteAccount() async{
-    final currentUser = FirebaseAuth.instance.currentUser!.uid;
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        // first delete the firestore data of the user
-        await FirebaseFirestore.instance.collection('Users').doc(currentUser).delete();
-        // delete the user and sign out the account
-        await user.delete();
-        await FirebaseAuth.instance.signOut();
-        Navigator.push(context, MaterialPageRoute(builder: (context) => MainPage(index: 0)));
+  Future<void> deleteAccount() async {
+  final currentUser = FirebaseAuth.instance.currentUser!.uid;
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      
+      // Close dialog and show loading
+      Navigator.of(context).pop();
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text('Hesap siliniyor...'),
+            ],
+          ),
+        ),
+      );
+
+      // Create batch for efficient deletion
+      final batch = FirebaseFirestore.instance.batch();
+
+      // Delete main user document
+      batch.delete(FirebaseFirestore.instance.collection('Users').doc(currentUser));
+
+      // Get and delete user's subcollections
+      final collections = ['ratings', 'appointmentbuyer', 'favourites', 'rentedUsers'];
+      
+      for (String collectionName in collections) {
+        try {
+          final snapshot = await FirebaseFirestore.instance
+              .collection('Users')
+              .doc(currentUser)
+              .collection(collectionName)
+              .get();
+
+          for (var doc in snapshot.docs) {
+            batch.delete(doc.reference);
+          }
+        } catch (e) {
+          // Continue with next collection if one fails
+          continue;
+        }
       }
-    } catch (e, stack) {
-      await reportErrorToCrashlytics(
+
+      // Delete chat rooms and messages (handle separately due to nested structure)
+      try {
+        final userChats = await FirebaseFirestore.instance
+            .collection('chat_rooms')
+            .where('users', arrayContains: currentUser)
+            .get();
+        
+        for (var chatDoc in userChats.docs) {
+          try {
+            // Delete messages first
+            final messages = await chatDoc.reference.collection('messages').get();
+            for (var messageDoc in messages.docs) {
+              batch.delete(messageDoc.reference);
+            }
+            // Delete chat room
+            batch.delete(chatDoc.reference);
+          } catch (e) {
+            continue;
+          }
+        }
+      } catch (e) {
+        // Continue even if chat deletion fails
+      }
+
+      // Commit the batch
+      await batch.commit();
+
+      // Delete user authentication
+      await user.delete();
+      await FirebaseAuth.instance.signOut();
+
+      // Close loading and navigate
+      Navigator.of(context).pop();
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => MainPage(index: 0)),
+        (route) => false,
+      );
+
+    }
+  } catch (e, stack) {
+    // Close any open dialogs
+    Navigator.of(context).pop();
+    
+    await reportErrorToCrashlytics(
       e,
       stack,
       reason: 'settings page deletion error for user $currentUser',
     );
-    }
+
+    // Show error message
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Hesap silinirken bir hata oluştu. Lütfen tekrar deneyin.'),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
+}
 }
 
 

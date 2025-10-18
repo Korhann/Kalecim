@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kiralik_kaleci/connectivity.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
@@ -33,77 +32,6 @@ class _DirectMessagesState extends State<DirectMessages> {
 
     super.dispose();
   }
-
-//   Stream<List<Map<String, dynamic>>> fetchConversations() {
-//     final user = FirebaseAuth.instance.currentUser;
-//     if (user == null){return const Stream.empty();}
-
-//     final currentUser = user.uid;
-//     Stream<QuerySnapshot> sentStream = FirebaseFirestore.instance
-//       .collectionGroup('messages')
-//       .where('senderId', isEqualTo: currentUser)
-//       .snapshots();
-    
-
-//     Stream<QuerySnapshot> receivedStream = FirebaseFirestore.instance
-//       .collectionGroup('messages')
-//       .where('receiverId', isEqualTo: currentUser)
-//       .snapshots();
-
-//     return Rx.combineLatest2(
-//     sentStream,
-//     receivedStream,
-//     (QuerySnapshot sentSnap, QuerySnapshot receivedSnap) async {  
-//       Set<String> participantIds = {};
-
-//       for (var doc in sentSnap.docs) {
-//         participantIds.add(doc['receiverId']);
-//       }
-
-//       for (var doc in receivedSnap.docs) {
-//         participantIds.add(doc['senderId']);
-//       }
-
-//       List<Map<String, dynamic>> tempConversations = [];
-
-//       for (String participantId in participantIds) {        
-//         String lastMessage = await _getLastMessage(participantId);
-//         String receiverName = await _getReceiverName(participantId);
-//         String? imageUrl = await _getReceiverImage(participantId);
-//         int unreadCount = await getUnreadCount(participantId);
-//         await addParticipantIdToPrefs(participantId);
-
-//         tempConversations.add({
-//           'receiverId': participantId,
-//           'receiverName': receiverName,
-//           'lastMessage': lastMessage,
-//           'imageUrl': imageUrl,
-//           'unread': unreadCount
-//         });
-//       }
-//       return tempConversations;
-//     },
-//   ).asyncMap((futureList) => futureList);
-// }
-
-  // Future<void> addParticipantIdToPrefs(String participantId) async {
-  //   try {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     List<String> ids = prefs.getStringList('ids') ?? [];
-
-  //     if (!ids.contains(participantId)) {
-  //       ids.add(participantId);
-  //       await prefs.setStringList('ids', ids);
-  //     }
-  //   } catch (e, stack) {
-  //     await reportErrorToCrashlytics(
-  //       e,
-  //       stack,
-  //       reason: 'directmessages addParticipantIdToPrefs error for participantId: $participantId',
-  //     );
-  //   }
-  // }
-
 
 
 Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
@@ -250,16 +178,16 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
     try {
       DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
       if (snapshot.exists) {
-        return snapshot['fullName'] ?? 'Unknown';
+        return snapshot['fullName'] ?? '';
       }
-      return 'Unknown';
+      return '';
     } catch (e, stack) {
       await reportErrorToCrashlytics(
         e,
         stack,
         reason: 'directmessages _getReceiverName error for userId: $userId',
       );
-      return 'Unknown';
+      return '';
     }
   }
 
@@ -361,8 +289,15 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
                       title: Text(conversation['receiverName'], style: TextStyle(fontSize: width * 0.045)),
                       subtitle: Row(
                         children: [
-                          Text(conversation['lastMessage'], style: TextStyle(fontSize: width * 0.04)),
-                          const Spacer(),
+                          Expanded(
+                            child: Text(
+                              conversation['lastMessage'], 
+                              style: TextStyle(fontSize: width * 0.04),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            )
+                          ),
+                          const SizedBox(width: 8),
                           if (conversation['unread'] > 0)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

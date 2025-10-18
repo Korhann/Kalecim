@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:core';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,17 +14,14 @@ import 'package:kiralik_kaleci/globals.dart';
 import 'package:kiralik_kaleci/messagepage.dart';
 import 'package:kiralik_kaleci/apptRequest.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
-import 'package:kiralik_kaleci/sellerHomepage.dart';
 import 'package:kiralik_kaleci/selleraddpage.dart';
 import 'package:kiralik_kaleci/sellermainpage.dart';
 import 'package:kiralik_kaleci/sharedvalues.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
-import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class SellerDetailsPage extends StatefulWidget {
   const SellerDetailsPage({
@@ -260,20 +256,41 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                   StreamBuilder<DocumentSnapshot>(
                                     stream: FirebaseFirestore.instance.collection('Users').doc(widget.sellerUid).snapshots(),
                                     builder: (context, snapshot) {
-                                      if (!snapshot.hasData) return SizedBox();
-                                        final sellerDetailsMap = snapshot.data!.data() as Map<String, dynamic>;
-                                        final nestedSellerDetails = sellerDetailsMap['sellerDetails'] as Map<String, dynamic>?;
-                                        
-                                        final bool hasGig = nestedSellerDetails != null && nestedSellerDetails['sellerGig'] != null && (nestedSellerDetails['sellerGig'] as String).trim().isNotEmpty;
-                                        
-                                        return Column(
-                                          children: [
-                                            if (hasGig) SizedBox(height: height * 0.020),
-                                            if (hasGig) showGig(sellerDetails: nestedSellerDetails),
-                                            ],
-                                          );
-                                      },
-                                    ),
+                                      if (!snapshot.hasData || !snapshot.data!.exists) {
+                                        return SizedBox();
+                                      }
+                                      
+                                      final data = snapshot.data!.data();
+                                      if (data == null) {
+                                        return SizedBox();
+                                      }
+                                      
+                                      final sellerDetailsMap = data as Map<String, dynamic>;
+                                      
+                                      // Check if sellerDetails exists and is not null
+                                      if (!sellerDetailsMap.containsKey('sellerDetails') || sellerDetailsMap['sellerDetails'] == null) {
+                                        return SizedBox();
+                                      }
+                                      
+                                      final nestedSellerDetails = sellerDetailsMap['sellerDetails'] as Map<String, dynamic>?;
+                                      
+                                      // Additional null check
+                                      if (nestedSellerDetails == null) {
+                                        return SizedBox();
+                                      }
+                                      
+                                      final bool hasGig = nestedSellerDetails.containsKey('sellerGig') && 
+                                                         nestedSellerDetails['sellerGig'] != null && 
+                                                         (nestedSellerDetails['sellerGig'] as String).trim().isNotEmpty;
+                                      
+                                      return Column(
+                                        children: [
+                                          if (hasGig) SizedBox(height: height * 0.020),
+                                          if (hasGig) showGig(sellerDetails: nestedSellerDetails),
+                                        ],
+                                      );
+                                    },
+                                  ),
 
                                   SizedBox(height: height * 0.005),
 
@@ -313,12 +330,46 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                                 if (!snapshot.hasData) {
                                                   return const Center(child: CircularProgressIndicator());
                                                 }
-                                                final userData = snapshot.data!.data() as Map<String, dynamic>;
-                                                final selectedHoursByDay = userData['sellerDetails']?['selectedHoursByDay'] as Map<String, dynamic>?;
+                                                
+                                                // Check if document exists
+                                                if (!snapshot.data!.exists) {
+                                                  return const Text('Kullanıcı bulunamadı');
+                                                }
+                                                
+                                                // Check if data is null
+                                                final data = snapshot.data!.data();
+                                                if (data == null) {
+                                                  return const Text('Kullanıcı bilgisi bulunamadı');
+                                                }
+                                                
+                                                // Safe casting with null check
+                                                final userData = data as Map<String, dynamic>?;
+                                                if (userData == null) {
+                                                  return const Text('Kullanıcı bilgisi bulunamadı');
+                                                }
+                                                
+                                                // Check if sellerDetails exists
+                                                if (!userData.containsKey('sellerDetails') || userData['sellerDetails'] == null) {
+                                                  return const Text('Kullanıcı artık mevcut değil');
+                                                }
+                                                
+                                                // Safe access to sellerDetails
+                                                final sellerDetails = userData['sellerDetails'] as Map<String, dynamic>?;
+                                                if (sellerDetails == null) {
+                                                  return const Text('Kullanıcı artık mevcut değil');
+                                                }
+                                                
+                                                // Check if selectedHoursByDay exists
+                                                if (!sellerDetails.containsKey('selectedHoursByDay') || sellerDetails['selectedHoursByDay'] == null) {
+                                                  return const Text('Saat bilgisi bulunamadı');
+                                                }
+                                                
+                                                final selectedHoursByDay = sellerDetails['selectedHoursByDay'] as Map<String, dynamic>?;
                                                 if (selectedHoursByDay == null) {
                                                   return const Text('Saat bilgisi bulunamadı');
                                                 }
                                                 
+                                                // Clear existing data
                                                 days.clear();
                                                 hoursByDay.clear();
                                                 hourColors.clear();
@@ -326,30 +377,42 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                                 final now = DateTime.now().toUtc().add(const Duration(hours: 3));
                                                 final int currentDayIndex = now.weekday - 1;
                                                 
+                                                // Process the hours data
                                                 for (int i = 0; i < orderedDays.length; i++) {
                                                   final day = orderedDays[i];
                                                   if (!selectedHoursByDay.containsKey(day)) continue;
-                                                    List<dynamic> hourList = selectedHoursByDay[day];
-                                                    
-                                                    if (hourList.isEmpty) continue;
-                                                      days.add(day);
-                                                      List<String> hourTitles = [];
-                                                      for (var hour in hourList) {
-                                                        final hourMap = hour as Map<String, dynamic>;
-                                                        final String title = hourMap['title'];
-                                                        final bool istaken = hourMap['istaken'];
-                                                        final String? takenby = hourMap['takenby'];
-                                                        final String startTime = title.split('-')[0];
-                                                        final String dayHourKey = '$day $title';
-                                                        List<String> nightTitles = ['00:00-01:00','01:00-02:00','02:00-03:00'];
-                                                        bool isNightHour = nightTitles.contains(title);
-
-                                                      
-                                                        dayChecker(i, currentDayIndex, now, startTime, dayHourKey, takenby!, day, title, hourTitles, isNightHour, istaken, hours);
-                                                      }
-                                                      
-                                                  }
                                                   
+                                                  final hourListData = selectedHoursByDay[day];
+                                                  if (hourListData == null) continue;
+                                                  
+                                                  List<dynamic> hourList = hourListData is List ? hourListData : [];
+                                                  if (hourList.isEmpty) continue;
+                                                  
+                                                  days.add(day);
+                                                  List<String> hourTitles = [];
+                                                  
+                                                  for (var hour in hourList) {
+                                                    try {
+                                                      final hourMap = hour as Map<String, dynamic>;
+                                                      final String title = hourMap['title'] ?? '';
+                                                      final bool istaken = hourMap['istaken'] ?? false;
+                                                      final String? takenby = hourMap['takenby'];
+                                                      
+                                                      if (title.isEmpty) continue;
+                                                      
+                                                      final String startTime = title.split('-')[0];
+                                                      final String dayHourKey = '$day $title';
+                                                      List<String> nightTitles = ['00:00-01:00','01:00-02:00','02:00-03:00'];
+                                                      bool isNightHour = nightTitles.contains(title);
+
+                                                      dayChecker(i, currentDayIndex, now, startTime, dayHourKey, takenby ?? '', day, title, hourTitles, isNightHour, istaken, hours);
+                                                    } catch (e) {
+                                                      // Skip invalid hour data
+                                                      continue;
+                                                    }
+                                                  }
+                                                }
+                                                
                                                 return DayHourListView(
                                                   width: width,
                                                   heigth: height,
@@ -1923,25 +1986,43 @@ class ChatButton extends StatelessWidget {
     return GestureDetector(
       onTap: () async{
         // Set shared state and navigate to the message page
-        sharedValues.onTapped = true;
-        bool paymentMade = await isPaymentMade();
-        if (paymentMade) {
+        // sharedValues.onTapped = true;
+        // bool paymentMade = await isPaymentMade();
+        // if (paymentMade) {
+        //   Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) {
+        //       sharedValues.onTapped = false;
+        //       return MessagePage();  // Assuming MessagePage is already defined
+        //     },
+        //   ),
+        // );
+        // } else {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     const SnackBar(
+        //       content: Text('Sohbet etmek için ödeme yapmanız gerek'),
+        //       backgroundColor: Colors.red,
+        //     )
+        //   );
+        // }
+        if (sellerUid == currentUser) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Kullanıcı kendisi ile sohbet edemez'),
+              backgroundColor: Colors.red,
+            )
+          );
+        } else {
           Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) {
               sharedValues.onTapped = false;
-              return MessagePage();  // Assuming MessagePage is already defined
+              return MessagePage();  
             },
           ),
         );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Sohbet etmek için ödeme yapmanız gerek'),
-              backgroundColor: Colors.red,
-            )
-          );
         }
       },
       child: ClipRRect(
