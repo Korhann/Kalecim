@@ -43,6 +43,9 @@ flutter run --flavor prod -t lib/main_prod.dart
 
 for building release version
 flutter build ios --release --flavor prod -t lib/main_prod.dart
+
+android 
+flutter build appbundle --flavor prod -t lib/main_prod.dart
 */
 
 /*

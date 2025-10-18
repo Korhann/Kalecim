@@ -25,7 +25,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "com.example.kiralik_kaleci" // Define the namespace
+    namespace "com.kiralik.kaleci" // Define the namespace
     compileSdk 35
     //compileSdkVersion 35 // Match the latest stable SDK version
     ndkVersion = "27.0.12077973" // Ensure NDK matches installed version
@@ -44,12 +44,20 @@ android {
         jvmTarget = "17" // Ensure Kotlin compatibility with Java 17
     }
 
+    // Add this to suppress Java 8 warnings
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += [
+            '-Xlint:-options',
+            '-Xlint:-deprecation'
+        ]
+    }
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin' // Include Kotlin source directory
     }
 
     defaultConfig {
-        applicationId "com.kiralik.kalecim" // App package name
+        applicationId "com.kiralik.kaleci" // App package name
         minSdkVersion 23 // Minimum supported Android version
         targetSdkVersion 35 // Target Android version
         versionCode flutterVersionCode.toInteger() // Version code from `local.properties`
@@ -79,19 +87,19 @@ android {
         productFlavors {
             dev {
                 dimension "env"
-                applicationId "com.kiralik.kalecim.dev"
+                applicationId "com.kiralik.kaleci.dev"
                 versionNameSuffix "-dev"
                 resValue "string", "app_name", "Kalecim Dev"
             }
             stage {
                 dimension "env"
-                applicationId "com.kiralik.kalecim.stg"
+                applicationId "com.kiralik.kaleci.stg"
                 versionNameSuffix "-stage"
                 resValue "string", "app_name", "Kalecim Stage"
             }
             prod {
                 dimension "env"
-                applicationId "com.kiralik.kalecim"
+                applicationId "com.kiralik.kaleci"
                 resValue "string", "app_name", "Kalecim"
             }
         }
