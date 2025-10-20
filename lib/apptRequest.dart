@@ -51,7 +51,6 @@ class _ApptRequestState extends State<ApptRequest> {
 
   @override
   void dispose() {
-    
     super.dispose();
   }
   
@@ -319,14 +318,7 @@ class _ApptRequestState extends State<ApptRequest> {
     }
   }
 
-  // // ÖDEME BURAYA EKLENECEK
-  // Future<bool> _processPayment() async {
-
-  //   // Simulate payment process (replace this with actual payment gateway logic)
-  //   await Future.delayed(const Duration(seconds: 2));
-  //   return true; // Return true if payment is successful
-  // }
-
+  
   // burada eğer approved olursa eklenecek
   Future<String> appointmentBuyer(String verificationCode, String startTime, String endTime) async{
     try {

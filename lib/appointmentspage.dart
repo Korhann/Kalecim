@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -265,6 +268,9 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                   onReject: () async {
                     await rejectAppointment(docId, index);
                   },
+                  onDelete: () async {
+                    await deleteAppointment(docId, index);
+                  },
                 );
               },
             ),
@@ -426,6 +432,274 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
       );
     }
   }
+
+  // SORUN KALECİ İÇİN ÖDEMEYE DEĞİL DE KABUL EDİP EDİLMEDİĞİNE BAKILIYOR
+  Future<void> deleteAppointment(String docId, int index) async {
+    late bool paymentMade;
+  try {
+    if (userorseller) {
+      // kaleci silememe mantığı
+      paymentMade = await checkIfPaymentMadeSeller(docId);
+    } else {
+      // alıcı silememe mantığı
+      paymentMade = await checkIfPaymentMadeBuyer(docId);
+    }
+
+    if (paymentMade) {
+      // Show confirmation for paid appointments
+      if (Platform.isIOS) {
+        await showCupertinoDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: const Text('Ödeme Yapılmış Randevu'),
+            content: const Text('Bu randevu için ödeme yapılmış, bu yüzden silinemiyor!'),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Tamam'),
+              ),
+            ],
+          );
+        },
+      );
+      } else {
+        await showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Ödeme Yapılmış Randevu'),
+            content: const Text('Bu randevu için ödeme yapılmış, bu yüzden silinemiyor!'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Tamam'),
+              ),
+            ],
+          );
+        },
+      );
+      }
+      return;
+    }
+
+    // Get appointment details first
+    DocumentSnapshot<Map<String, dynamic>> appointmentDoc;
+    
+    if (userorseller) {
+      appointmentDoc = await _firestore
+          .collection('Users')
+          .doc(currentuser)
+          .collection('appointmentseller')
+          .doc(docId)
+          .get();
+    } else {
+      appointmentDoc = await _firestore
+          .collection('Users')
+          .doc(currentuser)
+          .collection('appointmentbuyer')
+          .doc(docId)
+          .get();
+    }
+
+    if (!appointmentDoc.exists) {
+      throw Exception('Appointment not found');
+    }
+
+    final appointmentData = appointmentDoc.data()!['appointmentDetails'] as Map<String, dynamic>;
+
+    // Delete from current user's collection
+    if (userorseller) {
+      await _firestore
+          .collection('Users')
+          .doc(currentuser)
+          .collection('appointmentseller')
+          .doc(docId)
+          .delete();
+
+      // Delete from buyer's collection
+      if (appointmentData.containsKey('buyerUid') && appointmentData.containsKey('buyerDocId')) {
+        String buyerUid = appointmentData['buyerUid'];
+        String buyerDocId = appointmentData['buyerDocId'];
+        
+        await _firestore
+            .collection('Users')
+            .doc(buyerUid)
+            .collection('appointmentbuyer')
+            .doc(buyerDocId)
+            .delete();
+      }
+    } else {
+      await _firestore
+          .collection('Users')
+          .doc(currentuser)
+          .collection('appointmentbuyer')
+          .doc(docId)
+          .delete();
+
+      // Delete from seller's collection
+      if (appointmentData.containsKey('selleruid') && appointmentData.containsKey('sellerDocId')) {
+        String sellerUid = appointmentData['selleruid'];
+        String sellerDocId = appointmentData['sellerDocId'];
+        
+        await _firestore
+            .collection('Users')
+            .doc(sellerUid)
+            .collection('appointmentseller')
+            .doc(sellerDocId)
+            .delete();
+      }
+    }
+
+    // Show success message
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Randevu başarıyla silindi'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+
+  } catch (e, stack) {
+    await reportErrorToCrashlytics(
+      e,
+      stack,
+      reason: 'deleteAppointment error for user $currentuser, docId: $docId',
+    );
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Randevu silinirken hata oluştu'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+}
+
+  Future<bool> checkIfPaymentMadeSeller(String docId) async {
+  try {
+    DocumentSnapshot<Map<String, dynamic>> sellerApptDetails = await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(currentuser)
+      .collection('appointmentseller')
+      .doc(docId)
+      .get();
+
+    if (!sellerApptDetails.exists) {
+      return false;
+    }
+
+    final data = sellerApptDetails.data();
+    if (data == null) {
+      return false;
+    }
+    
+    if (!data.containsKey('appointmentDetails') || data['appointmentDetails'] == null) {
+      return false;
+    }
+    
+    final appointmentDetails = data['appointmentDetails'] as Map<String, dynamic>?;
+    if (appointmentDetails == null) {
+      return false;
+    }
+    
+    final buyerUid = appointmentDetails['buyerUid'];
+    final buyerDocId = appointmentDetails['buyerDocId'];
+    
+    // Check if buyerUid and buyerDocId exist
+    if (buyerUid == null || buyerDocId == null) {
+      return false;
+    }
+    
+    // Query the buyer's database for payment status
+    DocumentSnapshot<Map<String,dynamic>> querytoBuyer = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(buyerUid)
+        .collection('appointmentbuyer')
+        .doc(buyerDocId)
+        .get();
+
+    // Check if buyer's document exists
+    if (!querytoBuyer.exists) {
+      return false;
+    }
+
+    final buyerData = querytoBuyer.data();
+    if (buyerData == null) {
+      return false;
+    }
+
+    // Check if buyer's appointmentDetails exists
+    if (!buyerData.containsKey('appointmentDetails') || buyerData['appointmentDetails'] == null) {
+      return false;
+    }
+
+    final buyerAppointmentDetails = buyerData['appointmentDetails'] as Map<String, dynamic>?;
+    if (buyerAppointmentDetails == null) {
+      return false;
+    }
+
+    // Check the payment status in buyer's database
+    final paymentStatus = buyerAppointmentDetails['paymentStatus'] as String?;
+    return paymentStatus == 'done';
+
+  } catch (e, stack) {
+    await reportErrorToCrashlytics(
+      e,
+      stack,
+      reason: 'checkIfPaymentMadeSeller error for docId: $docId, user: $currentuser',
+    );
+    return false;
+  }
+}
+
+  Future<bool> checkIfPaymentMadeBuyer(String docId) async {
+  try {
+    DocumentSnapshot<Map<String, dynamic>> buyerApptDetails = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(currentuser)
+        .collection('appointmentbuyer')
+        .doc(docId)
+        .get();
+
+    // Check if document exists
+    if (!buyerApptDetails.exists) {
+      return false;
+    }
+
+    // Check if data is null
+    final data = buyerApptDetails.data();
+    if (data == null) {
+      return false;
+    }
+
+    // Check if appointmentDetails exists
+    if (!data.containsKey('appointmentDetails') || data['appointmentDetails'] == null) {
+      return false;
+    }
+
+    final appointmentDetails = data['appointmentDetails'] as Map<String, dynamic>?;
+    if (appointmentDetails == null) {
+      return false;
+    }
+
+    // Check payment status
+    final paymentStatus = appointmentDetails['paymentStatus'] as String?;
+    return paymentStatus == 'done';
+
+  } catch (e, stack) {
+    await reportErrorToCrashlytics(
+      e,
+      stack,
+      reason: 'checkIfPaymentMade error for docId: $docId, user: $currentuser',
+    );
+    return false;
+  }
+}
+
 
   
   Widget buyerStatusInfo() {
@@ -616,6 +890,7 @@ class apptsEmpty extends StatelessWidget {
   }
 }
 
+
 class AppointmentView extends StatelessWidget {
   final Color cardColor;
   final String name;
@@ -634,6 +909,7 @@ class AppointmentView extends StatelessWidget {
   final bool userorseller;
   final VoidCallback? onApprove;
   final VoidCallback? onReject;
+  final VoidCallback? onDelete; // Add this callback
   final double height;
   final double width;
 
@@ -656,49 +932,156 @@ class AppointmentView extends StatelessWidget {
     required this.userorseller,
     this.onApprove,
     this.onReject,
+    this.onDelete, // Add this
     required this.height,
     required this.width
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
     return Padding(
       padding: const EdgeInsets.all(10),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          color: cardColor,
+      child: Dismissible(
+        key: Key(docId),
+        direction: DismissDirection.endToStart,
+        // Add dismissThresholds to make it harder to dismiss paid appointments
+        dismissThresholds: paymentStatus == 'done' ? 
+          {DismissDirection.endToStart: 1.0} : // Make it impossible to dismiss
+          {DismissDirection.endToStart: 0.4},   // Normal threshold for unpaid
+        background: Container(
+          alignment: Alignment.centerRight,
+          decoration: BoxDecoration(
+            color: paymentStatus == 'done' ? Colors.grey : Colors.red,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.only(right: 20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ListTile(
-                contentPadding: const EdgeInsets.all(10),
-                title: nameSurname(name: name, surname: surname),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    iconDayHour(day: day, hour: hour),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Icon(Icons.location_on, size: width*0.06),
-                        const SizedBox(width: 5),
-                        Expanded(
-                          child: Text(
-                            field,
-                            textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
-                          ),
-                        ),
-                        const Spacer(),
-                        buildRightSideWidget(context: context ,userorseller: userorseller, status: status, paymentStatus: paymentStatus, verificationCode: verificationCode, docId: docId, appointmentDetails: appointmentDetails, verificationState: verificationState, isPastDay: isPastDay, hour: hour)
-                      ],
-                    ),
-                  ],
+              Icon(
+                paymentStatus == 'done' ? Icons.lock : Icons.delete,
+                color: Colors.white,
+                size: 30,
+              ),
+              SizedBox(height: 5),
+              Text(
+                paymentStatus == 'done' ? 'Kilitli' : 'Sil',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              if (userorseller && status == 'pending' && isPastDay == 'false')
-                sellerApproveOrReject(onApprove: onApprove, onReject: onReject)
             ],
+          ),
+        ),
+        confirmDismiss: (direction) async {
+          // For paid appointments, don't allow dismissal at all
+          if (paymentStatus == 'done') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Ödeme yapılmış randevular silinemez'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+            return false; // Prevent dismissal
+          }
+          
+          // For unpaid appointments, show confirmation
+          bool? shouldDelete = await showDialog<bool>(
+            context: context,
+            builder: (BuildContext context) {
+              if (Platform.isIOS) {
+                return CupertinoAlertDialog(
+                  title: const Text('Randevuyu Sil'),
+                  content: const Text('Bu randevuyu silmek istediğinizden emin misiniz?'),
+                  actions: [
+                    CupertinoDialogAction(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('İptal'),
+                    ),
+                    CupertinoDialogAction(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      isDestructiveAction: true,
+                      child: const Text('Sil'),
+                    ),
+                  ],
+                );
+              } else {
+                return AlertDialog(
+                  title: const Text('Randevuyu Sil'),
+                  content: const Text('Bu randevuyu silmek istediğinizden emin misiniz?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('İptal'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: TextButton.styleFrom(foregroundColor: Colors.red),
+                      child: const Text('Sil'),
+                    ),
+                  ],
+                );
+              }
+            },
+          );
+          
+          return shouldDelete ?? false; // Return the user's choice
+        },
+        onDismissed: (direction) {
+          // This will only be called if confirmDismiss returned true
+          if (onDelete != null) {
+            onDelete!();
+          }
+        },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            color: cardColor,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ListTile(
+                  contentPadding: const EdgeInsets.all(10),
+                  title: nameSurname(name: name, surname: surname),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      iconDayHour(day: day, hour: hour),
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          Icon(Icons.location_on, size: width*0.06),
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: Text(
+                              field,
+                              textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+                            ),
+                          ),
+                          const Spacer(),
+                          buildRightSideWidget(
+                            context: context,
+                            userorseller: userorseller,
+                            status: status,
+                            paymentStatus: paymentStatus,
+                            verificationCode: verificationCode,
+                            docId: docId,
+                            appointmentDetails: appointmentDetails,
+                            verificationState: verificationState,
+                            isPastDay: isPastDay,
+                            hour: hour
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                if (userorseller && status == 'pending' && isPastDay == 'false')
+                  sellerApproveOrReject(onApprove: onApprove, onReject: onReject)
+              ],
+            ),
           ),
         ),
       ),

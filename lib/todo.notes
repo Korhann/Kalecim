@@ -9,13 +9,15 @@ Yapılacaklar:
 [√] Kaleci kartlarında değerlendirme gözükecek
 [√] Chat sayfasındaki yorum ui ini değiştir, yorum sonuna kadar gidiyo ekranın
 [√] Mesajlaşmayı dene ve gözlemle
-[x] Hizmet bedeli %3 diye selleraddpage ye ekle ve %3 daha kes
 [√] Hesap silme sorunsuz olana kadar denenicek
-[ ] Mail doğrulama kodu veya en kötü telefon numarası ile kayıt
-[ ] Bazı resimler tüm alanı kaplayacağına dikdörtgen oluyor
-[ ] Fİrebase could not verify domain sorunu
+[√] Randevu isteğini beklemede ise veya para ödenmemiş ise geri çekme özelliği
 [√] Android telefonda da dene çalışmıyor hatayı çöz
-[!] Anroid i araştır nasıl olur diye
+[x] Hizmet bedeli %3 diye selleraddpage ye ekle ve %3 daha kes
+[!] satıcının da db sine paymentStatus ekle ve paymentpage de onu da update et (kilitli göstergesi için)
+[ ] Bazı resimler tüm alanı kaplayacağına dikdörtgen oluyor
+[ ] Mesajı alan kullanıcıya bildirim gelsin
+[ ] Fİrebase could not verify domain sorunu
+[ ] Mail doğrulama kodu veya en kötü telefon numarası ile kayıt (bunu mail onaylandıktan sonra yap çünkü spam a düşecek)
 
 
 - YORUM VE PUANLAMA ÖZELLİĞİ

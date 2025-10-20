@@ -415,7 +415,6 @@ Future<bool> waitForPaymentStatus(String docId) async {
   return false;
 }
 
-  //todo: bunu kullanıcaksan sonradan iyzipay.js ile update et(daha güvenilir)
   Future<bool> updatePaymentStatus() async {
     try {
       await _firestore
