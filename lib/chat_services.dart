@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kiralik_kaleci/messageContent.dart';
+import 'package:kiralik_kaleci/notification/push_helper.dart';
 import 'package:kiralik_kaleci/sharedvalues.dart';
 
 import 'message.dart';
@@ -32,7 +33,9 @@ class ChatService extends ChangeNotifier{
     } 
   }
 
-  Future<void> sendMessage(String receiverId, String message) async {
+
+// Update your sendMessage method in ChatService class:
+Future<void> sendMessage(String receiverId, String message) async {
   await initializeIds(_firebaseAuth.currentUser!.uid, receiverId);
 
   currentUserId = _firebaseAuth.currentUser!.uid;
@@ -109,8 +112,39 @@ class ChatService extends ChangeNotifier{
   final messageListRef = messageDocRef1.collection('messageList').doc();
 
   await messageListRef.set(messageContent.toMap());
+  
   // todo: bunu mesajı göndermeden önce göndermem lazım
   await unredMessages(messageListRef, receiverId, messageDocRef1);
+
+  // SEND NOTIFICATION TO RECEIVER
+  await _sendMessageNotification(receiverId, message);
+}
+
+// Add this new method to ChatService class:
+Future<void> _sendMessageNotification(String receiverId, String message) async {
+  try {
+    // Get sender's name for notification
+    String senderName = senderfullName.isNotEmpty ? senderfullName : 'Birisi';
+    
+    // Truncate message if too long
+    String notificationText = message.length > 50 
+        ? '${message.substring(0, 50)}...' 
+        : message;
+    
+    // Create notification text
+    String fullNotificationText = '$senderName: $notificationText';
+    
+    // Send push notification using your existing PushHelper
+    await PushHelper.sendPushMessage(
+      userId: receiverId,
+      senderName: senderName,
+      message: notificationText,
+      senderId: currentUserId,
+    );
+    
+  } catch (e) {
+    print('Error sending message notification: $e');
+  }
 }
 
 

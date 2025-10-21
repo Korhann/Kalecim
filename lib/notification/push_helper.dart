@@ -159,4 +159,43 @@ class PushHelper {
       }
     });
   }
+  // Add this method to your PushHelper class in push_helper.dart:
+
+static Future<void> sendPushMessage({
+  required String userId,
+  required String senderName, 
+  required String message,
+  required String senderId,
+}) async {
+  try {
+    final userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+    final userData = userSnapshot.data();
+    
+    if (userData != null) {
+      String? notificationToken = userData['notificationToken'];
+      
+      if (notificationToken != null) {
+        // Create notification text
+        String notificationText = '$senderName: $message';
+        
+        await sendPush(
+          text: notificationText,
+          id: notificationToken,
+          data: {
+            'page': 'message',
+            'senderId': senderId,
+            'senderName': senderName,
+            'chatRoomId': '${senderId}_${userId}', // or however you construct your chat room ID
+          }
+        );
+      } else {
+        print('Notification token is null for user: $userId');
+      }
+    } else {
+      print('User data is null for user: $userId');
+    }
+  } catch (e) {
+    print('Error sending message push notification: $e');
+  }
+}
 }

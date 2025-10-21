@@ -417,6 +417,7 @@ Future<bool> waitForPaymentStatus(String docId) async {
 
   Future<bool> updatePaymentStatus() async {
     try {
+      await updateSellersPaymentStatus();
       await _firestore
       .collection('Users')
       .doc(currentuser)
@@ -431,6 +432,21 @@ Future<bool> waitForPaymentStatus(String docId) async {
       print('Error updating payment status $e');
       return false;
     }
+  }
+
+  Future<void> updateSellersPaymentStatus() async {
+    try {
+      await _firestore.collection('Users')
+        .doc(widget.sellerUid)
+        .collection('appointmentseller')
+        .doc(widget.sellerDocId)
+        .update({
+          'appointmentDetails.paymentStatus': 'done'
+        });
+    } catch (e) {
+      print(e);
+    }
+
   }
 
   Future<void> checkIfDayPast() async{

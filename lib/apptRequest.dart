@@ -396,6 +396,7 @@ class _ApptRequestState extends State<ApptRequest> {
     'endTime': endTime,
     'isPastDay': 'false',
     'status': 'pending',
+    'paymentStatus': 'waiting',
     'isSeen' : false,
     'isWithdrawalButtonPressed': false,
     'timestamp': FieldValue.serverTimestamp()

@@ -435,54 +435,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
 
   // SORUN KALECİ İÇİN ÖDEMEYE DEĞİL DE KABUL EDİP EDİLMEDİĞİNE BAKILIYOR
   Future<void> deleteAppointment(String docId, int index) async {
-    late bool paymentMade;
   try {
-    if (userorseller) {
-      // kaleci silememe mantığı
-      paymentMade = await checkIfPaymentMadeSeller(docId);
-    } else {
-      // alıcı silememe mantığı
-      paymentMade = await checkIfPaymentMadeBuyer(docId);
-    }
-
-    if (paymentMade) {
-      // Show confirmation for paid appointments
-      if (Platform.isIOS) {
-        await showCupertinoDialog<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            title: const Text('Ödeme Yapılmış Randevu'),
-            content: const Text('Bu randevu için ödeme yapılmış, bu yüzden silinemiyor!'),
-            actions: [
-              CupertinoDialogAction(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Tamam'),
-              ),
-            ],
-          );
-        },
-      );
-      } else {
-        await showDialog<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Ödeme Yapılmış Randevu'),
-            content: const Text('Bu randevu için ödeme yapılmış, bu yüzden silinemiyor!'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Tamam'),
-              ),
-            ],
-          );
-        },
-      );
-      }
-      return;
-    }
-
     // Get appointment details first
     DocumentSnapshot<Map<String, dynamic>> appointmentDoc;
     
@@ -804,6 +757,21 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                 height: 10,
                 width: 10,
                 color: Colors.green.shade500,
+              ),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'Ödeme Alındı',
+              style:TextStyle(color: userorseller ? Colors.white : Colors.black),
+              textScaler: textScaler,
+            ),
+            const SizedBox(width: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                height: 10,
+                width: 10,
+                color: Colors.green.shade200,
               ),
             ),
             const SizedBox(width: 5),
