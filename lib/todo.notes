@@ -17,9 +17,10 @@ Yapılacaklar:
 [ ] Bazı resimler tüm alanı kaplayacağına dikdörtgen oluyor
 [√] Mesajı alan kullanıcıya bildirim gelsin
 [√] Kaleci mesaj sayfası da düzenlenecek alıcı ile aynı değil
-[ ] Mesaj bildirimi navigasyon panelinde de gözükecek
+[√] Mesaj bildirimi navigasyon panelinde de gözükecek
 [ ] Fİrebase could not verify domain sorunu
 [ ] Mail doğrulama kodu veya en kötü telefon numarası ile kayıt (bunu mail onaylandıktan sonra yap çünkü spam a düşecek)
+
 
 
 - YORUM VE PUANLAMA ÖZELLİĞİ

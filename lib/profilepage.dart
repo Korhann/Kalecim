@@ -545,7 +545,7 @@ class _BeSellerOrUserState extends State<BeSellerOrUser> {
                 // Badge overlay for "Kaleci"
                 Positioned(
                   // Position the badge at the top right of the "Kaleci" label
-                  right: 6, 
+                  right: toggleWidth * 0.1, 
                   top: -8,
                   child: StreamBuilder<int>(
                     stream: getUnreadCount(),

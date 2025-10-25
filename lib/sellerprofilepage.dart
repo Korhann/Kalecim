@@ -452,8 +452,9 @@ class BeSellerOrUser extends StatefulWidget {
 class _BeSellerOrUserState extends State<BeSellerOrUser> {
   @override
   Widget build(BuildContext context) {
+    final double toggleWidth = MediaQuery.of(context).size.width * 0.25;
+    final double badgeSize = 18;
     final height = MediaQuery.sizeOf(context).height;
-    final width = MediaQuery.sizeOf(context).width;
     return Container(
                 color: sellergrey,
                 height: height*0.070,
@@ -462,51 +463,100 @@ class _BeSellerOrUserState extends State<BeSellerOrUser> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      GlobalStyles.textStyle(text: 'Kaleci Ol', context: context, size: 18, fontWeight: FontWeight.w500, color: Colors.white),
-                      ToggleSwitch(
-                        minWidth: width*0.25,
-                        minHeight: height*0.045,
-                        cornerRadius: 20.0,
-                        activeBgColors: [
-                          [Colors.green[800]!],
-                          [Colors.red[800]!]
-                        ],
-                        activeFgColor: Colors.white,
-                        inactiveBgColor: Colors.grey,
-                        inactiveFgColor: Colors.white,
-                        initialLabelIndex: 1,
-                        totalSwitches: 2,
-                        labels: const ['Kullanıcı', 'Kaleci'],
-                        radiusStyle: true,
-                        onToggle: (index) async{
-                          // case 0 aynı sayfada kalacak case 1 satıcı sayfasına geçecek
-                          switch (index) {
-                            // aynı sayfada kal
-                            case 0:
-                              // settings in rengini değiştirmek için(beyaz yapıyor)
-                              if (await InternetConnection().hasInternetAccess) {
-                                userorseller = false;
-                                Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const MainPage(index: 2)),
-                              );
-                              break;
-                              } else {
-                                Showalert(context: context, text: 'Ooops...').showErrorAlert();
-                                setState(() {
-                                    index = 1;
-                                  });
-                              }
-                            // satıcı sayfasına geç
-                            case 1:
-                              return;
-                          }
-                        },
+                      Text(
+                        "Kaleci Ol",
+                        style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.w500,color: Colors.white),
+                        textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
                       ),
-                    ],
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          ToggleSwitch(
+                          minWidth: toggleWidth,
+                          minHeight: height*0.045,
+                          cornerRadius: 20.0,
+                          activeBgColors: [
+                            [Colors.green[800]!],
+                            [Colors.red[800]!]
+                          ],
+                          activeFgColor: Colors.white,
+                          inactiveBgColor: Colors.grey,
+                          inactiveFgColor: Colors.white,
+                          initialLabelIndex: 1,
+                          totalSwitches: 2,
+                          labels: const ['Kullanıcı', 'Kaleci'],
+                          radiusStyle: true,
+                          onToggle: (index) async{
+                            // case 0 aynı sayfada kalacak case 1 satıcı sayfasına geçecek
+                            switch (index) {
+                              // aynı sayfada kal
+                              case 0:
+                                // settings in rengini değiştirmek için(beyaz yapıyor)
+                                if (await InternetConnection().hasInternetAccess) {
+                                  userorseller = false;
+                                  Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const MainPage(index: 2)),
+                                );
+                                break;
+                                } else {
+                                  Showalert(context: context, text: 'Ooops...').showErrorAlert();
+                                  setState(() {
+                                      index = 1;
+                                    });
+                                }
+                              // satıcı sayfasına geç
+                              case 1:
+                                return;
+                            }
+                          },
+                        ),
+                      Positioned(
+                  // Position the badge at the top right of the "Kullanıcı" label
+                  left: toggleWidth * 0.1, 
+                  top: -8,
+                  child: StreamBuilder<int>(
+                    stream: getBuyerUnreadCount(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData || snapshot.data == 0) return const SizedBox();
+                      return Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: BoxConstraints(
+                          minWidth: badgeSize,
+                          minHeight: badgeSize,
+                        ),
+                        child: Text(
+                          '${snapshot.data}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                        ],
+                  )]
                   ),
                 ),
               );
+  }
+  Stream<int> getBuyerUnreadCount() {
+    final String currentUser = FirebaseAuth.instance.currentUser!.uid;
+    return FirebaseFirestore.instance
+        .collection('Users')
+        .doc(currentUser)
+        .collection('appointmentbuyer')
+        .where('appointmentDetails.status', isEqualTo: 'pending')
+        .where('appointmentDetails.isSeen', isEqualTo: false)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
   }
 }
 class SignUserOut extends StatelessWidget {
