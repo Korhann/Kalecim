@@ -29,25 +29,8 @@ class _DirectMessagesState extends State<DirectMessages> {
   }
   @override
   void dispose() {
-
     super.dispose();
   }
-
-
-Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
-  String lastMessage = await _getLastMessage(participantId);
-  String receiverName = await _getReceiverName(participantId);
-  String? imageUrl = await _getReceiverImage(participantId);
-  int unreadCount = await getUnreadCount(participantId);
-  // Optionally, add to SharedPreferences here if needed, but avoid if possible
-  return {
-    'receiverId': participantId,
-    'receiverName': receiverName,
-    'lastMessage': lastMessage,
-    'imageUrl': imageUrl,
-    'unread': unreadCount,
-  };
-}
 
   Stream<List<String>> fetchParticipantIds() {
   final user = FirebaseAuth.instance.currentUser;
@@ -72,13 +55,36 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
       Set<String> participantIds = {};
       for (var doc in sentSnap.docs) {
         participantIds.add(doc['receiverId']);
+        print('1 $participantIds');
       }
       for (var doc in receivedSnap.docs) {
         participantIds.add(doc['senderId']);
+        print('2 $participantIds');
       }
       return participantIds.toList();
     },
   );
+}
+
+
+Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
+  print('here $participantId');
+  String lastMessage = await _getLastMessage(participantId);
+  String receiverName = await _getReceiverName(participantId);
+  String? imageUrl = await _getReceiverImage(participantId);
+  int unreadCount = await getUnreadCount(participantId);
+  // Optionally, add to SharedPreferences here if needed, but avoid if possible
+  print(lastMessage);
+    print(receiverName);
+    print(imageUrl);
+    print(unreadCount);
+  return {
+    'receiverId': participantId,
+    'receiverName': receiverName,
+    'lastMessage': lastMessage,
+    'imageUrl': imageUrl,
+    'unread': unreadCount,
+  };
 }
   Future<int> getUnreadCount(String participantId) async {
     final user = FirebaseAuth.instance.currentUser;
@@ -161,6 +167,7 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
           .get();
 
       if (snapshot.docs.isNotEmpty) {
+        print(snapshot.docs.first['lastMessage']);
         return snapshot.docs.first['lastMessage'];
       }
       return "";

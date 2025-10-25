@@ -68,7 +68,6 @@ Future<void> sendMessage(String receiverId, String message) async {
         
     if (messageListSnapshot.docs.isNotEmpty) {
       lastMessage = messageListSnapshot.docs.first.get('message') as String;
-      print(lastMessage);
     }
   }
 
