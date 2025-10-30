@@ -70,6 +70,11 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
   Future<bool>? checkIfSameUser;
   TextStyle linkStyle = TextStyle(color: Colors.green);
 
+//   Map<String, Color> _cardColors = {
+//   'primary': const Color(0xFFCD7F32), // Default bronze
+//   'secondary': const Color(0xFFB8860B),
+//   'accent': const Color(0xFF8B4513),
+// };
 
   @override
   void initState() {
@@ -226,7 +231,8 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: Container(
-                          color: userorseller ? sellergrey: Colors.white,
+                          // burada kart rengini ayarla
+                          color: userorseller ? sellergrey : Colors.white,
                           height: height * 0.60,
                           width: width,
                           child: SingleChildScrollView(
@@ -244,7 +250,11 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                                     children: [
                                       showNameSurname(sellerDetails: widget.sellerDetails),
                                       const Spacer(),
-                                      AverageRating(sellerUid: widget.sellerUid),
+                                      AverageRating(
+                                        sellerUid: widget.sellerUid,
+                                        // onCardColorsChanged: (colors) {
+                                        // _cardColors = colors;
+                                      ),
                                     ],
                                   ),
                                   
@@ -655,6 +665,8 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
   });
 }
 
+
+
   Stream<DocumentSnapshot> _stream() {
     return FirebaseFirestore.instance
     .collection('Users')
@@ -731,6 +743,92 @@ Future<void> markPastDayAsTaken({required String userId,required String day,requ
 }
 }
 
+enum CardType { bronze, silver, gold, rareBronze, rareSilver, rareGold }
+
+CardType getCardType(double averageRating, int numberOfRatings) {
+  // Minimum ratings required for each tier
+  const int minRatingsForSilver = 10;
+  const int minRatingsForGold = 25;
+  const int minRatingsForRare = 50;
+
+  // Rating thresholds
+  const double bronzeThreshold = 3.0;
+  const double silverThreshold = 4.0;
+  const double goldThreshold = 4.5;
+
+  // No ratings or very few ratings
+  if (numberOfRatings == 0) {
+    return CardType.bronze; // Default for new sellers
+  }
+
+  // Rare cards (high volume + high quality)
+  if (numberOfRatings >= minRatingsForRare) {
+    if (averageRating >= goldThreshold) {
+      return CardType.rareGold; // 50+ ratings, 4.5+ average
+    } else if (averageRating >= silverThreshold) {
+      return CardType.rareSilver; // 50+ ratings, 4.0+ average
+    } else {
+      return CardType.rareBronze; // 50+ ratings, below 4.0 average
+    }
+  }
+
+  // Gold tier (premium quality)
+  if (numberOfRatings >= minRatingsForGold && averageRating >= goldThreshold) {
+    return CardType.gold; // 25+ ratings, 4.5+ average
+  }
+
+  // Silver tier (good quality)
+  if (numberOfRatings >= minRatingsForSilver && averageRating >= silverThreshold) {
+    return CardType.silver; // 10+ ratings, 4.0+ average
+  }
+
+  // Bronze tier (basic or low ratings)
+  return CardType.bronze; // Everything else
+}
+
+Map<String, Color> getCardColors(CardType cardType) {
+  print(cardType);
+  switch (cardType) {
+    case CardType.bronze:
+      return {
+        'primary': const Color(0xFFCD7F32), // Bronze color
+        'secondary': const Color(0xFFB8860B), // Dark goldenrod
+        'accent': const Color(0xFF8B4513), // Saddle brown
+      };
+    case CardType.silver:
+      return {
+        'primary': const Color(0xFFC0C0C0), // Silver
+        'secondary': const Color(0xFF808080), // Gray
+        'accent': const Color(0xFF696969), // Dim gray
+      };
+    case CardType.gold:
+      return {
+        'primary': const Color(0xFFFFD700), // Gold
+        'secondary': const Color(0xFFDAA520), // Goldenrod
+        'accent': const Color(0xFFB8860B), // Dark goldenrod
+      };
+    case CardType.rareBronze:
+      return {
+        'primary': const Color(0xFFCD7F32), // Bronze
+        'secondary': const Color(0xFF4B0082), // Indigo (rare effect)
+        'accent': const Color(0xFF8B008B), // Dark magenta
+      };
+    case CardType.rareSilver:
+      return {
+        'primary': const Color(0xFFC0C0C0), // Silver
+        'secondary': const Color(0xFF9400D3), // Violet (rare effect)
+        'accent': const Color(0xFF4B0082), // Indigo
+      };
+    case CardType.rareGold:
+      return {
+        'primary': const Color(0xFFFFD700), // Gold
+        'secondary': const Color(0xFFFF1493), // Deep pink (rare effect)
+        'accent': const Color(0xFF8B008B), // Dark magenta
+      };
+  }
+}
+
+
 Future<void> markSingleHourAsTaken({required String userId, required String day, required String title}) async {
   try {
     final userDoc = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
@@ -783,256 +881,6 @@ bool isPastNightHours(DateTime now, String startTime) {
 
   return nowInMinutes >= startInMinutes;
 }
-
-// class CommentInputBox extends StatefulWidget {
-//   final String sellerUid;
-//   final String? currentUserUid;
-//   const CommentInputBox({
-//     super.key,
-//     required this.sellerUid,
-//     required this.currentUserUid,
-//   });
-
-//   @override
-//   State<CommentInputBox> createState() => _CommentInputBoxState();
-// }
-
-// class _CommentInputBoxState extends State<CommentInputBox> {
-//   final TextEditingController _commentController = TextEditingController();
-//   bool _isSubmitting = false;
-//   String? currentUserName;
-
-//   @override
-//   void initState() {
-//     // TODO: implement initState
-//     super.initState();
-//     startInitFunctions();
-//   }
-
-//   void startInitFunctions() async {
-//     await getUserName();
-//   }
-
-//   Future<void> getUserName() async {
-//   try {
-//     if (widget.currentUserUid != null) {
-//       DocumentSnapshot<Map<String, dynamic>> doc = await FirebaseFirestore.instance
-//           .collection('Users')
-//           .doc(widget.currentUserUid!)
-//           .get();
-      
-//       var userData = doc.data();
-//       if (userData != null && userData.containsKey('fullName')) {
-//         currentUserName = userData['fullName'];
-//       }
-//     }
-//   } catch (e, stack) {
-//     reportErrorToCrashlytics(
-//       e,
-//       stack,
-//       reason: 'getUserName error for user ${widget.currentUserUid}',
-//     );
-//   }
-// }
-
-
-//   @override
-//   void dispose() {
-//     _commentController.dispose();
-//     super.dispose();
-//   }
-
-//   Future<void> _submitComment() async {
-//     if (_commentController.text.trim().isEmpty) return;
-
-//     setState(() {
-//       _isSubmitting = true;
-//     });
-
-//     try {
-//       // if the user is rented then can make a comment
-//       bool isRented = await checkIfRented();
-//       if (!isRented) {
-//         ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(
-//           content: Text('Sadece kiralama yapanlar yorum gönderebilir !'),
-//           backgroundColor: Colors.red,
-//         ),
-//       );
-//       _commentController.clear();
-//       } else {
-//         await addComment(currentUserName!, _commentController.text);
-//         _commentController.clear();
-      
-//       // Show success message
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(
-//           content: Text('Yorumunuz başarıyla gönderildi'),
-//           backgroundColor: Colors.green,
-//         ),
-//       );
-//       }
-//     } catch (e) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(
-//           content: Text('Yorum gönderilirken bir hata oluştu!'),
-//           backgroundColor: Colors.red,
-//         ),
-//       );
-//     } finally {
-//       setState(() {
-//         _isSubmitting = false;
-//       });
-//     }
-//   }
-
-//   Future<void> addComment(final String author, final String content) async {
-//     try {
-//       await FirebaseFirestore.instance
-//         .collection('Users')
-//         .doc(widget.sellerUid)
-//         .collection('rentedUsers')
-//         .doc(widget.currentUserUid)
-//         .set({
-//           'author': author,
-//           'comment': content,
-//           'timestamp': FieldValue.serverTimestamp()
-//         });
-//     } catch (e,stack) {
-//       await reportErrorToCrashlytics(
-//       e,
-//       stack,
-//       reason: 'getUserName error for user ${widget.currentUserUid}',
-//     );
-//     }
-//   }
-
-//   // checks if the user is rented the keeper before, for the permission to comment
-//   Future<bool> checkIfRented() async{
-//     try {
-//       DocumentSnapshot<Map<String,dynamic>> doc = await FirebaseFirestore.instance
-//       .collection('Users')
-//       .doc(widget.sellerUid)
-//       .collection('rentedUsers')
-//       .doc(widget.currentUserUid)
-//       .get();
-
-//       return doc.exists;
-
-//     } catch (e,stack) {
-//       await reportErrorToCrashlytics(e, stack,reason: 'error checking rented users ${widget.currentUserUid}');
-//       return false;
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-//       child: Container(
-//         padding: const EdgeInsets.all(12),
-//         decoration: BoxDecoration(
-//           color: userorseller ? sellergrey : Colors.white,
-//           borderRadius: BorderRadius.circular(12),
-//           border: Border.all(
-//             color: Colors.grey.shade300,
-//             width: 1,
-//           ),
-//           boxShadow: [
-//             BoxShadow(
-//               color: Colors.black.withOpacity(0.05),
-//               blurRadius: 4,
-//               offset: const Offset(0, 2),
-//             ),
-//           ],
-//         ),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Text(
-//               'Yorum yap',
-//               style: GoogleFonts.inter(
-//                 fontSize: 14,
-//                 fontWeight: FontWeight.w500,
-//                 color: userorseller ? Colors.white : Colors.black87,
-//               ),
-//             ),
-//             const SizedBox(height: 8),
-//             TextField(
-//               controller: _commentController,
-//               maxLines: 3,
-//               decoration: InputDecoration(
-//                 hintText: 'Yorumunuzu buraya yazın...',
-//                 hintStyle: TextStyle(
-//                   color: userorseller ? Colors.white70 : Colors.grey,
-//                   fontSize: 14,
-//                 ),
-//                 border: OutlineInputBorder(
-//                   borderRadius: BorderRadius.circular(8),
-//                   borderSide: BorderSide(color: Colors.grey.shade300),
-//                 ),
-//                 enabledBorder: OutlineInputBorder(
-//                   borderRadius: BorderRadius.circular(8),
-//                   borderSide: BorderSide(color: Colors.grey.shade300),
-//                 ),
-//                 focusedBorder: OutlineInputBorder(
-//                   borderRadius: BorderRadius.circular(8),
-//                   borderSide: const BorderSide(color: Colors.blue),
-//                 ),
-//                 filled: true,
-//                 fillColor: userorseller ? sellergrey.withOpacity(0.5) : Colors.grey.shade50,
-//                 contentPadding: const EdgeInsets.all(12),
-//               ),
-//               style: TextStyle(
-//                 color: userorseller ? Colors.white : Colors.black,
-//                 fontSize: 14,
-//               ),
-//             ),
-//             const SizedBox(height: 8),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.end,
-//               children: [
-//                 TextButton(
-//                   onPressed: _isSubmitting ? null : () {
-//                     _commentController.clear();
-//                   },
-//                   child: Text(
-//                     'Temizle',
-//                     style: TextStyle(
-//                       color: userorseller ? Colors.white70 : Colors.grey,
-//                     ),
-//                   ),
-//                 ),
-//                 const SizedBox(width: 8),
-//                 ElevatedButton(
-//                   onPressed: _isSubmitting ? null : _submitComment,
-//                   style: ElevatedButton.styleFrom(
-//                     backgroundColor: Colors.blue,
-//                     foregroundColor: Colors.white,
-//                     shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.circular(8),
-//                     ),
-//                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-//                   ),
-//                   child: _isSubmitting
-//                       ? const SizedBox(
-//                           width: 16,
-//                           height: 16,
-//                           child: CircularProgressIndicator(
-//                             strokeWidth: 2,
-//                             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-//                           ),
-//                         )
-//                       : const Text('Gönder'),
-//                 ),
-//               ],
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 
 class Ratings extends StatefulWidget {
@@ -1170,7 +1018,7 @@ class AverageRating extends StatefulWidget {
   final String sellerUid;
   const AverageRating({
     super.key,
-    required this.sellerUid
+    required this.sellerUid,
   });
 
   @override
@@ -1202,6 +1050,15 @@ class _AverageRatingState extends State<AverageRating> {
                   Map<String, dynamic> ratinginfo = sellerDetails['ratinginfo'];
                   averageRating = (ratinginfo['averageRating'] ?? 0).toDouble();
                   numberOfRatings = ratinginfo['numberOfRatings'] ?? 0;
+
+                  // CardType cardType = getCardType(averageRating, numberOfRatings);
+                  // Map<String, Color> cardColors = getCardColors(cardType);
+
+                  // WidgetsBinding.instance.addPostFrameCallback((_) {
+                  //   if (widget.onCardColorsChanged != null) {
+                  //     widget.onCardColorsChanged!(cardColors);
+                  //   }
+                  // });
                 }
               }
             } catch (e, stack) {
@@ -2156,6 +2013,7 @@ class PaymentButton extends StatelessWidget {
     }
   }
 }
+
 
 
 
