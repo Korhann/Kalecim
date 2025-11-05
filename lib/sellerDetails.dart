@@ -1842,27 +1842,6 @@ class ChatButton extends StatelessWidget {
 
     return GestureDetector(
       onTap: () async{
-        // Set shared state and navigate to the message page
-        // sharedValues.onTapped = true;
-        // bool paymentMade = await isPaymentMade();
-        // if (paymentMade) {
-        //   Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) {
-        //       sharedValues.onTapped = false;
-        //       return MessagePage();  // Assuming MessagePage is already defined
-        //     },
-        //   ),
-        // );
-        // } else {
-        //   ScaffoldMessenger.of(context).showSnackBar(
-        //     const SnackBar(
-        //       content: Text('Sohbet etmek için ödeme yapmanız gerek'),
-        //       backgroundColor: Colors.red,
-        //     )
-        //   );
-        // }
         if (sellerUid == currentUser) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

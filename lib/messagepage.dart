@@ -56,9 +56,7 @@ class _MessagePageState extends State<MessagePage> {
   void sendMessage() async {
     // sadece mesaj boş değilse gönder
     if (_messageController.text.isNotEmpty) {
-      await _chatService.sendMessage(sharedValues.sellerUid, _messageController.text);
-      // gönderdikten sonra temizle
-      _messageController.clear();
+      await _chatService.sendMessage(sharedValues.sellerUid, _messageController.text, _messageController);
     }
   }
 

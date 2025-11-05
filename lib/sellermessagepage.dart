@@ -42,7 +42,7 @@ class _SellerMessagePageState extends State<SellerMessagePage> {
   void sendMessage() async {
     // sadece mesaj boş değilse gönder
     if (_messageController.text.isNotEmpty) {
-      await _chatService.sendMessage(widget.receiverId, _messageController.text);
+      await _chatService.sendMessage(widget.receiverId, _messageController.text,_messageController);
       // gönderdikten sonra temizle
       _messageController.clear();
     }

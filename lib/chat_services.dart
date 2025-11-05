@@ -35,7 +35,10 @@ class ChatService extends ChangeNotifier{
 
 
 // Update your sendMessage method in ChatService class:
-Future<void> sendMessage(String receiverId, String message) async {
+Future<void> sendMessage(String receiverId, String message, TextEditingController messageController) async {
+  // mesajı iki defa göndermemesi için ilk başta temizle
+  messageController.clear();
+
   await initializeIds(_firebaseAuth.currentUser!.uid, receiverId);
 
   currentUserId = _firebaseAuth.currentUser!.uid;

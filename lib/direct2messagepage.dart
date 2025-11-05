@@ -44,7 +44,7 @@ class _Direct2MessageState extends State<Direct2Message> {
   void sendMessage() async {
     try {
       if (_messageController.text.isNotEmpty) {
-      await _chatService.sendMessage(widget.receiverId, _messageController.text);
+      await _chatService.sendMessage(widget.receiverId, _messageController.text,_messageController);
       _messageController.clear();
     }
     } catch (e, stack) {
