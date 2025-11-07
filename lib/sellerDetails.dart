@@ -914,7 +914,8 @@ class _RatingsState extends State<Ratings> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15),
       child: StarRating(
-        size: 25.0,
+        // bunu sonrada 25 yapabilirsin
+        size: 23.0,
         rating: currentRating,
         color: Colors.yellow,
         allowHalfRating: true,

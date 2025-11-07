@@ -7,7 +7,7 @@ import 'package:kiralik_kaleci/sharedvalues.dart';
 
 import 'message.dart';
 
-class ChatService extends ChangeNotifier{
+class ChatService extends ChangeNotifier {
 
   // TODO: bence unreadmessages fonksiyonu mesajı göndermeden önce çalışaması lazım(yarın yine bak) CHATGPT den dün sormuştun ona bak !!!
   
@@ -23,6 +23,7 @@ class ChatService extends ChangeNotifier{
   int toMsg = 0;
   late Message newMessage;
   String chatRoomId = '';
+
 
   Future<void> initializeIds(String userId, String otherUserId) async {
     List<String> ids = [userId, otherUserId];
@@ -118,7 +119,6 @@ Future<void> sendMessage(String receiverId, String message, TextEditingControlle
   // todo: bunu mesajı göndermeden önce göndermem lazım
   await unredMessages(messageListRef, receiverId, messageDocRef1);
 
-  // SEND NOTIFICATION TO RECEIVER
   await _sendMessageNotification(receiverId, message);
 }
 
@@ -126,7 +126,7 @@ Future<void> sendMessage(String receiverId, String message, TextEditingControlle
 Future<void> _sendMessageNotification(String receiverId, String message) async {
   try {
     // Get sender's name for notification
-    String senderName = senderfullName.isNotEmpty ? senderfullName : 'Birisi';
+    String senderName = senderfullName.isNotEmpty ? senderfullName : 'Bilinmeyen';
     
     // Truncate message if too long
     String notificationText = message.length > 50 

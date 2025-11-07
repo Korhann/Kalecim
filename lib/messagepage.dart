@@ -15,7 +15,7 @@ class MessagePage extends StatefulWidget {
   State<MessagePage> createState() => _MessagePageState();
 }
 
-class _MessagePageState extends State<MessagePage> {
+class _MessagePageState extends State<MessagePage>{
 
   final ScrollController _scrollController = ScrollController();
 
@@ -81,10 +81,7 @@ Widget build(BuildContext context) {
             child: _buildMessageList(),
           ),
           // Message input section
-          Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: _buildMessageInput(),
-          ),
+          _buildMessageInput(),
         ],
       ),
     ),

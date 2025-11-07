@@ -27,6 +27,7 @@ class PushHelper {
     }
   }
 
+
   static Future<void> sendPushPayment({
     required String sellerUid,
     required String buyerUid,
@@ -109,10 +110,9 @@ class PushHelper {
       // ignore: unused_local_variable
     var result = await http.post(Uri.parse('https://onesignal.com/api/v1/notifications'),
             headers: {
-              'Authorization':
-                'Basic os_v2_app_3yelu3d7avbqjefmupb4d5vzjxjas7kxnl4eevn5xaemshhaylxa5w23bitnhdtsjtfwtsknpp5yldb4d4lbxok32yf4pkyiulp67vi',
-                'accept': 'application/json',
-                'Content-Type': 'application/json'
+              'Authorization': 'key os_v2_app_3yelu3d7avbqjefmupb4d5vzjw74kdvhdy7e5yulbip2l47n3o3fmum4ffkrn2znonih2bwwu6a4pjtsvqkmdfyxe4rucervm6eagqy',
+              'accept': 'application/json',
+              'Content-Type': 'application/json'
             },
             body: jsonEncode({
               "app_id": "de08ba6c-7f05-4304-90ac-a3c3c1f6b94d",
@@ -168,34 +168,58 @@ static Future<void> sendPushMessage({
   required String senderId,
 }) async {
   try {
+    
     final userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+    
+    // Check if user document exists
+    if (!userSnapshot.exists) {
+      return;
+    }
+    
     final userData = userSnapshot.data();
     
-    if (userData != null) {
-      String? notificationToken = userData['notificationToken'];
-      
-      if (notificationToken != null) {
-        // Create notification text
-        String notificationText = '$senderName: $message';
-        
-        await sendPush(
-          text: notificationText,
-          id: notificationToken,
-          data: {
-            'page': 'message',
-            'senderId': senderId,
-            'senderName': senderName,
-            'chatRoomId': '${senderId}_${userId}', // or however you construct your chat room ID
-          }
-        );
-      } else {
-        print('Notification token is null for user: $userId');
-      }
-    } else {
-      print('User data is null for user: $userId');
+    // Check if user data is not null
+    if (userData == null) {
+      return;
     }
-  } catch (e) {
-    print('Error sending message push notification: $e');
+    
+    // Check if user has notification token
+    String? notificationToken = userData['notificationToken'];
+    
+    if (notificationToken == null || notificationToken.isEmpty) {
+      return;
+    }
+    
+    // Create notification text
+    String notificationText = '$senderName: $message';
+    
+    // Send the push notification
+    await sendPush(
+      text: notificationText,
+      id: notificationToken,
+      data: {
+        'page': 'message',
+        'senderId': senderId,
+        'senderName': senderName,
+        'chatRoomId': '${senderId}_${userId}',
+      }
+    );
+    
+    print('✅ Push notification sent successfully to $userId');
+    
+  } catch (e, stackTrace) {
+    print('❌ Critical error sending message push notification:');
+    print('   - Error: $e');
+    print('   - UserId: $userId');
+    print('   - SenderId: $senderId');
+    print('   - SenderName: $senderName');
+    print('   - StackTrace: ${stackTrace.toString().split('\n').take(3).join('\n')}');
   }
 }
 }
+
+
+/*
+
+message api key: os_v2_app_3yelu3d7avbqjefmupb4d5vzjw74kdvhdy7e5yulbip2l47n3o3fmum4ffkrn2znonih2bwwu6a4pjtsvqkmdfyxe4rucervm6eagqy
+*/

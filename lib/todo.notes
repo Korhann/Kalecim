@@ -27,7 +27,7 @@ Yapılacaklar:
 - Chat sayfası
 [√] Mesaj iki kere basıldığı için iki kere gidiyor
 [ ] Kullanıcı uygulamadayken bile bildirim gidiyor
-[ ] İlk başta sohbet et e basınca textfield çok yukarıda kalıyor
+[√] İlk başta sohbet et e basınca textfield çok yukarıda kalıyor
 [ ] Her mesajı yazışında ve silişinde mesajlar en aşşağıya bir daha kayıyor
 
 

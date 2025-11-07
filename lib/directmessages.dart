@@ -196,14 +196,10 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
       if (snapshot.exists && snapshot['sellerDetails']?['imageUrls'] != null) {
         List<dynamic> images = snapshot['sellerDetails']['imageUrls'];
         return images.isNotEmpty ? images.first : null;
+      } else {
+        return null;
       }
-      return null;
-    } catch (e, stack) {
-      await reportErrorToCrashlytics(
-        e,
-        stack,
-        reason: 'directmessages _getReceiverImage error for userId: $userId',
-      );
+    } catch (e) {
       return null;
     }
   }
