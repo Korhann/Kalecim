@@ -8,7 +8,7 @@ import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 import 'package:rxdart/rxdart.dart';
-import 'direct2messagepage.dart';
+import 'Messagepage.dart';
 
 class DirectMessages extends StatefulWidget {
   const DirectMessages({super.key});
@@ -312,7 +312,7 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Direct2Message(receiverId: conversation['receiverId']),
+                            builder: (context) => MessagePage(receiverId: conversation['receiverId']),
                           ),
                         );
                       },

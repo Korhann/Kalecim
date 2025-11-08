@@ -11,7 +11,7 @@ import 'package:kiralik_kaleci/comment_section.dart';
 import 'package:kiralik_kaleci/commentspage.dart';
 import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
 import 'package:kiralik_kaleci/globals.dart';
-import 'package:kiralik_kaleci/messagepage.dart';
+import 'package:kiralik_kaleci/directedMessagepage.dart';
 import 'package:kiralik_kaleci/apptRequest.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/selleraddpage.dart';
@@ -1856,7 +1856,7 @@ class ChatButton extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) {
               sharedValues.onTapped = false;
-              return MessagePage();  
+              return DirectedMessagePage();  
             },
           ),
         );

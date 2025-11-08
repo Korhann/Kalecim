@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kiralik_kaleci/direct2messagepage.dart';
+import 'package:kiralik_kaleci/Messagepage.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
@@ -316,7 +316,7 @@ class _SellerDirectMessagesState extends State<SellerDirectMessages> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Direct2Message(receiverId: conversation['receiverId']),
+                            builder: (context) => MessagePage(receiverId: conversation['receiverId']),
                           ),
                         );
                       },

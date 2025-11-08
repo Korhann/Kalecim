@@ -119,7 +119,12 @@ Future<void> sendMessage(String receiverId, String message, TextEditingControlle
   // todo: bunu mesajı göndermeden önce göndermem lazım
   await unredMessages(messageListRef, receiverId, messageDocRef1);
 
-  await _sendMessageNotification(receiverId, message);
+  bool shouldSendNotification = await _shouldSendNotification(receiverId);
+  print('should send notification $shouldSendNotification');
+  
+  if (shouldSendNotification) {
+    await _sendMessageNotification(receiverId, message);
+  }
 }
 
 // Add this new method to ChatService class:
@@ -146,6 +151,47 @@ Future<void> _sendMessageNotification(String receiverId, String message) async {
     
   } catch (e) {
     print('Error sending message notification: $e');
+  }
+}
+
+Future<bool> _shouldSendNotification(String receiverId) async {
+  try {
+    // Check if receiver is currently active in this specific chat
+    DocumentSnapshot userStatusDoc = await _firestore
+        .collection('Users')
+        .doc(receiverId)
+        .collection('userStatus')
+        .doc('status')
+        .get();
+    
+    if (userStatusDoc.exists) {
+      Map<String, dynamic> data = userStatusDoc.data() as Map<String, dynamic>;
+      
+      bool isOnline = data['isOnline'] ?? false;
+      String currentChatRoom = data['currentChatRoom'] ?? '';
+      
+      // Check if user was active recently (within last 30 seconds)
+      Timestamp? lastSeen = data['lastSeen'];
+      bool isRecentlyActive = false;
+      
+      if (lastSeen != null) {
+        DateTime lastSeenTime = lastSeen.toDate();
+        isRecentlyActive = DateTime.now().difference(lastSeenTime).inSeconds < 30;
+      }
+      
+      // Don't send notification if receiver is currently in this chat
+      bool receiverIsActiveInThisChat = (isOnline && currentChatRoom == chatRoomId) || (isRecentlyActive && currentChatRoom == chatRoomId);
+      
+      return !receiverIsActiveInThisChat;
+    }
+    
+    // If no status found, send notification (user likely offline)
+    return true;
+    
+  } catch (e) {
+    print('Error checking notification status: $e');
+    // On error, send notification to be safe
+    return true;
   }
 }
 

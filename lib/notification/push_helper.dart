@@ -110,9 +110,10 @@ class PushHelper {
       // ignore: unused_local_variable
     var result = await http.post(Uri.parse('https://onesignal.com/api/v1/notifications'),
             headers: {
-              'Authorization': 'key os_v2_app_3yelu3d7avbqjefmupb4d5vzjw74kdvhdy7e5yulbip2l47n3o3fmum4ffkrn2znonih2bwwu6a4pjtsvqkmdfyxe4rucervm6eagqy',
+              'Authorization': 'Basic os_v2_app_3yelu3d7avbqjefmupb4d5vzjw74kdvhdy7e5yulbip2l47n3o3fmum4ffkrn2znonih2bwwu6a4pjtsvqkmdfyxe4rucervm6eagqy',
               'accept': 'application/json',
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              
             },
             body: jsonEncode({
               "app_id": "de08ba6c-7f05-4304-90ac-a3c3c1f6b94d",
@@ -217,9 +218,3 @@ static Future<void> sendPushMessage({
   }
 }
 }
-
-
-/*
-
-message api key: os_v2_app_3yelu3d7avbqjefmupb4d5vzjw74kdvhdy7e5yulbip2l47n3o3fmum4ffkrn2znonih2bwwu6a4pjtsvqkmdfyxe4rucervm6eagqy
-*/
