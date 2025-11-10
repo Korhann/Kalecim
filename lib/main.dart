@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:kiralik_kaleci/Messagepage.dart';
 import 'package:kiralik_kaleci/approvedfield.dart';
 import 'package:kiralik_kaleci/football_field.dart';
 import 'package:kiralik_kaleci/globals.dart';
@@ -15,6 +16,7 @@ import 'package:kiralik_kaleci/mainpage.dart';
 import 'package:kiralik_kaleci/notification/push_helper.dart';
 import 'package:kiralik_kaleci/paymentpage.dart';
 import 'package:kiralik_kaleci/sellermainpage.dart';
+import 'package:kiralik_kaleci/sharedvalues.dart';
 import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -185,7 +187,7 @@ void setupNotificationListener() {
   OneSignal.Notifications.addClickListener((event) {
     final data = event.notification.additionalData;
     String? page = data?['page'];
-
+    print('THE PAGE IS $page');
 
     if (page != null) {
       BuildContext? context = MyApp.navigatorKey.currentContext;
@@ -219,13 +221,23 @@ void setupNotificationListener() {
             break;
           case "appointment":
             if (ModalRoute.of(context)?.settings.name != "/appointmentsPage") {
-              print('in this page rn');
               // alıcı sayfasında çağırınca alıcı olarak algılıyor
               userorseller = true;
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => AppointmentsPage(whereFrom: 'fromNoti')
+                )
+              );
+            }
+            break;
+          case 'messagepage':
+            String senderId = data?['senderId'] ?? '';
+            if (ModalRoute.of(context)?.settings.name != '/Messagepage') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MessagePage(receiverId: senderId, fromWhere: 'fromNoti',)
                 )
               );
             }

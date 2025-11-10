@@ -29,7 +29,9 @@ Yapılacaklar:
 [ ] Kullanıcı uygulamadayken bile bildirim gidiyor
 [√] İlk başta sohbet et e basınca textfield çok yukarıda kalıyor
 [ ] Her mesajı yazışında ve silişinde mesajlar en aşşağıya bir daha kayıyor
-[!] acces denied error onesignal 
+[√] Mesajı açınca direkt mesaj sayfasına gitmesi
+[!] Bildirimden mesaja gidince okundu olarak işaretlenmiyor
+[√] acces denied error onesignal 
 
 
 

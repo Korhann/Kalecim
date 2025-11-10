@@ -120,7 +120,6 @@ Future<void> sendMessage(String receiverId, String message, TextEditingControlle
   await unredMessages(messageListRef, receiverId, messageDocRef1);
 
   bool shouldSendNotification = await _shouldSendNotification(receiverId);
-  print('should send notification $shouldSendNotification');
   
   if (shouldSendNotification) {
     await _sendMessageNotification(receiverId, message);

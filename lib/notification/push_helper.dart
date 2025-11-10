@@ -110,10 +110,9 @@ class PushHelper {
       // ignore: unused_local_variable
     var result = await http.post(Uri.parse('https://onesignal.com/api/v1/notifications'),
             headers: {
-              'Authorization': 'Basic os_v2_app_3yelu3d7avbqjefmupb4d5vzjw74kdvhdy7e5yulbip2l47n3o3fmum4ffkrn2znonih2bwwu6a4pjtsvqkmdfyxe4rucervm6eagqy',
+              "Authorization": 'key os_v2_app_3yelu3d7avbqjefmupb4d5vzjujz4khbb2puxy4623fjmqasl7glav35qtve2f3jv4wz3icabvawccso644cqzq7wer5vrhcokisz5q',
               'accept': 'application/json',
               'Content-Type': 'application/json',
-              
             },
             body: jsonEncode({
               "app_id": "de08ba6c-7f05-4304-90ac-a3c3c1f6b94d",
@@ -162,7 +161,7 @@ class PushHelper {
   }
   // Add this method to your PushHelper class in push_helper.dart:
 
-static Future<void> sendPushMessage({
+static Future<void> sendPushMessage ({
   required String userId,
   required String senderName, 
   required String message,
@@ -199,7 +198,7 @@ static Future<void> sendPushMessage({
       text: notificationText,
       id: notificationToken,
       data: {
-        'page': 'message',
+        'page': 'messagepage',
         'senderId': senderId,
         'senderName': senderName,
         'chatRoomId': '${senderId}_${userId}',

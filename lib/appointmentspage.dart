@@ -150,39 +150,7 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
       appBar: AppBar(
         backgroundColor: userorseller ? sellerbackground : background,
         leading: IconButton(
-          onPressed: () {
-            // if its a seller
-            if (userorseller) {
-              if (widget.whereFrom == 'fromProfile') {
-                Navigator.of(context).pop();
-              } else if (widget.whereFrom == 'fromNoti') {
-                Navigator.pushAndRemoveUntil<void>(
-                  context,
-                  MaterialPageRoute<void>(
-                      builder: (BuildContext context) => const SellerMainPage(index: 2)),
-                  ModalRoute.withName('/'),
-                );
-              } else if (widget.whereFrom == 'fromSellerHomePage') {
-                Navigator.pushAndRemoveUntil<void>(
-                  context,
-                  MaterialPageRoute<void>(
-                      builder: (BuildContext context) => const SellerMainPage(index: 0)),
-                  ModalRoute.withName('/'),
-                );
-              }
-              // else if the its a user
-            } else {
-                if (widget.whereFrom == 'fromPayment') {
-                Navigator.pushAndRemoveUntil<void>(
-                  context,
-                  MaterialPageRoute<void>(builder: (BuildContext context) => const MainPage(index: 0)),
-                  (Route<dynamic> route) => false,
-                );
-              } else {
-                Navigator.of(context).pop();
-              }
-            }
-          },
+          onPressed: () => _handleBackNavigation(),
           icon: Icon(Icons.arrow_back, color: userorseller ? Colors.white : Colors.black),
         ),
       ),
@@ -529,6 +497,45 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
         ),
       );
     }
+  }
+}
+
+  void _handleBackNavigation() {
+  String navigationKey = '${userorseller ? 'seller' : 'user'}_${widget.whereFrom}';
+  
+  switch (navigationKey) {
+    case 'seller_fromProfile':
+    case 'user_normal': // Default case for users not from payment
+      Navigator.of(context).pop();
+      break;
+      
+    case 'seller_fromNoti':
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SellerMainPage(index: 2)),
+        ModalRoute.withName('/'),
+      );
+      break;
+      
+    case 'seller_fromSellerHomePage':
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SellerMainPage(index: 0)),
+        ModalRoute.withName('/'),
+      );
+      break;
+      
+    case 'user_fromPayment':
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const MainPage(index: 0)),
+        (Route<dynamic> route) => false,
+      );
+      break;
+      
+    default:
+      Navigator.of(context).pop();
+      break;
   }
 }
 
