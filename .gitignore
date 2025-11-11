@@ -69,3 +69,6 @@ macos/Flutter/ephemeral/
 **/DerivedData/
 **/xcuserdata/
 
+# files that hold sensitive data
+lib/config/secrets.dart
+.env*

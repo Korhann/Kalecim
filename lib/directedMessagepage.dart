@@ -4,7 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kiralik_kaleci/chat_services.dart';
+import 'package:kiralik_kaleci/globals.dart';
 import 'package:kiralik_kaleci/styles/chatBubble.dart';
+import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 
 import 'sharedvalues.dart';
@@ -34,6 +36,7 @@ class _DirectedMessagePageState extends State<DirectedMessagePage> with WidgetsB
   final TextEditingController _messageController = TextEditingController();
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final ValueNotifier<bool> _hasTextNotifier = ValueNotifier<bool>(false);
 
   @override
   void initState() {
@@ -60,9 +63,7 @@ class _DirectedMessagePageState extends State<DirectedMessagePage> with WidgetsB
   void _setupMessageListener() {
     _messageController.addListener(() {
       final currentHasText = _messageController.text.trim().isNotEmpty;
-      if (currentHasText != _hasText) {
-        setState(() => _hasText = currentHasText);
-      }
+      _hasTextNotifier.value = currentHasText;
     });
   }
 
@@ -96,7 +97,6 @@ class _DirectedMessagePageState extends State<DirectedMessagePage> with WidgetsB
     
     // Only update status if app active state actually changed
     if (wasActive != _isAppActive) {
-      print('no it changed');
       _setUserChatStatus(_isInChat);
     }
   }
@@ -237,74 +237,78 @@ Widget _buildMessageItem(DocumentSnapshot documentSnapshot) {
   );
 }
 
-Widget _buildMessageInput() {
-  return Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.1),
-          spreadRadius: 1,
-          blurRadius: 5,
-          offset: const Offset(0, -2),
-        ),
-      ],
-    ),
-    child: Row(
-      children: [
-        // Message input
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(25),
-              border: Border.all(color: Colors.grey[300]!),
-            ),
-            child: TextField(
-              controller: _messageController,
-              maxLines: 4,
-              minLines: 1,
-              decoration: InputDecoration(
-                hintText: 'Mesajınızı yazın...',
-                hintStyle: TextStyle(
-                  color: Colors.grey[500],
-                  fontSize: 16,
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                border: InputBorder.none,
+  Widget _buildMessageInput() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: userorseller ? sellergrey : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Message input
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(color: Colors.grey[300]!),
               ),
-              style: const TextStyle(fontSize: 16),
+              child: TextField(
+                controller: _messageController,
+                maxLines: 4,
+                minLines: 1,
+                decoration: InputDecoration(
+                  hintText: 'Mesajınızı yazın...',
+                  hintStyle: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: 16,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  border: InputBorder.none,
+                ),
+                style: const TextStyle(fontSize: 16),
+              ),
             ),
           ),
-        ),
-        
-        const SizedBox(width: 12),
-        
-        // Send button (reactive)
-        Container(
-          decoration: BoxDecoration(
-            color: _hasText
-                ? Theme.of(context).primaryColor 
-                : Colors.grey[400],
-            shape: BoxShape.circle,
+          
+          const SizedBox(width: 12),
+          
+          // send button
+          ValueListenableBuilder<bool>(
+            valueListenable: _hasTextNotifier,
+            builder: (context, hasText, child) {
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                decoration: BoxDecoration(
+                  color: hasText ? Theme.of(context).primaryColor : Colors.grey[400],
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  onPressed: hasText ? sendMessage : null,
+                  icon: const Icon(
+                    Icons.send_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                ),
+              );
+            },
           ),
-          child: IconButton(
-            onPressed: _hasText ? sendMessage : null,
-            icon: const Icon(
-              Icons.send_rounded,
-              color: Colors.white,
-              size: 22,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
  Future<void> _getEmail(String uid) async {
     try {
       DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("Users").doc(uid).get();

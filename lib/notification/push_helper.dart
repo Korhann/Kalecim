@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'bildirim_model.dart';
+import '../config/secrets.dart';
 
 class PushHelper {
   //Writen by Hakan Kayacı
@@ -110,12 +111,12 @@ class PushHelper {
       // ignore: unused_local_variable
     var result = await http.post(Uri.parse('https://onesignal.com/api/v1/notifications'),
             headers: {
-              "Authorization": 'key os_v2_app_3yelu3d7avbqjefmupb4d5vzjvwbwfbhecpexh5qehnhbt47sbxrosgootl4rbues6sgipme3wsdz234kxdzcsb4o3fd7toscmcs7ra',
+              "Authorization": 'key $apiKey',
               'accept': 'application/json',
               'Content-Type': 'application/json',
             },
             body: jsonEncode({
-              "app_id": "de08ba6c-7f05-4304-90ac-a3c3c1f6b94d",
+              "app_id": appId,
               "include_subscription_ids": [id],
               "contents": {"en": text},
               'data': data
