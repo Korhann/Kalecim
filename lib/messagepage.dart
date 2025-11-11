@@ -166,10 +166,8 @@ Future<void> _performStatusUpdate(bool isInChat) async {
         onPressed: () {
           // Create a combined key for the switch
           String navigationKey = '${userorseller ? 'seller' : 'user'}_${widget.fromWhere ?? 'normal'}';
-          print('navigaton key $navigationKey');
           switch (navigationKey) {
             case 'seller_fromNoti':
-              print('1');
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
@@ -180,7 +178,6 @@ Future<void> _performStatusUpdate(bool isInChat) async {
               break;
               
             case 'user_fromNoti':
-              print('2');
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
@@ -193,7 +190,6 @@ Future<void> _performStatusUpdate(bool isInChat) async {
             case 'seller_normal':
             case 'user_normal':
             default:
-              print('3');
               Navigator.of(context).pop();
               break;
           }

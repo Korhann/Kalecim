@@ -110,7 +110,7 @@ class PushHelper {
       // ignore: unused_local_variable
     var result = await http.post(Uri.parse('https://onesignal.com/api/v1/notifications'),
             headers: {
-              "Authorization": 'key os_v2_app_3yelu3d7avbqjefmupb4d5vzjujz4khbb2puxy4623fjmqasl7glav35qtve2f3jv4wz3icabvawccso644cqzq7wer5vrhcokisz5q',
+              "Authorization": 'key os_v2_app_3yelu3d7avbqjefmupb4d5vzjvwbwfbhecpexh5qehnhbt47sbxrosgootl4rbues6sgipme3wsdz234kxdzcsb4o3fd7toscmcs7ra',
               'accept': 'application/json',
               'Content-Type': 'application/json',
             },
