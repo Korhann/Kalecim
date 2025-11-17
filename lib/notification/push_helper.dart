@@ -152,11 +152,7 @@ class PushHelper {
           }).onError((error, stackTrace) {
             debugPrint('oneSignal: $error');
           });
-        } else {
-          print('its empty');
         }
-      } else {
-        print('email is null');
       }
     });
   }

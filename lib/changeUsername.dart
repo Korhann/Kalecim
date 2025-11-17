@@ -96,7 +96,7 @@ class _ChangeUserNameState extends State<ChangeUserName> {
                         if (isUpdated) {
                           _newUsername.clear();
                           if (mounted) {
-                            Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
+                            _showUserNameChangeSuccess();
                           }
                         }
                       } else {
@@ -163,6 +163,60 @@ class _ChangeUserNameState extends State<ChangeUserName> {
       }
     }
   }
+  void _showUserNameChangeSuccess() {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.green,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.check, color: Colors.white, size: 30),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Kullanıcı Adı Değiştirildi!',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.green[700],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Kullanıcı adınız başarı ile değiştirildi',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+          ),
+          child: Text('Tamam'),
+        ),
+      ],
+    ),
+  );
+}
 }
 
 class newUserName extends StatelessWidget {

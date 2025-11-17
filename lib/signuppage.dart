@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -9,8 +8,8 @@ import 'package:kiralik_kaleci/loginpage.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
 import 'package:kiralik_kaleci/userorseller.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
+import 'package:kiralik_kaleci/verifyEmailpage.dart';
 import 'styles/colors.dart';
-import 'mainpage.dart';
 
 //TODO: ANİMASYON EKLENECEK !!!
 
@@ -55,35 +54,49 @@ class _SignUpState extends State<SignUp> {
   }
 
   Future signUpUser() async {
-    String email = emailController.text.trim();
-    String password = passwordController.text;
+  String email = emailController.text.trim();
+  String password = passwordController.text;
 
-    saveUserType('user');
-    try {
-      if (samePassword()) {
-        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
+  saveUserType('user');
+  try {
+    if (samePassword()) {
+      // Create user account
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Send simple email verification
+      User? user = userCredential.user;
+      if (user != null && !user.emailVerified) {
+        await user.sendEmailVerification();
+        
+        // Save user data
+        String uid = userCredential.user!.uid;
+        await addUser(
+          fullNameController.text.trim(), 
+          email, 
+          uid, 
+          phoneController.text.trim()
         );
 
-        String uid = userCredential.user!.uid;
-        await addUser(fullNameController.text.trim(), email, uid, phoneController.text.trim());
-
-        Navigator.push(
-            context,
-            platformPageRoute(
-                builder: (_) => const MainPage(index: 0), context: (context)));
+        // mail doğrulama sayfasına yönlendir
+        Navigator.pushReplacement(
+          context, 
+          MaterialPageRoute(builder: (_) => VerifyEmailPage())
+        );
       }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use') {
-        setState(() {
-          _emailInUse = true;
-        });
-      }
-    } catch (e, stack) {
-      await reportErrorToCrashlytics(e, stack, reason: 'Sign up failed');
     }
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'email-already-in-use') {
+      setState(() {
+        _emailInUse = true;
+      });
+    }
+  } catch (e, stack) {
+    await reportErrorToCrashlytics(e, stack, reason: 'Sign up failed');
   }
+}
 
   bool samePassword() {
     return passwordController.text.trim() == confirmPasswordController.text.trim();

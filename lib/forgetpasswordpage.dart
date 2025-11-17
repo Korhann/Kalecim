@@ -52,7 +52,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
         Navigator.of(context).pop();
         resetController.clear();
         ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Email gönderildi')),
+        SnackBar(content: Text('Email gönderildi'), backgroundColor: Colors.green),
       );
       }
     } catch (e, stack) {

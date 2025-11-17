@@ -13,7 +13,6 @@ import 'package:kiralik_kaleci/profilepage.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key, required this.index});
@@ -25,15 +24,12 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  late Stream<User?> _authStream;
   int _currentIndex = 0;
   List<StreamSubscription<DocumentSnapshot>> _listeners = [];
 
   @override
   void initState() {
     super.initState();
-    // this does not login sometimes
-    _authStream = FirebaseAuth.instance.authStateChanges();
     _currentIndex = widget.index;
   }
 
@@ -49,8 +45,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-        overlays: [SystemUiOverlay.top]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,overlays: [SystemUiOverlay.top]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),

@@ -1,8 +1,9 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kiralik_kaleci/forgetpasswordpage.dart';
 import 'package:kiralik_kaleci/mainpage.dart';
 import 'package:kiralik_kaleci/signuppage.dart';
@@ -10,6 +11,7 @@ import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
 import 'package:kiralik_kaleci/userorseller.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
+import 'package:kiralik_kaleci/verifyEmailpage.dart';
 
 
 //TODO: ANİMASYON EKLENECEK !!!
@@ -72,12 +74,11 @@ class _LogInState extends State<LogIn> {
 
   bool _obsecureText = true;
 
-
   // Changed the future with void!!
   Future<void> signInUser() async {
     saveUserType('user');
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text.trim());
+      // await FirebaseAuth.instance.signInWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text.trim());
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -95,7 +96,6 @@ class _LogInState extends State<LogIn> {
         setState(() {
           _invalidcred = true;
         });
-        print('Girdiğiniz bilgiler geçersiz');
       }
     } catch (e, stack) {
       await reportErrorToCrashlytics(
@@ -105,6 +105,42 @@ class _LogInState extends State<LogIn> {
       );
     }
   }
+
+  Future<bool> _checkEmailVerified() async {
+    try {
+      await FirebaseAuth.instance.currentUser?.reload();
+      final user = FirebaseAuth.instance.currentUser;
+      
+      if (user!.emailVerified) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      print('Error checking email verification: $e');
+      return false;
+    }
+  }
+
+  void _pushToVerificationPage() {
+  if (mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Lütfen emailinizi doğrulayın'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+  // If you want to add a delay before navigation:
+  Timer(const Duration(seconds: 1), () {
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const VerifyEmailPage())
+      );
+    }
+  });
+}
 
   // Future<UserCredential?> signInWithGoogle() async {
   //   try {
@@ -330,7 +366,24 @@ class _LogInState extends State<LogIn> {
                       ElevatedButton(
                         onPressed: () async{
                           if (formkey.currentState!.validate()) {
-                            await signInUser();
+                            try {
+                              await FirebaseAuth.instance.signInWithEmailAndPassword(
+                              email: emailController.text.trim(), 
+                              password: passwordController.text.trim()
+                            );
+                            bool isEmailVerified = await _checkEmailVerified();
+                            if (isEmailVerified) {
+                              // Email verified, proceed to main page
+                              await signInUser();
+                            } else {
+                              // Email not verified, go to verification page
+                              _pushToVerificationPage();
+                            }
+                            } catch (e) {
+                              setState(() {
+                                _invalidcred = true;
+                              });
+                            }
                           }
                         },
                         style: GlobalStyles.buttonPrimary(context),

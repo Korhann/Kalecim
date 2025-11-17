@@ -27,10 +27,11 @@ class _ChangePasswordState extends State<ChangePassword> {
   bool _showErrorNewPassword = false;
 
   String _reauthErrorMessage = '';
-  final errorstyle = const TextStyle(
-      fontSize: 14, fontWeight: FontWeight.w300, color: Colors.red);
+  final errorstyle = const TextStyle(fontSize: 14, fontWeight: FontWeight.w300, color: Colors.red);
 
   bool isUpdated = false;
+
+  bool _isWaitingForVerification = false;
 
   @override
   void dispose() {
@@ -150,7 +151,7 @@ class _ChangePasswordState extends State<ChangePassword> {
               const SizedBox(height: 30),
               Center(
                 child: ElevatedButton(
-                  onPressed: () async {
+                  onPressed: _isWaitingForVerification ? null : () async {
                     if (_key.currentState!.validate()) {
                       if (await InternetConnection().hasInternetAccess) {
                         await changePassword();
@@ -158,14 +159,12 @@ class _ChangePasswordState extends State<ChangePassword> {
                           _currentPasswordController.clear();
                           _newPasswordController.clear();
                           if (mounted) {
-                            Showalert(context: context, text: 'İşlem Başarılı')
-                                .showSuccessAlert();
+                            Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
                           }
                         }
                       } else {
                         if (mounted) {
-                          Showalert(context: context, text: 'Ooopps...')
-                              .showErrorAlert();
+                          Showalert(context: context, text: 'Ooopps...').showErrorAlert();
                         }
                       }
                     }
@@ -205,31 +204,105 @@ class _ChangePasswordState extends State<ChangePassword> {
 
   /*
   MEVCUT ŞİFRELER
-   Krhndmr2002
+   krhndmr2002
   */
 
   Future<void> changePassword() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null && user.email != null) {
       final cred = EmailAuthProvider.credential(
-          email: user.email.toString(),
-          password: _currentPasswordController.text);
+        email: user.email.toString(),
+        password: _currentPasswordController.text
+      );
 
-      try {
-        await user.reauthenticateWithCredential(cred);
-        await user.updatePassword(_newPasswordController.text.trim());
-        isUpdated = true;
-      } catch (e,stack) {
-        setState(() {
-          _reauthErrorMessage = 'Geçerli bir şifre giriniz';
-        });
-        await reportErrorToCrashlytics(
+      await doUpdateOperations(user,cred);
+    }
+  }
+
+  Future<void> doUpdateOperations(User user, final cred) async{
+    try {
+      await user.reauthenticateWithCredential(cred);
+      await user.updatePassword(_newPasswordController.text.trim());
+
+      setState(() {
+        _isWaitingForVerification = true;
+      });
+      _showPasswordChangeSuccess();
+    } catch (e,stack) {
+      setState(() {
+        _reauthErrorMessage = 'Geçerli bir şifre giriniz';
+      });
+      await reportErrorToCrashlytics(
         e,
         stack,
         reason: 'change password failed',
       );
-      }
     }
+  }
+
+  void _showPasswordChangeSuccess() {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.green,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.check, color: Colors.white, size: 30),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Şifre Başarıyla Değiştirildi!',
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.green[700],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Yeni şifrenizi aktive etmek için yeniden giriş yapmanız gerekiyor.',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            _navigateToLogin();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+          ),
+          child: Text('Tamam'),
+        ),
+      ],
+    ),
+  );
+}
+  void _navigateToLogin() {
+    setState(() {
+      _isWaitingForVerification = false;
+    });
+    
+    // Sign out any remaining session
+    FirebaseAuth.instance.signOut();
+    
+    // Navigate to login page
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   void clearErrors() {

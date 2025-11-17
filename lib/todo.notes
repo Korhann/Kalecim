@@ -3,9 +3,9 @@ Yapılacaklar:
 
 [ ] Kalecilerin kart renginin puanlamalara göre değişmesi
 [ ] Bazı resimler tüm alanı kaplayacağına dikdörtgen oluyor
-[ ] Fİrebase could not verify domain sorunu
-[ ] Mail doğrulama kodu veya en kötü telefon numarası ile kayıt (bunu mail onaylandıktan sonra yap çünkü spam a düşecek)
-
+[√] Fİrebase could not verify domain sorunu
+[√] Mail doğrulama 
+[ ] Bir kiralama olmuş ise kalecim mailine mail gönderilsin ve hergün iyzico ya bakmaya gerek kalmaz, mantığı düşün ödemeyi takip etmeyi kolaylaştır
 
 
 - YORUM VE PUANLAMA ÖZELLİĞİ

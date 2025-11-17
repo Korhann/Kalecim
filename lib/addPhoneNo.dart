@@ -146,7 +146,6 @@ class _PhoneNoState extends State<PhoneNo> {
         'phoneNo': phoneNo
       });
       isUpdated = true;
-      print('is updated $isUpdated');
       Navigator.of(context).pop();
     } catch (e,stack) {
       await reportErrorToCrashlytics(e, stack, reason: 'add phone page add phone failed');
