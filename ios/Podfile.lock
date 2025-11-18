@@ -1363,8 +1363,6 @@ PODS:
   - Flutter (1.0.0)
   - flutter_background_service_ios (0.0.3):
     - Flutter
-  - flutter_email_sender (0.0.1):
-    - Flutter
   - flutter_image_compress_common (1.0.0):
     - Flutter
     - Mantle
@@ -1651,7 +1649,6 @@ DEPENDENCIES:
   - firebase_storage (from `.symlinks/plugins/firebase_storage/ios`)
   - Flutter (from `Flutter`)
   - flutter_background_service_ios (from `.symlinks/plugins/flutter_background_service_ios/ios`)
-  - flutter_email_sender (from `.symlinks/plugins/flutter_email_sender/ios`)
   - flutter_image_compress_common (from `.symlinks/plugins/flutter_image_compress_common/ios`)
   - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
   - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/darwin`)
@@ -1733,8 +1730,6 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_background_service_ios:
     :path: ".symlinks/plugins/flutter_background_service_ios/ios"
-  flutter_email_sender:
-    :path: ".symlinks/plugins/flutter_email_sender/ios"
   flutter_image_compress_common:
     :path: ".symlinks/plugins/flutter_image_compress_common/ios"
   flutter_keyboard_visibility:
@@ -1795,7 +1790,6 @@ SPEC CHECKSUMS:
   FirebaseStorage: f1578d57e1fd3683fc05f5d4d7b24b7490b321ac
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_background_service_ios: 00d31bdff7b4bfe06d32375df358abe0329cf87e
-  flutter_email_sender: aa1e9772696691d02cd91fea829856c11efb8e58
   flutter_image_compress_common: 1697a328fd72bfb335507c6bca1a65fa5ad87df1
   flutter_keyboard_visibility: 4625131e43015dbbe759d9b20daaf77e0e3f6619
   google_sign_in_ios: 205742c688aea0e64db9da03c33121694a365109

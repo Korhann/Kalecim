@@ -26,7 +26,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.kiralik.kaleci" // Define the namespace
-    compileSdk 35
+    compileSdk 36
     //compileSdkVersion 35 // Match the latest stable SDK version
     ndkVersion = "27.0.12077973" // Ensure NDK matches installed version
     lintOptions {
@@ -59,7 +59,7 @@ android {
     defaultConfig {
         applicationId "com.kiralik.kaleci" // App package name
         minSdkVersion 23 // Minimum supported Android version
-        targetSdkVersion 35 // Target Android version
+        targetSdkVersion 36 // Target Android version
         versionCode flutterVersionCode.toInteger() // Version code from `local.properties`
         versionName flutterVersionName // Version name from `local.properties`
         multiDexEnabled true // Enable multidex support

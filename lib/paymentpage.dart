@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emailjs/emailjs.dart' as emailjs;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:html/parser.dart';
 import 'package:kiralik_kaleci/addPhoneNo.dart';
 import 'package:kiralik_kaleci/appointmentspage.dart';
 import 'package:kiralik_kaleci/mainpage.dart';
 import 'package:kiralik_kaleci/notification/push_helper.dart';
+import 'package:kiralik_kaleci/profilepage.dart' hide Email;
 import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
@@ -58,8 +61,8 @@ class _PaymentPageState extends State<PaymentPage> {
   late String buyerIpNo;
   late String buyerPhoneNo;
 
+  String? sellerEmail;
   late String token;
-
   final log = Logger('MyClassName');
 
   @override
@@ -370,6 +373,8 @@ class _PaymentPageState extends State<PaymentPage> {
       );
       if (result == true) {
         bool isPaid = await updatePaymentStatus();
+        // burada kendime mail göndermem lazım ödeme bilgileri ile ilgili
+        await sendEmailToKalecimMail(buyerName,buyerPrice.toString());
         setState(() {
           isPaymentLoading = false;
         });
@@ -432,6 +437,72 @@ Future<bool> waitForPaymentStatus(String docId) async {
       print('Error updating payment status $e');
       return false;
     }
+  }
+
+  Future<void> sendEmailToKalecimMail(String buyerName, String buyerPrice) async {
+  try {
+    // Get seller info
+    DocumentSnapshot sellerDoc = await _firestore
+        .collection('Users')
+        .doc(widget.sellerUid)
+        .get();
+    
+    String sellerName = 'Unknown';
+    if (sellerDoc.exists) {
+      var sellerData = sellerDoc.data() as Map<String, dynamic>;
+      sellerName = sellerData['sellerDetails']['sellerFullName'] ?? 'Unknown';
+    }
+    String sellerEmail = await getSellerEmail();
+    
+    int priceasInt = int.tryParse(buyerPrice) ?? buyerPrice as int;
+    double keeperEarningDouble = priceasInt * 0.90;
+    int keeperEarning = keeperEarningDouble.round();
+
+    await emailjs.send(
+      'service_hlxxaad',
+      'template_m1xf1mr',
+      {
+        'to_email': 'kiraliikkalecii@gmail.com',
+        'buyer_name': buyerName,
+        'buyer_email': buyerEmail,
+        'buyer_phone': buyerPhoneNo,
+        'seller_name': sellerName,
+        'amount': buyerPrice,
+        'selected_day': widget.selectedDay,
+        'selected_hour': widget.selectedHour,
+        'selected_field': widget.selectedField,
+        'seller_email': sellerEmail,
+        'keeper_earning': keeperEarning.toStringAsFixed(2),
+        'app_commission': (priceasInt * 0.10).round().toString(),
+        'transaction_time': DateTime.now().toString(),
+      },
+      const emailjs.Options(
+        publicKey: '1BmZBWSGJjMTQ0eWu',
+        privateKey: 'n6iSFiqAl9YhG6ksYM5qS',
+      ),
+    );
+    
+    print('✅ Transaction email sent via EmailJS');
+  } catch (e) {
+    print('⚠️ Error sending email via EmailJS: $e');
+  }
+}
+
+  Future<String> getSellerEmail() async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("Users").doc(widget.sellerUid).get();
+      if (snapshot.exists) {
+        Map<String,dynamic> data = snapshot.data() as Map<String,dynamic>;
+        if (data.isNotEmpty && data.containsKey('email')) {
+          return data['email'];
+        }
+      } else {
+        print("email bulunamadı");
+      }
+    } catch (e) {
+      print("Hata $e");
+    }
+    return 'satıcı maili bulunamadı';
   }
 
   Future<void> updateSellersPaymentStatus() async {

@@ -1,7 +1,7 @@
 name: kiralik_kaleci
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.0+24
+version: 1.0.0+25
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -34,7 +34,6 @@ dependencies:
   intl: 0.20.2
   shared_preferences: ^2.5.3
   url_launcher: ^6.3.2
-  flutter_email_sender: ^7.0.0
   path_provider: ^2.1.5
   http: ^1.5.0
   html: ^0.15.6
@@ -75,6 +74,7 @@ dependencies:
   upgrader: ^12.1.0
   firebase_remote_config: ^6.0.2
   flutter_rating: ^2.0.2
+  emailjs: ^4.0.0
 
   
 dev_dependencies:

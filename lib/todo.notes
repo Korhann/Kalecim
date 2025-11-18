@@ -5,7 +5,9 @@ Yapılacaklar:
 [ ] Bazı resimler tüm alanı kaplayacağına dikdörtgen oluyor
 [√] Fİrebase could not verify domain sorunu
 [√] Mail doğrulama 
-[ ] Bir kiralama olmuş ise kalecim mailine mail gönderilsin ve hergün iyzico ya bakmaya gerek kalmaz, mantığı düşün ödemeyi takip etmeyi kolaylaştır
+[√] Bir kiralama olmuş ise benim mailine mail gönderilsin ve hergün iyzico ya bakmaya gerek kalmaz, mantığı düşün ödemeyi takip etmeyi kolaylaştır
+[ ] Resim yakınlaştırma
+[ ] Hata var mı diye uygulamada dolaş
 
 
 - YORUM VE PUANLAMA ÖZELLİĞİ
