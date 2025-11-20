@@ -187,7 +187,6 @@ void setupNotificationListener() {
   OneSignal.Notifications.addClickListener((event) {
     final data = event.notification.additionalData;
     String? page = data?['page'];
-    print('THE PAGE IS $page');
 
     if (page != null) {
       BuildContext? context = MyApp.navigatorKey.currentContext;
