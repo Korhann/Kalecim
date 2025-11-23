@@ -7,53 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:783910203845:android:1bdba6ea005701d2c2dbac",
-        "android_client_info": {
-          "package_name": "com.kiralik.kaleci"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "783910203845-rql75pup2mfsat8sd5gomdpibml60bfe.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.kiralik.kaleci",
-            "certificate_hash": "0a299bf6ecf39de4153fc4ae9e00af0ba224c380"
-          }
-        },
-        {
-          "client_id": "783910203845-eic2sl6nub7mjctkv7vjkc3i7t66iav5.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCIdbnLqEXRI_7etAi7ZsC1HrBsx5Shb2U"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "783910203845-eic2sl6nub7mjctkv7vjkc3i7t66iav5.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "783910203845-0kpj67jstaclttl15hok58rq91tcetk5.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.kiralikKaleci"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:783910203845:android:1e54971cc051ec9ec2dbac",
         "android_client_info": {
-          "package_name": "com.kiralik.kaleci.dev"
+          "package_name": "com.example.kiralik_kaleci.dev"
         }
       },
       "oauth_client": [
@@ -89,7 +45,79 @@
       "client_info": {
         "mobilesdk_app_id": "1:783910203845:android:a4160aff30a68b94c2dbac",
         "android_client_info": {
-          "package_name": "com.kiralik.kaleci.stg"
+          "package_name": "com.example.kiralik_kaleci.stage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "783910203845-eic2sl6nub7mjctkv7vjkc3i7t66iav5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIdbnLqEXRI_7etAi7ZsC1HrBsx5Shb2U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "783910203845-eic2sl6nub7mjctkv7vjkc3i7t66iav5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "783910203845-0kpj67jstaclttl15hok58rq91tcetk5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.kiralikKaleci"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:783910203845:android:1a34072e3bbf0434c2dbac",
+        "android_client_info": {
+          "package_name": "com.kiralik.kaleci"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "783910203845-eic2sl6nub7mjctkv7vjkc3i7t66iav5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIdbnLqEXRI_7etAi7ZsC1HrBsx5Shb2U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "783910203845-eic2sl6nub7mjctkv7vjkc3i7t66iav5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "783910203845-0kpj67jstaclttl15hok58rq91tcetk5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.kiralikKaleci"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:783910203845:android:8df9caee8627f6c7c2dbac",
+        "android_client_info": {
+          "package_name": "com.kiralik.kalecim"
         }
       },
       "oauth_client": [
