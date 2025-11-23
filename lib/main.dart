@@ -139,8 +139,7 @@ class _HomeRouterState extends State<HomeRouter> {
   }
 
   Future<void> checkForceUpdate(BuildContext context) async {
-  // Only check for force update on iOS
-  if (Platform.isIOS) {
+  try {
     final remoteConfig = FirebaseRemoteConfig.instance;
     await remoteConfig.setConfigSettings(RemoteConfigSettings(
       fetchTimeout: const Duration(seconds: 10),
@@ -148,17 +147,35 @@ class _HomeRouterState extends State<HomeRouter> {
     ));
     await remoteConfig.fetchAndActivate();
 
-    final requiredVersion = remoteConfig.getString('appversion'); // Remote Config variable
+    // Get platform-specific version requirement
+    String requiredVersion;
+    if (Platform.isIOS) {
+      requiredVersion = remoteConfig.getString('appversion'); // iOS version
+    } else {
+      requiredVersion = remoteConfig.getString('androidappversion'); // Android version
+    }
+
     final info = await PackageInfo.fromPlatform();
     final currentVersion = info.version;
 
+    print('📱 Current version: $currentVersion');
+    print('🎯 Required version: $requiredVersion');
+
     if (requiredVersion.isNotEmpty && currentVersion != requiredVersion) {
       if (context.mounted) {
-        Showalert(context: context, text: 'En iyi özelliklerden faydalanmak için lütfen güncelleme yapın').showUpgradeAlert();
+        Showalert(
+          context: context, 
+          text: Platform.isIOS 
+            ? 'En iyi özelliklerden faydalanmak için lütfen App Store\'dan güncelleme yapın'
+            : 'En iyi özelliklerden faydalanmak için lütfen Google Play\'den güncelleme yapın'
+        ).showUpgradeAlert();
       }
+    } else {
+      print('✅ App version is up to date');
     }
+  } catch (e) {
+    print('❌ Error checking force update: $e');
   }
-  // If not iOS (i.e., Android), do nothing
 }
 
 
