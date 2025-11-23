@@ -13,6 +13,7 @@ import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
 import 'package:kiralik_kaleci/globals.dart';
 import 'package:kiralik_kaleci/directedMessagepage.dart';
 import 'package:kiralik_kaleci/apptRequest.dart';
+import 'package:kiralik_kaleci/imageZoomscreen.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/selleraddpage.dart';
 import 'package:kiralik_kaleci/sellermainpage.dart';
@@ -241,8 +242,16 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(
-                                    child: showImage(imageUrl: imageUrl, sellerDetails: widget.sellerDetails, sellerUid: widget.sellerUid, width: width, height: height, whereFrom: widget.wherFrom,)
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context, 
+                                        MaterialPageRoute(builder: (context) => Imagezoomscreen(imageUrl: imageUrl))
+                                      );
+                                    },
+                                    child: SizedBox(
+                                      child: showImage(imageUrl: imageUrl, sellerDetails: widget.sellerDetails, sellerUid: widget.sellerUid, width: width, height: height, whereFrom: widget.wherFrom,)
+                                    ),
                                   ),
                                   SizedBox(height: height * 0.020),
 
