@@ -155,8 +155,8 @@ Future<void> _performStatusUpdate(bool isInChat) async {
   @override
   Widget build(BuildContext context) {
   return Scaffold(
-    backgroundColor: userorseller ? sellerbackground : Colors.white,
     resizeToAvoidBottomInset: true, 
+    backgroundColor: userorseller ? sellerbackground : Colors.white,
     appBar: AppBar(
       backgroundColor: userorseller ? sellerbackground : Colors.white,
       title: Text(
@@ -198,19 +198,20 @@ Future<void> _performStatusUpdate(bool isInChat) async {
       ),
     ),
     body: SafeArea(
-      child: Column(
-        children: [
-          // Messages List
-          Expanded(child: _buildMessageList()),
-              
-          // Message Input Field wrapped in SafeArea
-          SafeArea(
-            top: false,
-            child: _buildMessageInput(),
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
+    child: Column(
+      children: [
+        // Messages List
+        Expanded(child: _buildMessageList()),
+            
+        // Message Input Field wrapped in SafeArea
+        SafeArea(
+          top: false,
+          child: _buildMessageInput(),
+        ),
+        
+        const SizedBox(height: 20),
+      ],
+    ),
     ),
   );
 }

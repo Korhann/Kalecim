@@ -2,15 +2,16 @@
 Yapılacaklar:
 
 [ ] Kalecilerin kart renginin puanlamalara göre değişmesi
-[ ] Bazı resimler tüm alanı kaplayacağına dikdörtgen oluyor
-[√] Fİrebase could not verify domain sorunu
-[√] Mail doğrulama 
-[√] Bir kiralama olmuş ise benim mailine mail gönderilsin ve hergün iyzico ya bakmaya gerek kalmaz, mantığı düşün ödemeyi takip etmeyi kolaylaştır
-[√] Resim yakınlaştırma
-[ ] Hata var mı diye uygulamada dolaş
 
-- ANDROID SORUNLAR
-[!] andorid de uygulama açılmadan kapanıyor apk ile açınca, sha-1 keyiyle alakalı olabilir
+- ANDROID FIXES
+[ ] mesajlaşma sayfasına textfield altında kalıyor, dene ve çöz (çözümünü bulamadım)
+
+- KULLANICI İLAN AÇMA MANTIĞI
+[ ] Kullanıcı saat, fiyat, il, ilçe, halısaha ve gün belirterek ilan açıcak. Kullanıcı ilanları kaleci ana sayfasına gözükecek
+[ ] Kaleciler ilan için istek gönderebilecek
+[ ] İstek gönderenlerin isteğine basınca profilini görebiliceksin
+[ ] 24 saat geçmediyse yeni ilan açamaz
+[ ] İlan kullanıcı kaleciye ödeme yapınca kapanıcak
 
 
 - YORUM VE PUANLAMA ÖZELLİĞİ
@@ -27,16 +28,7 @@ Yapılacaklar:
 - KART RENGİ
 [√] Yorumu ve puanlamayı yapdıktan sonra düşün
 [ ] Kart renkleri (bronze, silver, gold, rare bronze, rare silver, rare gold)
-[ ] En üst seviyeye de özel bir renk ata, fifa kartlarından esinlen
-
-- Chat sayfası
-[√] Mesaj iki kere basıldığı için iki kere gidiyor
-[√] Kullanıcı uygulamadayken bile bildirim gidiyor
-[√] İlk başta sohbet et e basınca textfield çok yukarıda kalıyor
-[√] Her mesajı yazışında ve silişinde mesajlar en aşşağıya bir daha kayıyor
-[√] Mesajı açınca direkt mesaj sayfasına gitmesi
-[√] Bildirimden mesaja gidince okundu olarak işaretlenmiyor
-[√] acces denied error onesignal 
+[ ] En üst seviyeye de özel bir renk ata, fifa kartlarından esinlen (daha sonra da yapabilirsin,uygulama daha aktif olunca)
 
 
 

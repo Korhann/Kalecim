@@ -8,8 +8,8 @@ import 'package:kiralik_kaleci/globals.dart';
 import 'package:kiralik_kaleci/styles/chatBubble.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
-
 import 'sharedvalues.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 
 class DirectedMessagePage extends StatefulWidget {
