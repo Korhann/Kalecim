@@ -10,6 +10,7 @@ import 'package:kiralik_kaleci/authpage.dart';
 import 'package:kiralik_kaleci/directmessages.dart';
 import 'package:kiralik_kaleci/homepage.dart';
 import 'package:kiralik_kaleci/profilepage.dart';
+import 'package:kiralik_kaleci/shareGig.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 import 'package:rxdart/rxdart.dart';
@@ -109,6 +110,19 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ),
                 ),
+
+                BottomNavyBarItem(
+                  icon: Stack(
+                    children: [
+                      const Icon(Icons.search, color: Colors.black),
+                    ],
+                  ),
+                  title: Text(
+                    'Maç İlanı',
+                    style: GoogleFonts.inter(color: Colors.black),
+                  ),
+                ),
+
                 BottomNavyBarItem(
                   icon: Stack(
                     children: [
@@ -212,7 +226,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   List<Widget> screens() {
-    return [const HomePage(), const DirectMessages(), const ProfilePage()];
+    return [const HomePage(), const ShareGigPage(), const DirectMessages(), const ProfilePage()];
   }
 
   Stream<List<String>> fetchParticipantIds() {
