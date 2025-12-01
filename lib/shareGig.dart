@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
 
@@ -12,7 +16,11 @@ class ShareGigPage extends StatefulWidget {
 }
 
 class _ShareGigPageState extends State<ShareGigPage> {
+
   final _formKey = GlobalKey<FormState>();
+
+  String? selectedDay;
+  String? selectedHour;
 
   TextEditingController nameController = TextEditingController();
   bool showErrorName = false;
@@ -101,13 +109,21 @@ class _ShareGigPageState extends State<ShareGigPage> {
                 // gün bilgisi
                 DayText(),
                 SizedBox(height: height * 0.01),
-                DayField(),
+                DayField(
+                  onDaySelected: (value) {
+                    selectedDay = value;
+                  },
+                ),
                 SizedBox(height: height * 0.03),
 
                 // saat bilgisi
                 HourText(),
                 SizedBox(height: height * 0.01),
-                HourPicker(),
+                HourPicker(
+                  onHourSelected: (value) {
+                    selectedHour = value;
+                  },
+                ),
                 SizedBox(height: height * 0.03),
 
                 // il bilgisi
@@ -141,12 +157,78 @@ class _ShareGigPageState extends State<ShareGigPage> {
                   controller: priceController,
                   showErrorPrice: showErrorPrice),
                 SizedBox(height: height * 0.03),
+
+                // Onayla butonu
+                Center(
+                  child: ElevatedButton(
+                    style: GlobalStyles.buttonPrimary(context),
+                    onPressed: () async {
+                      try {
+                        if (await InternetConnection().hasInternetAccess) {
+                          await _insertUserGig();
+                        } else {
+                          if (mounted) {
+                            Showalert(context: context, text: 'Ooops...').showErrorAlert();
+                          }
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          Showalert(context: context, text: 'Tüm alanları doldurduğunuza emin misiniz?').showErrorAlert();
+                        }
+                      }
+                    }, 
+                    child: GlobalStyles.textStyle(text: 'Onayla', context: context, size: 24, fontWeight: FontWeight.w600, color: Colors.white),
+                  ),
+                )
               ],
             ),
           ),
         ),
       ),
     );
+  }
+  Future<void> _insertUserGig() async {
+    String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    CollectionReference collectionReference = FirebaseFirestore.instance.collection('Users');
+    try {
+    Map<String,dynamic> gigInfo = {
+      'name': nameController.text,
+      'day': selectedDay,
+      'hour': selectedHour,
+      'province': provinceController.text,
+      'district': districtController.text,
+      'field': fieldController.text,
+      'price': priceController.text
+    };
+
+    if (_formKey.currentState!.validate()) {
+      await collectionReference.doc(currentUserUid).collection('userGig').add({
+        'userGig': gigInfo
+      });
+      Showalert(context: context, text: 'İlan başarı ile gönderlimiştir').showSuccessAlert();
+      clearAllFields();
+    } else {
+      Showalert(context: context, text: 'Tüm alanları doldurduğunuza emin misiniz!').showErrorAlert();
+    }
+    } catch (e) {
+      if (mounted) {
+        Showalert(context: context, text: 'Ooops...').showErrorAlert();
+      }
+    }
+  }
+
+  void clearAllFields() {
+    if (mounted) {
+      setState(() {
+        nameController.clear();
+        selectedDay = null;
+        selectedHour = null;
+        priceController.clear();
+        districtController.clear();
+        fieldController.clear();
+        priceController.clear();
+      });
+    }
   }
 }
 
@@ -187,6 +269,7 @@ class NameField extends StatelessWidget {
   }
 }
 
+
 class DayText extends StatelessWidget {
   const DayText({super.key});
 
@@ -215,7 +298,8 @@ enum Days {
 }
 
 class DayField extends StatefulWidget {
-  const DayField({super.key});
+  final ValueChanged<String?> onDaySelected;
+  const DayField({super.key, required this.onDaySelected});
 
   @override
   State<DayField> createState() => _DayFieldState();
@@ -237,9 +321,15 @@ class _DayFieldState extends State<DayField> {
         setState(() {
           selectedDay = value;
         });
+        widget.onDaySelected(value?.label);
       },
-      decoration: InputDecoration(
-          labelText: 'Gün Seçiniz', border: OutlineInputBorder()),
+      validator: (value) {
+        if (value == null) {
+          return 'Gün seçmelisiniz!';
+        }
+        return null;
+      },
+      decoration: InputDecoration(labelText: 'Gün Seçiniz', border: OutlineInputBorder()),
     );
   }
 }
@@ -273,7 +363,8 @@ class HourText extends StatelessWidget {
 }
 
 class HourPicker extends StatefulWidget {
-  const HourPicker({super.key});
+  final ValueChanged<String?> onHourSelected;
+  const HourPicker({super.key, required this.onHourSelected});
 
   @override
   State<HourPicker> createState() => _HourPickerState();
@@ -296,9 +387,15 @@ class _HourPickerState extends State<HourPicker> {
         setState(() {
           selectedHour = value;
         });
+        widget.onHourSelected(value?.label);
       },
-      decoration:
-          InputDecoration(labelText: 'Saatler', border: OutlineInputBorder()),
+      validator: (value) {
+        if (value == null) {
+          return 'Saat seçmelisiniz!';
+        }
+        return null;
+      },
+      decoration: InputDecoration(labelText: 'Saatler', border: OutlineInputBorder()),
     );
   }
 }
@@ -334,10 +431,8 @@ class ProvinceField extends StatelessWidget {
           }
           return null;
         },
-        style: GoogleFonts.inter(
-            color: Colors.black, fontSize: 14, fontWeight: FontWeight.w300),
-        decoration: GlobalStyles.inputDecoration1(
-            hintText: 'İl', showError: showErrorProvince));
+        style: GoogleFonts.inter(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w300),
+        decoration: GlobalStyles.inputDecoration1(hintText: 'İl', showError: showErrorProvince));
   }
 }
 
@@ -372,10 +467,8 @@ class DistrictField extends StatelessWidget {
           }
           return null;
         },
-        style: GoogleFonts.inter(
-            color: Colors.black, fontSize: 14, fontWeight: FontWeight.w300),
-        decoration: GlobalStyles.inputDecoration1(
-            hintText: 'İlçe', showError: showErrorDistrict));
+        style: GoogleFonts.inter(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w300),
+        decoration: GlobalStyles.inputDecoration1(hintText: 'İlçe', showError: showErrorDistrict));
   }
 }
 
@@ -410,10 +503,8 @@ class FieldInfo extends StatelessWidget {
           }
           return null;
         },
-        style: GoogleFonts.inter(
-            color: Colors.black, fontSize: 14, fontWeight: FontWeight.w300),
-        decoration: GlobalStyles.inputDecoration1(
-            hintText: 'Halı Saha', showError: showErrorField));
+        style: GoogleFonts.inter(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w300),
+        decoration: GlobalStyles.inputDecoration1(hintText: 'Halı Saha', showError: showErrorField));
   }
 }
 
@@ -458,13 +549,11 @@ class PriceField extends StatelessWidget {
           return null;
         }
       },
-      style: GoogleFonts.inter(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600),
+      style: GoogleFonts.inter(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w600),
       decoration: InputDecoration(
-          border: InputBorder.none,
-          fillColor: sellergrey,
-          filled: true,
+          border: OutlineInputBorder(),
           suffixText: 'TL',
-          suffixStyle: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white)),
+          suffixStyle: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.black)),
     );
   }
 }

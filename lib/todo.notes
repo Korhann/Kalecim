@@ -2,12 +2,14 @@
 Yapılacaklar:
 
 [ ] Kalecilerin kart renginin puanlamalara göre değişmesi
+[!] shareGig den bakarak selleraddpage dropdownlarına da validator koyabilirsin
 [ ] Yeni branch açıldı
 
 - ANDROID FIXES
 [ ] mesajlaşma sayfasına textfield altında kalıyor, dene ve çöz (çözümünü bulamadım)
 
 - KULLANICI İLAN AÇMA MANTIĞI
+[!] Dropdown buttonlarındaki değerler gönderildikten sonra silinmiyor
 [ ] Kullanıcı saat, fiyat, il, ilçe, halısaha ve gün belirterek ilan açıcak. Kullanıcı ilanları kaleci ana sayfasına gözükecek
 [ ] Kaleciler ilan için istek gönderebilecek
 [ ] İstek gönderenlerin isteğine basınca profilini görebiliceksin
