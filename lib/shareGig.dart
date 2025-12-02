@@ -17,10 +17,15 @@ class ShareGigPage extends StatefulWidget {
 
 class _ShareGigPageState extends State<ShareGigPage> {
 
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   final _formKey = GlobalKey<FormState>();
 
   String? selectedDay;
   String? selectedHour;
+
+  Days? selectedDayEnum;
+  HourSlot? selectedHourEnum;
 
   TextEditingController nameController = TextEditingController();
   bool showErrorName = false;
@@ -36,6 +41,12 @@ class _ShareGigPageState extends State<ShareGigPage> {
 
   TextEditingController priceController = TextEditingController();
   bool showErrorPrice = false;
+
+  @override
+  void initState() { 
+    super.initState();
+    // checkIf24HoursPassed();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,8 +121,10 @@ class _ShareGigPageState extends State<ShareGigPage> {
                 DayText(),
                 SizedBox(height: height * 0.01),
                 DayField(
+                  selectedDay: selectedDayEnum,
                   onDaySelected: (value) {
-                    selectedDay = value;
+                    selectedDayEnum = value;
+                    selectedDay = value?.label;
                   },
                 ),
                 SizedBox(height: height * 0.03),
@@ -120,8 +133,10 @@ class _ShareGigPageState extends State<ShareGigPage> {
                 HourText(),
                 SizedBox(height: height * 0.01),
                 HourPicker(
+                  selectedHour: selectedHourEnum,
                   onHourSelected: (value) {
-                    selectedHour = value;
+                    selectedHourEnum = value;
+                    selectedHour = value?.label;
                   },
                 ),
                 SizedBox(height: height * 0.03),
@@ -189,7 +204,7 @@ class _ShareGigPageState extends State<ShareGigPage> {
   }
   Future<void> _insertUserGig() async {
     String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
-    CollectionReference collectionReference = FirebaseFirestore.instance.collection('Users');
+    CollectionReference collectionReference = _firestore.collection('Users');
     try {
     Map<String,dynamic> gigInfo = {
       'name': nameController.text,
@@ -198,15 +213,24 @@ class _ShareGigPageState extends State<ShareGigPage> {
       'province': provinceController.text,
       'district': districtController.text,
       'field': fieldController.text,
-      'price': priceController.text
+      'price': priceController.text,
+      'timestamp': DateTime.now().toUtc()
     };
 
     if (_formKey.currentState!.validate()) {
-      await collectionReference.doc(currentUserUid).collection('userGig').add({
-        'userGig': gigInfo
-      });
+      // todo: buraya 24 saat geçmeden yeni ilan veremezsiniz diye bir alan koyucam
+      bool dayPassed = await checkIf24HoursPassed();
+      // bir gün geçmiş mi diye kontrol ediyor
+      if (dayPassed == false) {
+        Showalert(context: context, text: 'Yeni ilan için 24 saat geçmesi gerekmektedir').showErrorAlert();
+      } else {
+        await collectionReference.doc(currentUserUid).collection('userGig').add({
+          'userGig': gigInfo
+        });
+      
       Showalert(context: context, text: 'İlan başarı ile gönderlimiştir').showSuccessAlert();
       clearAllFields();
+      }
     } else {
       Showalert(context: context, text: 'Tüm alanları doldurduğunuza emin misiniz!').showErrorAlert();
     }
@@ -217,13 +241,44 @@ class _ShareGigPageState extends State<ShareGigPage> {
     }
   }
 
+  Future<bool> checkIf24HoursPassed() async {
+    String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+    DateTime? gigTime;
+    DateTime? now;
+    try {
+      // db den önceki olan gig i al ve time stamp bak
+      QuerySnapshot<Map<String,dynamic>> userGigDoc = await _firestore.collection('Users').doc(currentUserUid).collection('userGig').get();
+      if (userGigDoc.docs.isEmpty){return true;}
+      for (final doc in userGigDoc.docs) {
+        Map<String,dynamic> gigdetails = doc.data();
+        if (gigdetails.isNotEmpty && gigdetails.containsKey('userGig')) {
+          final userGig = gigdetails['userGig'] as Map<String,dynamic>;
+          final ts = userGig['timestamp'];
+          // 24 saat geçmiş mi diye bak öyle döndür
+          if (ts != null && ts is Timestamp) {
+            gigTime = ts.toDate();
+            now = DateTime.now().toUtc();
+            final difference = now.difference(gigTime);
+            print('difference is $difference');
+            return difference.inHours >= 24;
+          }
+        }
+      }
+    } catch (e) {
+      print('Error is $e');
+    }
+    return true;
+  }
+
   void clearAllFields() {
     if (mounted) {
       setState(() {
         nameController.clear();
+        selectedDayEnum = null;
+        selectedHourEnum = null;
         selectedDay = null;
         selectedHour = null;
-        priceController.clear();
+        provinceController.clear();
         districtController.clear();
         fieldController.clear();
         priceController.clear();
@@ -298,8 +353,9 @@ enum Days {
 }
 
 class DayField extends StatefulWidget {
-  final ValueChanged<String?> onDaySelected;
-  const DayField({super.key, required this.onDaySelected});
+  final Days? selectedDay;
+  final ValueChanged<Days?> onDaySelected;
+  const DayField({super.key, required this.selectedDay ,required this.onDaySelected});
 
   @override
   State<DayField> createState() => _DayFieldState();
@@ -310,19 +366,14 @@ class _DayFieldState extends State<DayField> {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<Days>(
-      value: selectedDay,
+      value: widget.selectedDay,
       items: Days.values.map((day) {
         return DropdownMenuItem(
           value: day,
           child: Text(day.label),
         );
       }).toList(),
-      onChanged: (value) {
-        setState(() {
-          selectedDay = value;
-        });
-        widget.onDaySelected(value?.label);
-      },
+      onChanged: widget.onDaySelected,
       validator: (value) {
         if (value == null) {
           return 'Gün seçmelisiniz!';
@@ -363,8 +414,9 @@ class HourText extends StatelessWidget {
 }
 
 class HourPicker extends StatefulWidget {
-  final ValueChanged<String?> onHourSelected;
-  const HourPicker({super.key, required this.onHourSelected});
+  final HourSlot? selectedHour;
+  final ValueChanged<HourSlot?> onHourSelected;
+  const HourPicker({super.key,required this.selectedHour ,required this.onHourSelected});
 
   @override
   State<HourPicker> createState() => _HourPickerState();
@@ -376,19 +428,14 @@ class _HourPickerState extends State<HourPicker> {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<HourSlot>(
-      value: selectedHour,
+      value: widget.selectedHour,
       items: HourSlot.values.map((hour) {
         return DropdownMenuItem(
           value: hour,
           child: Text(hour.label),
         );
       }).toList(),
-      onChanged: (value) {
-        setState(() {
-          selectedHour = value;
-        });
-        widget.onHourSelected(value?.label);
-      },
+      onChanged: widget.onHourSelected,
       validator: (value) {
         if (value == null) {
           return 'Saat seçmelisiniz!';
