@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kiralik_kaleci/authpage.dart';
+import 'package:kiralik_kaleci/sellekeeperRequests.dart';
 import 'package:kiralik_kaleci/sellerHomepage.dart';
 import 'package:kiralik_kaleci/selleraddpage.dart';
 import 'package:kiralik_kaleci/sellerdirectmessages.dart';
@@ -100,6 +101,22 @@ class SellerMainPageState extends State<SellerMainPage> {
                     ),
                     title: const Text('Ana Sayfa'),
                   ),
+                  BottomNavyBarItem(
+                  icon: Stack(
+                    children: [
+                      const Icon(
+                        Icons.attach_money,
+                        color: Colors.white,
+                      ),
+                    ],
+                  ),
+                  title: Text(
+                    'Talepler',
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
                   BottomNavyBarItem(
                     icon: Stack(
                       children: [
@@ -203,8 +220,10 @@ class SellerMainPageState extends State<SellerMainPage> {
   List<Widget> screens() {
     return [
       const SellerHomePage(),
+      const seeUsersKeeperRequests(),
       const SellerDirectMessages(),
       const SellerProfilePage(),
+      // seller add page neden burada anlamadım ama bozmuyor akışı
       const SellerAddPage()
     ];
   }
@@ -243,7 +262,7 @@ class SellerMainPageState extends State<SellerMainPage> {
 
   Future<int> getUnreadMessages(String participantId) async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return Future.error('noUnreadCount'); // Or redirect to login
+    if (user == null) return Future.error('noUnreadCount'); // Or redirect to loginf
 
     final currentUser = user.uid;
 

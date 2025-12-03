@@ -18,8 +18,8 @@ class ShareGigPage extends StatefulWidget {
 class _ShareGigPageState extends State<ShareGigPage> {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   final _formKey = GlobalKey<FormState>();
+  String? docIdToUpdate;
 
   String? selectedDay;
   String? selectedHour;
@@ -123,8 +123,10 @@ class _ShareGigPageState extends State<ShareGigPage> {
                 DayField(
                   selectedDay: selectedDayEnum,
                   onDaySelected: (value) {
-                    selectedDayEnum = value;
-                    selectedDay = value?.label;
+                    setState(() {
+                      selectedDayEnum = value;
+                      selectedDay = value?.label;
+                    });
                   },
                 ),
                 SizedBox(height: height * 0.03),
@@ -135,8 +137,10 @@ class _ShareGigPageState extends State<ShareGigPage> {
                 HourPicker(
                   selectedHour: selectedHourEnum,
                   onHourSelected: (value) {
-                    selectedHourEnum = value;
-                    selectedHour = value?.label;
+                    setState(() {
+                      selectedHourEnum = value;
+                      selectedHour = value?.label;
+                    });
                   },
                 ),
                 SizedBox(height: height * 0.03),
@@ -192,7 +196,7 @@ class _ShareGigPageState extends State<ShareGigPage> {
                         }
                       }
                     }, 
-                    child: GlobalStyles.textStyle(text: 'Onayla', context: context, size: 24, fontWeight: FontWeight.w600, color: Colors.white),
+                    child: GlobalStyles.textStyle(text: 'Onayla', context: context, size: 24, fontWeight: FontWeight.w600, color: Colors.black),
                   ),
                 )
               ],
@@ -218,13 +222,13 @@ class _ShareGigPageState extends State<ShareGigPage> {
     };
 
     if (_formKey.currentState!.validate()) {
-      // todo: buraya 24 saat geçmeden yeni ilan veremezsiniz diye bir alan koyucam
       bool dayPassed = await checkIf24HoursPassed();
       // bir gün geçmiş mi diye kontrol ediyor
       if (dayPassed == false) {
         Showalert(context: context, text: 'Yeni ilan için 24 saat geçmesi gerekmektedir').showErrorAlert();
+        clearAllFields();
       } else {
-        await collectionReference.doc(currentUserUid).collection('userGig').add({
+        await collectionReference.doc(currentUserUid).collection('userGig').doc(docIdToUpdate).update({
           'userGig': gigInfo
         });
       
@@ -250,6 +254,8 @@ class _ShareGigPageState extends State<ShareGigPage> {
       QuerySnapshot<Map<String,dynamic>> userGigDoc = await _firestore.collection('Users').doc(currentUserUid).collection('userGig').get();
       if (userGigDoc.docs.isEmpty){return true;}
       for (final doc in userGigDoc.docs) {
+        print('the doc is ${doc.id}');
+        docIdToUpdate = doc.id;
         Map<String,dynamic> gigdetails = doc.data();
         if (gigdetails.isNotEmpty && gigdetails.containsKey('userGig')) {
           final userGig = gigdetails['userGig'] as Map<String,dynamic>;
@@ -283,6 +289,8 @@ class _ShareGigPageState extends State<ShareGigPage> {
         fieldController.clear();
         priceController.clear();
       });
+      print(selectedDayEnum);
+      print(selectedDay);
     }
   }
 }
@@ -352,28 +360,22 @@ enum Days {
   const Days(this.label);
 }
 
-class DayField extends StatefulWidget {
+class DayField extends StatelessWidget {
   final Days? selectedDay;
   final ValueChanged<Days?> onDaySelected;
-  const DayField({super.key, required this.selectedDay ,required this.onDaySelected});
+  const DayField({super.key, required this.selectedDay, required this.onDaySelected});
 
-  @override
-  State<DayField> createState() => _DayFieldState();
-}
-
-class _DayFieldState extends State<DayField> {
-  Days? selectedDay;
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<Days>(
-      value: widget.selectedDay,
+      value: selectedDay, 
       items: Days.values.map((day) {
         return DropdownMenuItem(
           value: day,
           child: Text(day.label),
         );
       }).toList(),
-      onChanged: widget.onDaySelected,
+      onChanged: onDaySelected,
       validator: (value) {
         if (value == null) {
           return 'Gün seçmelisiniz!';
@@ -413,29 +415,22 @@ class HourText extends StatelessWidget {
   }
 }
 
-class HourPicker extends StatefulWidget {
+class HourPicker extends StatelessWidget {
   final HourSlot? selectedHour;
   final ValueChanged<HourSlot?> onHourSelected;
-  const HourPicker({super.key,required this.selectedHour ,required this.onHourSelected});
-
-  @override
-  State<HourPicker> createState() => _HourPickerState();
-}
-
-class _HourPickerState extends State<HourPicker> {
-  HourSlot? selectedHour;
+  const HourPicker({super.key, required this.selectedHour, required this.onHourSelected});
 
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<HourSlot>(
-      value: widget.selectedHour,
+      value: selectedHour, // Use parent's value
       items: HourSlot.values.map((hour) {
         return DropdownMenuItem(
           value: hour,
           child: Text(hour.label),
         );
       }).toList(),
-      onChanged: widget.onHourSelected,
+      onChanged: onHourSelected,
       validator: (value) {
         if (value == null) {
           return 'Saat seçmelisiniz!';

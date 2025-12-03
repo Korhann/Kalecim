@@ -9,8 +9,9 @@ Yapılacaklar:
 [ ] mesajlaşma sayfasına textfield altında kalıyor, dene ve çöz (çözümünü bulamadım)
 
 - KULLANICI İLAN AÇMA MANTIĞI
-[!] Dropdown buttonlarındaki değerler gönderildikten sonra silinmiyor
-[ ] Kullanıcı saat, fiyat, il, ilçe, halısaha ve gün belirterek ilan açıcak. Kullanıcı ilanları kaleci ana sayfasına gözükecek
+[√] Dropdown buttonlarındaki değerler gönderildikten sonra silinmiyor
+[√] Kullanıcı saat, fiyat, il, ilçe, halısaha ve gün belirterek ilan açıcak. 
+[ ] Kullanıcı ilanları kaleci ana sayfasına gözükecek
 [ ] Kaleciler ilan için istek gönderebilecek
 [ ] İstek gönderenlerin isteğine basınca profilini görebiliceksin
 [ ] 24 saat geçmediyse yeni ilan açamaz
