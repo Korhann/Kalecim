@@ -18,6 +18,7 @@ class seeUsersKeeperRequests extends StatefulWidget {
 }
 
 class _seeUsersKeeperRequestsState extends State<seeUsersKeeperRequests> {
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String currentuser = FirebaseAuth.instance.currentUser!.uid;
 
@@ -34,10 +35,10 @@ class _seeUsersKeeperRequestsState extends State<seeUsersKeeperRequests> {
               );
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              GigsEmpty();
+              return GigsEmpty();
             }
-            final docs = snapshot.data!.docs;
 
+            final gigs = snapshot.data!.docs;
             return Scaffold(
               appBar: AppBar(
                 automaticallyImplyLeading: false,
@@ -55,30 +56,20 @@ class _seeUsersKeeperRequestsState extends State<seeUsersKeeperRequests> {
                 centerTitle: true,
               ),
               backgroundColor: sellerbackground,
-              body: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: docs.length,
-                      itemBuilder: (context, index) {
-                        final gigDetails = docs[index].data() as Map<String,dynamic>;
-                        print('gig details are $gigDetails');
-                        // final day = gigDetails['userGig']['day'];
-                        // final district = gigDetails['userGig']['district'];
-                        // final field = gigDetails['userGig']['field'];
-                        // final hour = gigDetails['userGig']['hour'];
-                        // final name = gigDetails['userGig']['name'];
-                        // final price = gigDetails['userGig']['price'];
-                        // final province = gigDetails['userGig']['province'];
-                        // final timestamp = gigDetails['userGig']['timestamp'];
+              body: ListView.builder(
+                itemCount: gigs.length,
+                itemBuilder: (context, index) {
+                  final gigData = gigs[index].data() as Map<String, dynamic>;
+                  final day = gigData['userGig']['day'];
+                  final district = gigData['userGig']['district'];
+                  final field = gigData['userGig']['field'];
+                  final hour = gigData['userGig']['hour'];
+                  final name = gigData['userGig']['name'];
+                  final price = gigData['userGig']['price'];
+                  final province = gigData['userGig']['province'];
 
-                        print('length of docs ${docs.length}');
-                      },
-                    )
-                  ],
-                ),
+                  return GigView(day: day, district: district, field: field, hour: hour, name: name, price: price, province: province);
+                },
               ),
             );
           }
@@ -87,10 +78,118 @@ class _seeUsersKeeperRequestsState extends State<seeUsersKeeperRequests> {
   }
 
   Stream<QuerySnapshot> gigStream() {
-    return _firestore
-      .collection('Users')
-      .where('sellerDetails', isNotEqualTo: null)
-      .snapshots();
+    return _firestore.collectionGroup('userGig').snapshots();
+  }
+}
+
+class GigView extends StatelessWidget {
+  final String day;
+  final String district;
+  final String field;
+  final String hour;
+  final String name;
+  final String price;
+  final String province;
+  const GigView({
+    super.key,
+    required this.day,
+    required this.district,
+    required this.field,
+    required this.hour,
+    required this.name,
+    required this.price,
+    required this.province
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.sports_soccer, color: Colors.blueGrey, size: 28),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    field,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '$price ₺',
+                    style: TextStyle(
+                      color: Colors.blue.shade700,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Divider(),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.calendar_today, size: 18, color: Colors.grey[600]),
+                const SizedBox(width: 6),
+                Text(
+                  day,
+                  style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+                ),
+                const SizedBox(width: 18),
+                Icon(Icons.access_time, size: 18, color: Colors.grey[600]),
+                const SizedBox(width: 6),
+                Text(
+                  hour,
+                  style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.location_on, size: 18, color: Colors.red[400]),
+                const SizedBox(width: 6),
+                Text(
+                  '$province, $district',
+                  style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Icon(Icons.person, size: 18, color: Colors.green[700]),
+                const SizedBox(width: 6),
+                Text(
+                  name,
+                  style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

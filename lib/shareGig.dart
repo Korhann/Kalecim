@@ -228,7 +228,7 @@ class _ShareGigPageState extends State<ShareGigPage> {
         Showalert(context: context, text: 'Yeni ilan için 24 saat geçmesi gerekmektedir').showErrorAlert();
         clearAllFields();
       } else {
-        await collectionReference.doc(currentUserUid).collection('userGig').doc(docIdToUpdate).update({
+        await collectionReference.doc(currentUserUid).collection('userGig').doc(docIdToUpdate).set({
           'userGig': gigInfo
         });
       
@@ -241,6 +241,7 @@ class _ShareGigPageState extends State<ShareGigPage> {
     } catch (e) {
       if (mounted) {
         Showalert(context: context, text: 'Ooops...').showErrorAlert();
+        print(e);
       }
     }
   }
