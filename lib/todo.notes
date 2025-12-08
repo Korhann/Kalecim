@@ -3,7 +3,6 @@ Yapılacaklar:
 
 [ ] Kalecilerin kart renginin puanlamalara göre değişmesi
 [!] shareGig den bakarak selleraddpage dropdownlarına da validator koyabilirsin
-[ ] Yeni branch açıldı
 
 - ANDROID FIXES
 [ ] mesajlaşma sayfasına textfield altında kalıyor, dene ve çöz (çözümünü bulamadım)
@@ -11,22 +10,21 @@ Yapılacaklar:
 - KULLANICI İLAN AÇMA MANTIĞI
 [√] Dropdown buttonlarındaki değerler gönderildikten sonra silinmiyor
 [√] Kullanıcı saat, fiyat, il, ilçe, halısaha ve gün belirterek ilan açıcak. 
-[ ] Kullanıcı ilanları kaleci ana sayfasına gözükecek
-[ ] Kaleciler ilan için istek gönderebilecek
-[ ] İstek gönderenlerin isteğine basınca profilini görebiliceksin
-[ ] 24 saat geçmediyse yeni ilan açamaz
+[√] Kullanıcı ilanları kaleci ana sayfasına gözükecek
+[√] 24 saat geçmediyse yeni ilan açamaz
+
+- Gig mantığı
+[ ] Eğer kaleci ilanı var ise randevuyu kabul edebilecek, yoksa ilk başta ilan açması gerekiyor
+[ ] Kaleci ilana randevu talebi gönderebilecek
+[ ] Kullanıcının talep sayfasında talepleri görüntüle diye bir kısım olucak
 [ ] İlan kullanıcı kaleciye ödeme yapınca kapanıcak
 
 
-- YORUM VE PUANLAMA ÖZELLİĞİ
-[√] Kalecinin db sine kiralayanlar diye liste oluştur, eğer biri kiralamışsa alıcı uid'sini oraya ekle
-[√] Yorum yazma kutusu
-[√] Yorumlara timestamp de ekle
-[√] Sadece kiralayanlar yorum ve puanlama yapabilsin (not eklerken kiralama yapmadıysanız not ekleyemezsiniz yazısı yap)
-[√] Puanlamaların ortalamasını sellerGridItem de göster
-[ ] Maç saati geçtikten sonra randevularım da puanla ve yorum yap diye bir bölüm oluştur
-[√] iki farklı kullanıcı ile yorum eklemeyi dene
-[√] Yorum eklerken bazen author null olarak ekliyor
+
+- Gig özellikleri
+[ ] İlana gelen talep sayısı gösterilcek
+[ ] İstek gönderenlerin isteğine basınca profilini görebiliceksin
+
 
 
 - KART RENGİ

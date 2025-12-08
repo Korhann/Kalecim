@@ -21,6 +21,7 @@ class ApptRequest extends StatefulWidget {
   final String selectedHour;
   final String selectedField;
   final int selectedPrice;
+  final String whereFrom;
 
   const ApptRequest({
     super.key,
@@ -28,7 +29,8 @@ class ApptRequest extends StatefulWidget {
     required this.selectedDay,
     required this.selectedHour,
     required this.selectedField,
-    required this.selectedPrice
+    required this.selectedPrice,
+    required this.whereFrom
   });
 
   @override
@@ -162,19 +164,24 @@ class _ApptRequestState extends State<ApptRequest> {
                       });
                       }
                     }
-                    bool isSameAppointment = await checkIfSameApptRequest();
-                    if (isSameAppointment) {
-                      await sendRequest();
-                      await navigateToHomePage();
-                    } else {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Aynı saat için birden fazla talep gönderemezsiniz'),
-                          backgroundColor: Colors.red,
-                        )
-                      );
+                    if (widget.whereFrom == 'fromSellerDetails') {
+                      bool isSameAppointment = await checkIfSameApptRequest();
+                      if (isSameAppointment) {
+                        await sendRequest();
+                        await navigateToHomePage();
+                      }else {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Aynı saat için birden fazla talep gönderemezsiniz'),
+                              backgroundColor: Colors.red,
+                            )
+                          );
+                        }
                       }
+                    } else {
+                      // keeperRequest sayfasından gelince burası çalışıcak
+                      // istek gönder
                     }
                     Future.delayed(const Duration(seconds: 5), () {
                       if (mounted) {

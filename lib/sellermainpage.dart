@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kiralik_kaleci/authpage.dart';
-import 'package:kiralik_kaleci/sellekeeperRequests.dart';
+import 'package:kiralik_kaleci/seeKeeperRequests.dart';
 import 'package:kiralik_kaleci/sellerHomepage.dart';
 import 'package:kiralik_kaleci/selleraddpage.dart';
 import 'package:kiralik_kaleci/sellerdirectmessages.dart';

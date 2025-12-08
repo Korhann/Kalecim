@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kiralik_kaleci/apptRequest.dart';
 import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
 import 'package:kiralik_kaleci/globals.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
@@ -68,7 +69,7 @@ class _seeUsersKeeperRequestsState extends State<seeUsersKeeperRequests> {
                   final price = gigData['userGig']['price'];
                   final province = gigData['userGig']['province'];
 
-                  return GigView(day: day, district: district, field: field, hour: hour, name: name, price: price, province: province);
+                  return GigView(day: day, district: district, field: field, hour: hour, name: name, price: price, province: province, currentuser: currentuser);
                 },
               ),
             );
@@ -90,6 +91,7 @@ class GigView extends StatelessWidget {
   final String name;
   final String price;
   final String province;
+  final String currentuser;
   const GigView({
     super.key,
     required this.day,
@@ -98,7 +100,8 @@ class GigView extends StatelessWidget {
     required this.hour,
     required this.name,
     required this.price,
-    required this.province
+    required this.province,
+    required this.currentuser
   });
 
   @override
@@ -164,7 +167,7 @@ class GigView extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Row(
               children: [
                 Icon(Icons.location_on, size: 18, color: Colors.red[400]),
@@ -175,7 +178,7 @@ class GigView extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
             Row(
               children: [
                 Icon(Icons.person, size: 18, color: Colors.green[700]),
@@ -184,6 +187,33 @@ class GigView extends StatelessWidget {
                   name,
                   style: TextStyle(fontSize: 15, color: Colors.grey[800]),
                 ),
+                Spacer(),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    color: Colors.grey[350],
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context, 
+                          MaterialPageRoute(
+                            builder: (context) => ApptRequest(
+                            sellerUid: currentuser,
+                            selectedDay: day,
+                            selectedHour: hour,
+                            selectedField: field, 
+                            selectedPrice: int.tryParse(price)!,
+                            whereFrom: 'fromKeeperRequests',
+                          )
+                          )
+                        );
+                      },
+                      child: const Icon(Icons.arrow_forward, size: 24),
+                    ),
+                  ),
+                )
               ],
             ),
           ],
