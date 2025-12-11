@@ -6,6 +6,7 @@ Yapılacaklar:
 
 - ANDROID FIXES
 [ ] mesajlaşma sayfasına textfield altında kalıyor, dene ve çöz (çözümünü bulamadım)
+[ ] android ve ios kullanıcıları için tag koy onesignal da
 
 - KULLANICI İLAN AÇMA MANTIĞI
 [√] Dropdown buttonlarındaki değerler gönderildikten sonra silinmiyor

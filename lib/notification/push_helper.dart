@@ -9,7 +9,7 @@ import 'bildirim_model.dart';
 import '../config/secrets.dart';
 
 class PushHelper {
-  //Writen by Hakan Kayacı
+  //Written by Hakan Kayacı
 
   static Future<void> sendPushBefore({required String userId,required String text,required String page}) async {
     final userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(userId).get();

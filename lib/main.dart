@@ -16,6 +16,7 @@ import 'package:kiralik_kaleci/mainpage.dart';
 import 'package:kiralik_kaleci/notification/push_helper.dart';
 import 'package:kiralik_kaleci/paymentpage.dart';
 import 'package:kiralik_kaleci/sellermainpage.dart';
+import 'package:kiralik_kaleci/shareGig.dart';
 import 'package:kiralik_kaleci/sharedvalues.dart';
 import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -253,11 +254,22 @@ void setupNotificationListener() {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MessagePage(receiverId: senderId, fromWhere: 'fromNoti',)
+                  builder: (context) => MessagePage(receiverId: senderId, fromWhere: 'fromNoti')
                 )
               );
             }
             break;
+          //todo: Doğru çalışıyor mu diye bak
+          case 'shareGigPage':
+            if (ModalRoute.of(context)?.settings.name != '/shareGigPage') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ShareGigPage()
+                )
+              );
+            }
+          break;
           default:
             print("Unknown page: $page");
             break;

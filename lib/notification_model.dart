@@ -9,3 +9,9 @@ class NotificationModel {
     return '$selectedHour, $selectedDay, $selectedField';
   }
 }
+
+class NotificationFromKeeperToUser {
+  String notification() {
+    return 'Bir randevu talebi geldi!';
+  }
+}

@@ -4,6 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:kiralik_kaleci/apptRequest.dart';
+import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
+import 'package:kiralik_kaleci/shimmers.dart';
 import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
@@ -16,7 +19,6 @@ class ShareGigPage extends StatefulWidget {
 }
 
 class _ShareGigPageState extends State<ShareGigPage> {
-
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
   String? docIdToUpdate;
@@ -42,202 +44,318 @@ class _ShareGigPageState extends State<ShareGigPage> {
   TextEditingController priceController = TextEditingController();
   bool showErrorPrice = false;
 
-  @override
-  void initState() { 
-    super.initState();
-    // checkIf24HoursPassed();
+  String currentuser = FirebaseAuth.instance.currentUser!.uid;
+
+  Stream<QuerySnapshot> gigStream() {
+    return _firestore
+        .collection('Users')
+        .doc(currentuser)
+        .collection('userGig')
+        .snapshots();
+  }
+
+  Future<bool> checkIfUserHasGig() async {
+    try {
+      final gigSnapshot = await _firestore
+          .collection('Users')
+          .doc(currentuser)
+          .collection('userGig')
+          .get();
+
+      if (gigSnapshot.docs.isEmpty) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch (e) {
+      print('Error checking the gig $e');
+      return false;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
-    // bütün textfieldlara sadece text girilebilsin
 
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Padding(
-          padding: const EdgeInsets.only(top: 30),
-          child: GlobalStyles.textStyle(
-            text: 'İlan ver',
-            context: context,
-            size: 20,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
-        ),
-        backgroundColor: background,
-        centerTitle: true,
-      ),
-      backgroundColor: background,
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.08),
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 14, horizontal: 12),
-                      child: Center(
-                        child: Text(
-                          'İlan verin, kaleciler başvursun!\nMaç bilgilerinizi paylaşın, teklif alın.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black87,
-                            height: 1.4,
+    //todo: eğer ilan sayfanın içindeyken silinmiş ise boş bir sayfa gösteriyor çöz
+    return FutureBuilder<bool>(
+        future: checkIfUserHasGig(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Bir hata oluştu'));
+          }
+          final hasGig = snapshot.data ?? false;
+          if (hasGig) {
+            return ConnectivityWithBackButton(
+              child: StreamBuilder<QuerySnapshot>(
+                  stream: gigStream(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Padding(
+                        padding: EdgeInsets.only(top: 40),
+                        child: ShareGigViewShimmer(),
+                      );
+                    }
+                    final gigs = snapshot.data!.docs;
+                    return Scaffold(
+                      appBar: AppBar(
+                        automaticallyImplyLeading: false,
+                        title: Padding(
+                          padding: const EdgeInsets.only(top: 30),
+                          child: GlobalStyles.textStyle(
+                            text: 'İlanınız',
+                            context: context,
+                            size: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
                           ),
                         ),
+                        backgroundColor: background,
+                        centerTitle: true,
                       ),
+                      backgroundColor: background,
+                      body: ListView.builder(
+                        itemCount: gigs.length,
+                        itemBuilder: (context, index) {
+                          final gigData = gigs[index].data() as Map<String, dynamic>;
+                          final day = gigData['userGig']['day'];
+                          final district = gigData['userGig']['district'];
+                          final field = gigData['userGig']['field'];
+                          final hour = gigData['userGig']['hour'];
+                          final name = gigData['userGig']['name'];
+                          final price = gigData['userGig']['price'];
+                          final province = gigData['userGig']['province'];
+                          final gigOwner = gigData['userGig']['gigOwner'];
+
+                          return GigView(
+                              day: day,
+                              district: district,
+                              field: field,
+                              hour: hour,
+                              name: name,
+                              price: price,
+                              province: province,
+                              gigOwner: gigOwner);
+                        },
+                      ),
+                    );
+                  }),
+            );
+          } else {
+            return Scaffold(
+              appBar: AppBar(
+                automaticallyImplyLeading: false,
+                title: Padding(
+                  padding: const EdgeInsets.only(top: 30),
+                  child: GlobalStyles.textStyle(
+                    text: 'İlan ver',
+                    context: context,
+                    size: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black,
+                  ),
+                ),
+                backgroundColor: background,
+                centerTitle: true,
+              ),
+              backgroundColor: background,
+              body: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.08),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 14, horizontal: 12),
+                              child: Center(
+                                child: Text(
+                                  'İlan verin, kaleciler başvursun!\nMaç bilgilerinizi paylaşın, teklif alın.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black87,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        // isim soyisim bilgisi
+                        NameText(),
+                        SizedBox(height: height * 0.01),
+                        NameField(
+                            controller: nameController,
+                            showErrorName: showErrorName),
+                        SizedBox(height: height * 0.03),
+
+                        // gün bilgisi
+                        DayText(),
+                        SizedBox(height: height * 0.01),
+                        DayField(
+                          selectedDay: selectedDayEnum,
+                          onDaySelected: (value) {
+                            setState(() {
+                              selectedDayEnum = value;
+                              selectedDay = value?.label;
+                            });
+                          },
+                        ),
+                        SizedBox(height: height * 0.03),
+
+                        // saat bilgisi
+                        HourText(),
+                        SizedBox(height: height * 0.01),
+                        HourPicker(
+                          selectedHour: selectedHourEnum,
+                          onHourSelected: (value) {
+                            setState(() {
+                              selectedHourEnum = value;
+                              selectedHour = value?.label;
+                            });
+                          },
+                        ),
+                        SizedBox(height: height * 0.03),
+
+                        // il bilgisi
+                        ProvinceText(),
+                        SizedBox(height: height * 0.01),
+                        ProvinceField(
+                            controller: provinceController,
+                            showErrorProvince: showErrorProvince),
+                        SizedBox(height: height * 0.03),
+
+                        // ilçe bilgisi
+                        DistrictText(),
+                        SizedBox(height: height * 0.01),
+                        DistrictField(
+                            controller: districtController,
+                            showErrorDistrict: showErrorDistrict),
+                        SizedBox(height: height * 0.03),
+
+                        // halısaha bilgisi
+                        FieldText(),
+                        SizedBox(height: height * 0.01),
+                        FieldInfo(
+                            controller: fieldController,
+                            showErrorField: showErrorField),
+                        SizedBox(height: height * 0.03),
+
+                        // fiyat bilgisi
+                        PriceText(),
+                        SizedBox(height: height * 0.01),
+                        PriceField(
+                            controller: priceController,
+                            showErrorPrice: showErrorPrice),
+                        SizedBox(height: height * 0.03),
+
+                        // Onayla butonu
+                        Center(
+                          child: ElevatedButton(
+                            style: GlobalStyles.buttonPrimary(context),
+                            onPressed: () async {
+                              try {
+                                if (await InternetConnection()
+                                    .hasInternetAccess) {
+                                  await _insertUserGig();
+                                } else {
+                                  if (mounted) {
+                                    Showalert(
+                                            context: context, text: 'Ooops...')
+                                        .showErrorAlert();
+                                  }
+                                }
+                              } catch (e) {
+                                if (mounted) {
+                                  Showalert(
+                                          context: context,
+                                          text:
+                                              'Tüm alanları doldurduğunuza emin misiniz?')
+                                      .showErrorAlert();
+                                }
+                              }
+                            },
+                            child: GlobalStyles.textStyle(
+                                text: 'Onayla',
+                                context: context,
+                                size: 24,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black),
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ),
-                // isim soyisim bilgisi
-                NameText(),
-                SizedBox(height: height * 0.01),
-                NameField(
-                    controller: nameController, showErrorName: showErrorName),
-                SizedBox(height: height * 0.03),
-
-                // gün bilgisi
-                DayText(),
-                SizedBox(height: height * 0.01),
-                DayField(
-                  selectedDay: selectedDayEnum,
-                  onDaySelected: (value) {
-                    setState(() {
-                      selectedDayEnum = value;
-                      selectedDay = value?.label;
-                    });
-                  },
-                ),
-                SizedBox(height: height * 0.03),
-
-                // saat bilgisi
-                HourText(),
-                SizedBox(height: height * 0.01),
-                HourPicker(
-                  selectedHour: selectedHourEnum,
-                  onHourSelected: (value) {
-                    setState(() {
-                      selectedHourEnum = value;
-                      selectedHour = value?.label;
-                    });
-                  },
-                ),
-                SizedBox(height: height * 0.03),
-
-                // il bilgisi
-                ProvinceText(),
-                SizedBox(height: height * 0.01),
-                ProvinceField(
-                    controller: provinceController,
-                    showErrorProvince: showErrorProvince),
-                SizedBox(height: height * 0.03),
-
-                // ilçe bilgisi
-                DistrictText(),
-                SizedBox(height: height * 0.01),
-                DistrictField(
-                    controller: districtController,
-                    showErrorDistrict: showErrorDistrict),
-                SizedBox(height: height * 0.03),
-
-                // halısaha bilgisi
-                FieldText(),
-                SizedBox(height: height * 0.01),
-                FieldInfo(
-                    controller: fieldController,
-                    showErrorField: showErrorField),
-                SizedBox(height: height * 0.03),
-
-                // fiyat bilgisi
-                PriceText(),
-                SizedBox(height: height * 0.01),
-                PriceField(
-                  controller: priceController,
-                  showErrorPrice: showErrorPrice),
-                SizedBox(height: height * 0.03),
-
-                // Onayla butonu
-                Center(
-                  child: ElevatedButton(
-                    style: GlobalStyles.buttonPrimary(context),
-                    onPressed: () async {
-                      try {
-                        if (await InternetConnection().hasInternetAccess) {
-                          await _insertUserGig();
-                        } else {
-                          if (mounted) {
-                            Showalert(context: context, text: 'Ooops...').showErrorAlert();
-                          }
-                        }
-                      } catch (e) {
-                        if (mounted) {
-                          Showalert(context: context, text: 'Tüm alanları doldurduğunuza emin misiniz?').showErrorAlert();
-                        }
-                      }
-                    }, 
-                    child: GlobalStyles.textStyle(text: 'Onayla', context: context, size: 24, fontWeight: FontWeight.w600, color: Colors.black),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+              ),
+            );
+          }
+        });
   }
+
   Future<void> _insertUserGig() async {
     String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
     CollectionReference collectionReference = _firestore.collection('Users');
     try {
-    Map<String,dynamic> gigInfo = {
-      'name': nameController.text,
-      'day': selectedDay,
-      'hour': selectedHour,
-      'province': provinceController.text,
-      'district': districtController.text,
-      'field': fieldController.text,
-      'price': priceController.text,
-      'timestamp': DateTime.now().toUtc()
-    };
+      Map<String, dynamic> gigInfo = {
+        'name': nameController.text,
+        'day': selectedDay,
+        'hour': selectedHour,
+        'province': provinceController.text,
+        'district': districtController.text,
+        'field': fieldController.text,
+        'price': priceController.text,
+        'gigOwner': currentUserUid,
+        'timestamp': DateTime.now().toUtc()
+      };
 
-    if (_formKey.currentState!.validate()) {
-      bool dayPassed = await checkIf24HoursPassed();
-      // bir gün geçmiş mi diye kontrol ediyor
-      if (dayPassed == false) {
-        Showalert(context: context, text: 'Yeni ilan için 24 saat geçmesi gerekmektedir').showErrorAlert();
-        clearAllFields();
+      if (_formKey.currentState!.validate()) {
+        bool dayPassed = await checkIf24HoursPassed();
+        // bir gün geçmiş mi diye kontrol ediyor
+        if (dayPassed == false) {
+          Showalert(
+                  context: context,
+                  text: 'Yeni ilan için 24 saat geçmesi gerekmektedir')
+              .showErrorAlert();
+          clearAllFields();
+        } else {
+          await collectionReference
+              .doc(currentUserUid)
+              .collection('userGig')
+              .doc(docIdToUpdate)
+              .set({'userGig': gigInfo});
+
+          Showalert(context: context, text: 'İlan başarı ile gönderlimiştir')
+              .showSuccessAlert();
+          clearAllFields();
+        }
       } else {
-        await collectionReference.doc(currentUserUid).collection('userGig').doc(docIdToUpdate).set({
-          'userGig': gigInfo
-        });
-      
-      Showalert(context: context, text: 'İlan başarı ile gönderlimiştir').showSuccessAlert();
-      clearAllFields();
+        Showalert(
+                context: context,
+                text: 'Tüm alanları doldurduğunuza emin misiniz!')
+            .showErrorAlert();
       }
-    } else {
-      Showalert(context: context, text: 'Tüm alanları doldurduğunuza emin misiniz!').showErrorAlert();
-    }
     } catch (e) {
       if (mounted) {
         Showalert(context: context, text: 'Ooops...').showErrorAlert();
@@ -252,14 +370,20 @@ class _ShareGigPageState extends State<ShareGigPage> {
     DateTime? now;
     try {
       // db den önceki olan gig i al ve time stamp bak
-      QuerySnapshot<Map<String,dynamic>> userGigDoc = await _firestore.collection('Users').doc(currentUserUid).collection('userGig').get();
-      if (userGigDoc.docs.isEmpty){return true;}
+      QuerySnapshot<Map<String, dynamic>> userGigDoc = await _firestore
+          .collection('Users')
+          .doc(currentUserUid)
+          .collection('userGig')
+          .get();
+      if (userGigDoc.docs.isEmpty) {
+        return true;
+      }
       for (final doc in userGigDoc.docs) {
         print('the doc is ${doc.id}');
         docIdToUpdate = doc.id;
-        Map<String,dynamic> gigdetails = doc.data();
+        Map<String, dynamic> gigdetails = doc.data();
         if (gigdetails.isNotEmpty && gigdetails.containsKey('userGig')) {
-          final userGig = gigdetails['userGig'] as Map<String,dynamic>;
+          final userGig = gigdetails['userGig'] as Map<String, dynamic>;
           final ts = userGig['timestamp'];
           // 24 saat geçmiş mi diye bak öyle döndür
           if (ts != null && ts is Timestamp) {
@@ -333,7 +457,6 @@ class NameField extends StatelessWidget {
   }
 }
 
-
 class DayText extends StatelessWidget {
   const DayText({super.key});
 
@@ -364,12 +487,13 @@ enum Days {
 class DayField extends StatelessWidget {
   final Days? selectedDay;
   final ValueChanged<Days?> onDaySelected;
-  const DayField({super.key, required this.selectedDay, required this.onDaySelected});
+  const DayField(
+      {super.key, required this.selectedDay, required this.onDaySelected});
 
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<Days>(
-      value: selectedDay, 
+      value: selectedDay,
       items: Days.values.map((day) {
         return DropdownMenuItem(
           value: day,
@@ -383,7 +507,8 @@ class DayField extends StatelessWidget {
         }
         return null;
       },
-      decoration: InputDecoration(labelText: 'Gün Seçiniz', border: OutlineInputBorder()),
+      decoration: InputDecoration(
+          labelText: 'Gün Seçiniz', border: OutlineInputBorder()),
     );
   }
 }
@@ -419,7 +544,8 @@ class HourText extends StatelessWidget {
 class HourPicker extends StatelessWidget {
   final HourSlot? selectedHour;
   final ValueChanged<HourSlot?> onHourSelected;
-  const HourPicker({super.key, required this.selectedHour, required this.onHourSelected});
+  const HourPicker(
+      {super.key, required this.selectedHour, required this.onHourSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -438,7 +564,8 @@ class HourPicker extends StatelessWidget {
         }
         return null;
       },
-      decoration: InputDecoration(labelText: 'Saatler', border: OutlineInputBorder()),
+      decoration:
+          InputDecoration(labelText: 'Saatler', border: OutlineInputBorder()),
     );
   }
 }
@@ -474,8 +601,10 @@ class ProvinceField extends StatelessWidget {
           }
           return null;
         },
-        style: GoogleFonts.inter(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w300),
-        decoration: GlobalStyles.inputDecoration1(hintText: 'İl', showError: showErrorProvince));
+        style: GoogleFonts.inter(
+            color: Colors.black, fontSize: 14, fontWeight: FontWeight.w300),
+        decoration: GlobalStyles.inputDecoration1(
+            hintText: 'İl', showError: showErrorProvince));
   }
 }
 
@@ -510,8 +639,10 @@ class DistrictField extends StatelessWidget {
           }
           return null;
         },
-        style: GoogleFonts.inter(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w300),
-        decoration: GlobalStyles.inputDecoration1(hintText: 'İlçe', showError: showErrorDistrict));
+        style: GoogleFonts.inter(
+            color: Colors.black, fontSize: 14, fontWeight: FontWeight.w300),
+        decoration: GlobalStyles.inputDecoration1(
+            hintText: 'İlçe', showError: showErrorDistrict));
   }
 }
 
@@ -546,8 +677,10 @@ class FieldInfo extends StatelessWidget {
           }
           return null;
         },
-        style: GoogleFonts.inter(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w300),
-        decoration: GlobalStyles.inputDecoration1(hintText: 'Halı Saha', showError: showErrorField));
+        style: GoogleFonts.inter(
+            color: Colors.black, fontSize: 14, fontWeight: FontWeight.w300),
+        decoration: GlobalStyles.inputDecoration1(
+            hintText: 'Halı Saha', showError: showErrorField));
   }
 }
 
@@ -568,7 +701,8 @@ class PriceText extends StatelessWidget {
 class PriceField extends StatelessWidget {
   final TextEditingController controller;
   final bool showErrorPrice;
-  const PriceField({super.key, required this.controller, required this.showErrorPrice});
+  const PriceField(
+      {super.key, required this.controller, required this.showErrorPrice});
 
   @override
   Widget build(BuildContext context) {
@@ -592,11 +726,126 @@ class PriceField extends StatelessWidget {
           return null;
         }
       },
-      style: GoogleFonts.inter(color: Colors.black, fontSize: 17, fontWeight: FontWeight.w600),
+      style: GoogleFonts.inter(
+          color: Colors.black, fontSize: 17, fontWeight: FontWeight.w600),
       decoration: InputDecoration(
           border: OutlineInputBorder(),
           suffixText: 'TL',
-          suffixStyle: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.black)),
+          suffixStyle: GoogleFonts.inter(
+              fontSize: 17, fontWeight: FontWeight.w600, color: Colors.black)),
+    );
+  }
+}
+
+class GigView extends StatelessWidget {
+  final String day;
+  final String district;
+  final String field;
+  final String hour;
+  final String name;
+  final String price;
+  final String province;
+  final String gigOwner;
+  const GigView(
+      {super.key,
+      required this.day,
+      required this.district,
+      required this.field,
+      required this.hour,
+      required this.name,
+      required this.price,
+      required this.province,
+      required this.gigOwner});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.sports_soccer, color: Colors.blueGrey, size: 28),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    field,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '$price ₺',
+                    style: TextStyle(
+                      color: Colors.blue.shade700,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Divider(),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.calendar_today, size: 18, color: Colors.grey[600]),
+                const SizedBox(width: 6),
+                Text(
+                  day,
+                  style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+                ),
+                const SizedBox(width: 18),
+                Icon(Icons.access_time, size: 18, color: Colors.grey[600]),
+                const SizedBox(width: 6),
+                Text(
+                  hour,
+                  style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Icon(Icons.location_on, size: 18, color: Colors.red[400]),
+                const SizedBox(width: 6),
+                Text(
+                  '$province, $district',
+                  style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Icon(Icons.person, size: 18, color: Colors.green[700]),
+                const SizedBox(width: 6),
+                Text(
+                  name,
+                  style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

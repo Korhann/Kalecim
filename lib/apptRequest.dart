@@ -43,6 +43,7 @@ class _ApptRequestState extends State<ApptRequest> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String currentuser = FirebaseAuth.instance.currentUser!.uid;
   late String sellerFullName;
+  late String gigRequester;
 
   bool _buttonDisable = false;
 
@@ -181,7 +182,7 @@ class _ApptRequestState extends State<ApptRequest> {
                       }
                     } else {
                       // keeperRequest sayfasından gelince burası çalışıcak
-                      // istek gönder
+                      await requestToUserGig();
                     }
                     Future.delayed(const Duration(seconds: 5), () {
                       if (mounted) {
@@ -475,7 +476,42 @@ class _ApptRequestState extends State<ApptRequest> {
     }
   }
   String generateCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return List.generate(5, (index) => chars[Random().nextInt(chars.length)]).join();
-}
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    return List.generate(5, (index) => chars[Random().nextInt(chars.length)]).join();
+  }
+
+  Future<void> requestToUserGig() async {
+    try {
+      await sendAppointmentRequest();
+      NotificationFromKeeperToUser notificationFromKeeperToUser = NotificationFromKeeperToUser();
+      // todo: burada selleruid ye göndermemem lazım (firebase da gig i oluşturan diye bir uid oluştur shareGigpage)
+      await PushHelper.sendPushBefore(userId: widget.sellerUid, text: notificationFromKeeperToUser.notification(), page: 'shareGigPage');
+      if (mounted) {
+        Showalert(context: context, text: 'Randevu talebi gönderilmiştir').showSuccessAlert();
+      }
+    } catch (e) {
+      print('Error sending request $e');
+      if (mounted){
+        Showalert(context: context, text: 'Ooops...').showErrorAlert();
+      }
+    }
+  }
+
+  Future<void> sendAppointmentRequest() async{
+    try {
+      final snapshot = await _firestore.collection('Users').doc(currentuser).get();
+      if (snapshot.exists) {
+        final userdata = snapshot.data();
+        gigRequester = await userdata!['fullName'];
+      } else {
+        throw Exception("User data not found"); 
+      }
+      Map<String,dynamic> requestFromKeeper = {
+        'fullName': gigRequester,
+        
+      };
+    } catch (e) {
+      print('Error sendin app request to gigs $e');
+    }
+  }
 }

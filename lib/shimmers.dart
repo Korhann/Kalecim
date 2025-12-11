@@ -558,4 +558,74 @@ class KeeperRequestsShimmer extends StatelessWidget {
     );
   }
 }
+class ShareGigCreationShimmer extends StatelessWidget {
+  const ShareGigCreationShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey.shade300,
+        highlightColor: Colors.grey.shade100,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: List.generate(7, (index) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 22),
+              child: Container(
+                width: width,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
+}
+class ShareGigViewShimmer extends StatelessWidget {
+  const ShareGigViewShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey.shade300,
+        highlightColor: Colors.grey.shade100,
+        child: Container(
+          width: width,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(height: 22, width: width * 0.5, color: Colors.grey.shade300, margin: const EdgeInsets.only(bottom: 16)),
+              Container(height: 16, width: width * 0.3, color: Colors.grey.shade300, margin: const EdgeInsets.only(bottom: 12)),
+              Container(height: 16, width: width * 0.4, color: Colors.grey.shade300, margin: const EdgeInsets.only(bottom: 12)),
+              Container(height: 16, width: width * 0.25, color: Colors.grey.shade300, margin: const EdgeInsets.only(bottom: 12)),
+              Row(
+                children: [
+                  Container(height: 36, width: 36, decoration: BoxDecoration(color: Colors.grey.shade300, shape: BoxShape.circle)),
+                  const SizedBox(width: 12),
+                  Container(height: 16, width: width * 0.2, color: Colors.grey.shade300),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 

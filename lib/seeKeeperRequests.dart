@@ -23,6 +23,7 @@ class _seeUsersKeeperRequestsState extends State<seeUsersKeeperRequests> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String currentuser = FirebaseAuth.instance.currentUser!.uid;
 
+
   @override
   Widget build(BuildContext context) {
     return ConnectivityWithBackButton(
@@ -68,8 +69,9 @@ class _seeUsersKeeperRequestsState extends State<seeUsersKeeperRequests> {
                   final name = gigData['userGig']['name'];
                   final price = gigData['userGig']['price'];
                   final province = gigData['userGig']['province'];
+                  final gigOwner = gigData['userGig']['gigOwner'];
 
-                  return GigView(day: day, district: district, field: field, hour: hour, name: name, price: price, province: province, currentuser: currentuser);
+                  return GigView(day: day, district: district, field: field, hour: hour, name: name, price: price, province: province, gigOwner: gigOwner);
                 },
               ),
             );
@@ -91,7 +93,7 @@ class GigView extends StatelessWidget {
   final String name;
   final String price;
   final String province;
-  final String currentuser;
+  final String gigOwner;
   const GigView({
     super.key,
     required this.day,
@@ -101,7 +103,7 @@ class GigView extends StatelessWidget {
     required this.name,
     required this.price,
     required this.province,
-    required this.currentuser
+    required this.gigOwner
   });
 
   @override
@@ -200,7 +202,7 @@ class GigView extends StatelessWidget {
                           context, 
                           MaterialPageRoute(
                             builder: (context) => ApptRequest(
-                            sellerUid: currentuser,
+                            sellerUid: gigOwner,
                             selectedDay: day,
                             selectedHour: hour,
                             selectedField: field, 
@@ -228,20 +230,23 @@ class GigsEmpty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Align(
-          alignment: Alignment.center,
-          child: Text(
-            'Randevunuz bulunmamaktadır',
-            style: GoogleFonts.poppins(
-              fontSize: 26,
-              color: userorseller ? Colors.white : Colors.black,
-              fontWeight: FontWeight.bold,
+    return Scaffold(
+      backgroundColor: sellerbackground,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              'Henüz bir kaleci talebi bulunmamaktadır',
+              style: GoogleFonts.poppins(
+                fontSize: 26,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+              textAlign: TextAlign.center,
             ),
-            textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
-            textAlign: TextAlign.center,
           ),
         ),
       ),
