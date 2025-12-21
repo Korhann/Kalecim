@@ -130,6 +130,11 @@ class _ShareGigPageState extends State<ShareGigPage> {
                           final province = gigData['userGig']['province'];
                           final gigOwner = gigData['userGig']['gigOwner'];
 
+                          // todo: aşşağıdaki kısımları gigRequester için alınıcak
+
+
+                          print(gigData);
+
                           return GigView(
                               day: day,
                               district: district,

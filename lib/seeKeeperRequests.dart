@@ -71,7 +71,7 @@ class _seeUsersKeeperRequestsState extends State<seeUsersKeeperRequests> {
                   final province = gigData['userGig']['province'];
                   final gigOwner = gigData['userGig']['gigOwner'];
 
-                  return GigView(day: day, district: district, field: field, hour: hour, name: name, price: price, province: province, gigOwner: gigOwner);
+                  return GigView(day: day, district: district, field: field, hour: hour, name: name, price: price, province: province, gigOwner: gigOwner, gigId: gigs[index].id);
                 },
               ),
             );
@@ -94,6 +94,7 @@ class GigView extends StatelessWidget {
   final String price;
   final String province;
   final String gigOwner;
+  final String gigId;
   const GigView({
     super.key,
     required this.day,
@@ -103,7 +104,8 @@ class GigView extends StatelessWidget {
     required this.name,
     required this.price,
     required this.province,
-    required this.gigOwner
+    required this.gigOwner,
+    required this.gigId
   });
 
   @override
@@ -198,6 +200,7 @@ class GigView extends StatelessWidget {
                     color: Colors.grey[350],
                     child: GestureDetector(
                       onTap: () {
+                        // print(gigId);
                         Navigator.push(
                           context, 
                           MaterialPageRoute(
@@ -208,6 +211,7 @@ class GigView extends StatelessWidget {
                             selectedField: field, 
                             selectedPrice: int.tryParse(price)!,
                             whereFrom: 'fromKeeperRequests',
+                            gigId: gigId,
                           )
                           )
                         );

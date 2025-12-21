@@ -22,6 +22,7 @@ class ApptRequest extends StatefulWidget {
   final String selectedField;
   final int selectedPrice;
   final String whereFrom;
+  final String? gigId;
 
   const ApptRequest({
     super.key,
@@ -30,7 +31,8 @@ class ApptRequest extends StatefulWidget {
     required this.selectedHour,
     required this.selectedField,
     required this.selectedPrice,
-    required this.whereFrom
+    required this.whereFrom,
+    this.gigId
   });
 
   @override
@@ -506,10 +508,22 @@ class _ApptRequestState extends State<ApptRequest> {
       } else {
         throw Exception("User data not found"); 
       }
+
       Map<String,dynamic> requestFromKeeper = {
         'fullName': gigRequester,
-        
+        'uid': currentuser,
+        'timestamp': DateTime.now()
       };
+
+      await _firestore.collection('Users')
+      .doc(widget.sellerUid)
+      .collection('userGig')
+      .doc(widget.gigId)
+      .set({
+        'gigRequesters': FieldValue.arrayUnion([requestFromKeeper])
+      }, 
+      SetOptions(merge: true));
+      
     } catch (e) {
       print('Error sendin app request to gigs $e');
     }
