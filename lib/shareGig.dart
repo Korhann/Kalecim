@@ -1,13 +1,15 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:kiralik_kaleci/apptRequest.dart';
 import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
 import 'package:kiralik_kaleci/showAlert.dart';
+import 'package:kiralik_kaleci/showRequestsRecieved.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
 
@@ -68,7 +70,9 @@ class _ShareGigPageState extends State<ShareGigPage> {
         return true;
       }
     } catch (e) {
-      print('Error checking the gig $e');
+      if (kDebugMode) {
+        print('Error checking the gig $e');
+      }
       return false;
     }
   }
@@ -131,9 +135,8 @@ class _ShareGigPageState extends State<ShareGigPage> {
                           final gigOwner = gigData['userGig']['gigOwner'];
 
                           // todo: aşşağıdaki kısımları gigRequester için alınıcak
-
-
-                          print(gigData);
+                          final gigRequesters = gigData['gigRequesters'];
+                          int requesterLength = (gigRequesters != null && gigRequesters is List) ? gigRequesters.length : 0;
 
                           return GigView(
                               day: day,
@@ -143,7 +146,10 @@ class _ShareGigPageState extends State<ShareGigPage> {
                               name: name,
                               price: price,
                               province: province,
-                              gigOwner: gigOwner);
+                              gigOwner: gigOwner,
+                              requesterLength: requesterLength,
+                              gigRequesters: gigRequesters
+                            );
                         },
                       ),
                     );
@@ -183,6 +189,7 @@ class _ShareGigPageState extends State<ShareGigPage> {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
+                                  // ignore: deprecated_member_use
                                   color: Colors.grey.withOpacity(0.08),
                                   blurRadius: 8,
                                   offset: Offset(0, 2),
@@ -286,8 +293,7 @@ class _ShareGigPageState extends State<ShareGigPage> {
                                   await _insertUserGig();
                                 } else {
                                   if (mounted) {
-                                    Showalert(
-                                            context: context, text: 'Ooops...')
+                                    Showalert(context: context, text: 'Ooops...')
                                         .showErrorAlert();
                                   }
                                 }
@@ -364,7 +370,9 @@ class _ShareGigPageState extends State<ShareGigPage> {
     } catch (e) {
       if (mounted) {
         Showalert(context: context, text: 'Ooops...').showErrorAlert();
-        print(e);
+        if (kDebugMode) {
+          print(e);
+        }
       }
     }
   }
@@ -384,7 +392,6 @@ class _ShareGigPageState extends State<ShareGigPage> {
         return true;
       }
       for (final doc in userGigDoc.docs) {
-        print('the doc is ${doc.id}');
         docIdToUpdate = doc.id;
         Map<String, dynamic> gigdetails = doc.data();
         if (gigdetails.isNotEmpty && gigdetails.containsKey('userGig')) {
@@ -395,13 +402,14 @@ class _ShareGigPageState extends State<ShareGigPage> {
             gigTime = ts.toDate();
             now = DateTime.now().toUtc();
             final difference = now.difference(gigTime);
-            print('difference is $difference');
             return difference.inHours >= 24;
           }
         }
       }
     } catch (e) {
-      print('Error is $e');
+      if (kDebugMode) {
+        print('Error is $e');
+      }
     }
     return true;
   }
@@ -419,8 +427,6 @@ class _ShareGigPageState extends State<ShareGigPage> {
         fieldController.clear();
         priceController.clear();
       });
-      print(selectedDayEnum);
-      print(selectedDay);
     }
   }
 }
@@ -751,8 +757,10 @@ class GigView extends StatelessWidget {
   final String price;
   final String province;
   final String gigOwner;
-  const GigView(
-      {super.key,
+  final int requesterLength;
+  final List<dynamic> gigRequesters;
+  const GigView({
+      super.key,
       required this.day,
       required this.district,
       required this.field,
@@ -760,10 +768,14 @@ class GigView extends StatelessWidget {
       required this.name,
       required this.price,
       required this.province,
-      required this.gigOwner});
+      required this.gigOwner,
+      required this.requesterLength,
+      required this.gigRequesters
+    });
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       elevation: 4,
@@ -788,9 +800,31 @@ class GigView extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (requesterLength > 0)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: green,
+                      borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.remove_red_eye_sharp, size: 16, color: Colors.white),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$requesterLength',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(width: 10),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.blue.shade50,
                     borderRadius: BorderRadius.circular(12),
@@ -826,7 +860,7 @@ class GigView extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: height * 0.010),
             Row(
               children: [
                 Icon(Icons.location_on, size: 18, color: Colors.red[400]),
@@ -837,7 +871,7 @@ class GigView extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            // SizedBox(height: height * 0.010),
             Row(
               children: [
                 Icon(Icons.person, size: 18, color: Colors.green[700]),
@@ -845,6 +879,24 @@ class GigView extends StatelessWidget {
                 Text(
                   name,
                   style: TextStyle(fontSize: 15, color: Colors.grey[800]),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    // todo: Eğer istek yoksa ok çıkmayacak
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => RequestsReceived(gigRequesters: gigRequesters))
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Icon(Icons.arrow_forward, size: 22, color: green)
+                  ),
                 ),
               ],
             ),
