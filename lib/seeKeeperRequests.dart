@@ -200,7 +200,6 @@ class GigView extends StatelessWidget {
                     color: Colors.grey[350],
                     child: GestureDetector(
                       onTap: () {
-                        // print(gigId);
                         Navigator.push(
                           context, 
                           MaterialPageRoute(

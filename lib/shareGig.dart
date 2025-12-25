@@ -133,6 +133,7 @@ class _ShareGigPageState extends State<ShareGigPage> {
                           final price = gigData['userGig']['price'];
                           final province = gigData['userGig']['province'];
                           final gigOwner = gigData['userGig']['gigOwner'];
+                          final docId = gigs[index].id;
 
                           // todo: aşşağıdaki kısımları gigRequester için alınıcak
                           final gigRequesters = gigData['gigRequesters'];
@@ -148,7 +149,8 @@ class _ShareGigPageState extends State<ShareGigPage> {
                               province: province,
                               gigOwner: gigOwner,
                               requesterLength: requesterLength,
-                              gigRequesters: gigRequesters
+                              gigRequesters: gigRequesters,
+                              docId: docId,
                             );
                         },
                       ),
@@ -759,6 +761,7 @@ class GigView extends StatelessWidget {
   final String gigOwner;
   final int requesterLength;
   final List<dynamic> gigRequesters;
+  final String docId;
   const GigView({
       super.key,
       required this.day,
@@ -770,7 +773,8 @@ class GigView extends StatelessWidget {
       required this.province,
       required this.gigOwner,
       required this.requesterLength,
-      required this.gigRequesters
+      required this.gigRequesters,
+      required this.docId
     });
 
   @override
@@ -886,7 +890,7 @@ class GigView extends StatelessWidget {
                     // todo: Eğer istek yoksa ok çıkmayacak
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => RequestsReceived(gigRequesters: gigRequesters))
+                        builder: (context) => RequestsReceived(gigRequesters: gigRequesters, docId: docId))
                     );
                   },
                   child: Container(

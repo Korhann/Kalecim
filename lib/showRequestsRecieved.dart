@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
@@ -10,7 +8,8 @@ import 'package:kiralik_kaleci/styles/designs.dart';
 
 class RequestsReceived extends StatefulWidget {
   final List<dynamic> gigRequesters;
-  const RequestsReceived({super.key, required this.gigRequesters});
+  final String docId;
+  const RequestsReceived({super.key, required this.gigRequesters, required this.docId});
 
   @override
   State<RequestsReceived> createState() => _RequestsReceivedState();
@@ -51,7 +50,7 @@ class _RequestsReceivedState extends State<RequestsReceived> {
             final timestamp = widget.gigRequesters[index]['timestamp'];
             final uid = widget.gigRequesters[index]['uid'];
 
-            return GigRequestsView(name:name, timestamp:timestamp, uid:uid,);
+            return GigRequestsView(name:name, timestamp:timestamp, uid:uid, docId: widget.docId, index:index);
           }
         ),
       ),
@@ -63,11 +62,15 @@ class GigRequestsView extends StatefulWidget {
   final String name;
   final Timestamp timestamp;
   final String uid;
+  final String docId;
+  final int index;
   const GigRequestsView({
     super.key,
     required this.name,
     required this.timestamp,
-    required this.uid
+    required this.uid,
+    required this.docId,
+    required this.index
   });
 
   @override
@@ -75,6 +78,10 @@ class GigRequestsView extends StatefulWidget {
 }
 
 class _GigRequestsViewState extends State<GigRequestsView> {
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  String currentuser = FirebaseAuth.instance.currentUser!.uid;
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -107,8 +114,8 @@ class _GigRequestsViewState extends State<GigRequestsView> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ElevatedButton.icon(
-                  onPressed: () {
-                    // TODO: Add accept logic here
+                  onPressed: () async{
+                    await acceptKeeperRequest(widget.docId, widget.index);
                   },
                   icon: const Icon(Icons.check, size: 18),
                   label: const Text('Kabul Et'),
@@ -122,8 +129,8 @@ class _GigRequestsViewState extends State<GigRequestsView> {
                 ),
                 const SizedBox(width: 12),
                 ElevatedButton.icon(
-                  onPressed: () {
-                    // TODO: Add decline logic here
+                  onPressed: () async{
+                    await declineKeeperRequest(widget.docId, widget.index);
                   },
                   icon: const Icon(Icons.close, size: 18),
                   label: const Text('Reddet'),
@@ -142,4 +149,46 @@ class _GigRequestsViewState extends State<GigRequestsView> {
       ),
     );
   }
+
+  // todo: userGig e requests diye collection sonrada bunları requestId si ile birlikte kullanmak daha mı mantıklı
+  Future<void> acceptKeeperRequest(String docId, int index) async {
+    try {
+      final docRef = _firestore
+      .collection('Users')
+      .doc(currentuser)
+      .collection('userGig')
+      .doc(widget.docId);
+
+      final snapshot = await docRef.get();
+      final List gigRequesters = List.from(snapshot['gigRequesters']);
+      gigRequesters[index]['status'] = 'approved';
+
+      await docRef.update({
+        'gigRequesters': gigRequesters
+      });
+
+    } catch (e) {
+      print('Error accepting the keeper request $e');
+    }
+  } 
+
+  Future<void> declineKeeperRequest(String docId, int index) async {
+    try {
+      final docRef = _firestore
+      .collection('Users')
+      .doc(currentuser)
+      .collection('userGig')
+      .doc(widget.docId);
+
+      final snapshot = await docRef.get();
+      final List gigRequesters = List.from(snapshot['gigRequesters']);
+      gigRequesters[index]['status'] = 'declined';
+      
+      await docRef.update({
+        'gigRequesters': gigRequesters
+      });
+    } catch (e) {
+      print('Error declining the keeper request $e');
+    }
+  } 
 }

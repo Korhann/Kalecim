@@ -512,6 +512,8 @@ class _ApptRequestState extends State<ApptRequest> {
       Map<String,dynamic> requestFromKeeper = {
         'fullName': gigRequester,
         'uid': currentuser,
+        'status': 'pending',
+        'paymentstatus': 'waiting',
         'timestamp': DateTime.now()
       };
 
