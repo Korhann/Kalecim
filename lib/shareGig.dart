@@ -47,6 +47,7 @@ class _ShareGigPageState extends State<ShareGigPage> {
   bool showErrorPrice = false;
 
   String currentuser = FirebaseAuth.instance.currentUser!.uid;
+  late String docId;
 
   Stream<QuerySnapshot> gigStream() {
     return _firestore
@@ -54,6 +55,16 @@ class _ShareGigPageState extends State<ShareGigPage> {
         .doc(currentuser)
         .collection('userGig')
         .snapshots();
+  }
+
+  Stream<QuerySnapshot> gigRequestersStream() {
+    return _firestore
+      .collection('Users')
+      .doc(currentuser)
+      .collection('userGig')
+      .doc(docId)
+      .collection('requests')
+      .snapshots();
   }
 
   Future<bool> checkIfUserHasGig() async {
@@ -125,6 +136,8 @@ class _ShareGigPageState extends State<ShareGigPage> {
                         itemCount: gigs.length,
                         itemBuilder: (context, index) {
                           final gigData = gigs[index].data() as Map<String, dynamic>;
+                          docId = gigs[index].id;
+
                           final day = gigData['userGig']['day'];
                           final district = gigData['userGig']['district'];
                           final field = gigData['userGig']['field'];
@@ -133,25 +146,44 @@ class _ShareGigPageState extends State<ShareGigPage> {
                           final price = gigData['userGig']['price'];
                           final province = gigData['userGig']['province'];
                           final gigOwner = gigData['userGig']['gigOwner'];
-                          final docId = gigs[index].id;
 
                           // todo: aşşağıdaki kısımları gigRequester için alınıcak
-                          final gigRequesters = gigData['gigRequesters'];
-                          int requesterLength = (gigRequesters != null && gigRequesters is List) ? gigRequesters.length : 0;
+                          return StreamBuilder<QuerySnapshot>(
+                            stream: gigRequestersStream(),
+                            builder: (context, requestSnapshot) {
+                              if (!requestSnapshot.hasData) {
+                                return const SizedBox();
+                              }
+                              final requests = requestSnapshot.data!.docs;
+                              final requesterLength = requests.length;
 
-                          return GigView(
-                              day: day,
-                              district: district,
-                              field: field,
-                              hour: hour,
-                              name: name,
-                              price: price,
-                              province: province,
-                              gigOwner: gigOwner,
-                              requesterLength: requesterLength,
-                              gigRequesters: gigRequesters,
-                              docId: docId,
-                            );
+                              final gigRequesters = requests.map((doc) {
+                                final data = doc.data() as Map<String,dynamic>;
+                                final requestsData = data['requestFromKeeper'];
+                                return {
+                                  'requestId': doc.id,
+                                  'fullName': requestsData['fullName'],
+                                  'paymentStatus': requestsData['paymentstatus'],
+                                  'status': requestsData['status'],
+                                  'timestamp': requestsData['timestamp'],
+                                  'uid': requestsData['uid'],
+                                };
+                              }).toList();
+                              return GigView(
+                                day: day,
+                                district: district,
+                                field: field,
+                                name: name,
+                                hour: hour,
+                                province: province,
+                                price: price,
+                                gigOwner: gigOwner,
+                                gigRequesters: gigRequesters,
+                                requesterLength: requesterLength,
+                                docId: docId,
+                              );
+                            }
+                          );
                         },
                       ),
                     );
@@ -774,7 +806,7 @@ class GigView extends StatelessWidget {
       required this.gigOwner,
       required this.requesterLength,
       required this.gigRequesters,
-      required this.docId
+      required this.docId,
     });
 
   @override

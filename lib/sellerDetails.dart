@@ -67,7 +67,6 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
   late Future<void> _daysNameFuture;
   List<String> hours = []; 
 
-  // Future<bool>? checkUserRentedBefore;
   Future<bool>? checkIfSameUser;
   TextStyle linkStyle = TextStyle(color: Colors.green);
 

@@ -8,22 +8,12 @@ Yapılacaklar:
 [ ] mesajlaşma sayfasına textfield altında kalıyor, dene ve çöz (çözümünü bulamadım)
 [ ] android ve ios kullanıcıları için tag koy onesignal da
 
-- KULLANICI İLAN AÇMA MANTIĞI
-[√] Dropdown buttonlarındaki değerler gönderildikten sonra silinmiyor
-[√] Kullanıcı saat, fiyat, il, ilçe, halısaha ve gün belirterek ilan açıcak. 
-[√] Kullanıcı ilanları kaleci ana sayfasına gözükecek
-[√] 24 saat geçmediyse yeni ilan açamaz
-
 - Gig mantığı
-[ ] Eğer kaleci ilanı var ise randevuyu kabul edebilecek, yoksa ilk başta ilan açması gerekiyor
-[ ] Kaleci ilana randevu talebi gönderebilecek
-[ ] Kullanıcının talep sayfasında talepleri görüntüle diye bir kısım olucak
-[ ] İlan kullanıcı kaleciye ödeme yapınca kapanıcak
-
-
-- Gig özellikleri
-[ ] İlana gelen talep sayısı gösterilcek
+[√] Eğer kaleci ilanı var ise randevuyu kabul edebilecek, yoksa ilk başta ilan açması gerekiyor
+[√] Kaleci ilana randevu talebi gönderebilecek
 [ ] İstek gönderenlerin isteğine basınca profilini görebiliceksin
+[ ] Randevu talepleri sayfasında kabul et reddet yerine ödeme yap olucak
+[ ] İlan kullanıcı kaleciye ödeme yapınca veya ilan verdikten 24 saat sonra kapanıcak
 
 
 

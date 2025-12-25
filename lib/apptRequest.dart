@@ -50,11 +50,6 @@ class _ApptRequestState extends State<ApptRequest> {
   bool _buttonDisable = false;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
     super.dispose();
   }
@@ -184,7 +179,16 @@ class _ApptRequestState extends State<ApptRequest> {
                       }
                     } else {
                       // keeperRequest sayfasından gelince burası çalışıcak
-                      await requestToUserGig();
+                      if (widget.sellerUid != currentuser) {
+                        await requestToUserGig();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Kullanıcı kendini seçemez'),
+                          backgroundColor: Colors.red,
+                        )
+                      );
+                      }
                     }
                     Future.delayed(const Duration(seconds: 5), () {
                       if (mounted) {
@@ -484,12 +488,23 @@ class _ApptRequestState extends State<ApptRequest> {
 
   Future<void> requestToUserGig() async {
     try {
-      await sendAppointmentRequest();
-      NotificationFromKeeperToUser notificationFromKeeperToUser = NotificationFromKeeperToUser();
-      // todo: burada selleruid ye göndermemem lazım (firebase da gig i oluşturan diye bir uid oluştur shareGigpage)
-      await PushHelper.sendPushBefore(userId: widget.sellerUid, text: notificationFromKeeperToUser.notification(), page: 'shareGigPage');
-      if (mounted) {
-        Showalert(context: context, text: 'Randevu talebi gönderilmiştir').showSuccessAlert();
+      // eğer aynı kullanıcı veya ilanı yoksa randevuyu kabul edemiyecek
+      bool hasGig = await checkIfKeeperHasGig();
+      if (hasGig) {
+        await sendAppointmentRequest();
+        NotificationFromKeeperToUser notificationFromKeeperToUser = NotificationFromKeeperToUser();
+        // todo: burada selleruid ye göndermemem lazım (firebase da gig i oluşturan diye bir uid oluştur shareGigpage)
+        await PushHelper.sendPushBefore(userId: widget.sellerUid, text: notificationFromKeeperToUser.notification(), page: 'shareGigPage');
+        if (mounted) {
+          Showalert(context: context, text: 'Randevu talebi gönderilmiştir').showSuccessAlert();
+        }
+      } else {
+        if (mounted) {
+          Showalert(
+          context: context,
+          text: 'Randevu talebi göndermek için ilk önce ilan oluşturmanız gerekiyor')
+          .navigateAlert();
+        }
       }
     } catch (e) {
       print('Error sending request $e');
@@ -517,17 +532,39 @@ class _ApptRequestState extends State<ApptRequest> {
         'timestamp': DateTime.now()
       };
 
-      await _firestore.collection('Users')
-      .doc(widget.sellerUid)
-      .collection('userGig')
-      .doc(widget.gigId)
-      .set({
-        'gigRequesters': FieldValue.arrayUnion([requestFromKeeper])
-      }, 
-      SetOptions(merge: true));
+      // await _firestore.collection('Users')
+      // .doc(widget.sellerUid)
+      // .collection('userGig')
+      // .doc(widget.gigId)
+      // .collection('requests')
+      // .add({
+      //   'requestFromKeeper': requestFromKeeper
+      // });
       
     } catch (e) {
       print('Error sendin app request to gigs $e');
     }
   }
+
+  Future<bool> checkIfKeeperHasGig() async {
+    try {
+      final docSnap = await _firestore
+      .collection('Users')
+      .doc(currentuser)
+      .get();
+
+      if (!docSnap.exists) return false;
+
+      final data = docSnap.data();
+      return data != null && data.containsKey('sellerDetails');
+    } catch (e) {
+      print('Erorr checking the gig $e');
+      return false;
+    }
+  }
+
+  Future<bool> checkIfDifferentUser() async {
+    return widget.sellerUid != currentuser;
+  }
+
 }

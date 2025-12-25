@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kiralik_kaleci/selleraddpage.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -21,8 +22,8 @@ class Showalert {
   Future<void> showErrorAlert() async{
     QuickAlert.show(context: context, text: text,type: QuickAlertType.error,confirmBtnText: 'Tamam',title: 'Bir şeyler ters gitti');
   }
-void showUpgradeAlert() async {
-  QuickAlert.show(
+  void showUpgradeAlert() async {
+    QuickAlert.show(
     context: context,
     barrierDismissible: false,
     text: text,
@@ -35,6 +36,19 @@ void showUpgradeAlert() async {
         await launchUrl(Uri.parse(appStoreUrl), mode: LaunchMode.externalApplication);
       }
     },
-  );
-}
+    );
+  }
+  Future<void> navigateAlert() async{
+    QuickAlert.show(
+      context: context, 
+      text: text,
+      type: QuickAlertType.warning,
+      confirmBtnText: 'Tamam',
+      cancelBtnText: 'Vazgeç',
+      title: 'İlan oluşturun',
+      onConfirmBtnTap: () {
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => SellerAddPage()));
+      },
+    );
+  }
 }
