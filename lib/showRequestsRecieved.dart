@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
+import 'package:kiralik_kaleci/sellerDetails.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
@@ -95,70 +96,107 @@ class _GigRequestsViewState extends State<GigRequestsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.person, color: Colors.green[700], size: 22),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    widget.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      color: Colors.black87,
+    return GestureDetector(
+      onTap: () async{
+        Map<String,dynamic> sellerDetails = await getSellerDetails();
+        Navigator.push(
+          context, 
+          MaterialPageRoute(
+            builder: (context) => 
+            SellerDetailsPage(
+              sellerDetails: sellerDetails,
+              sellerUid: widget.uid,
+              wherFrom: 'fromRequestsRecieved'
+            )
+          )
+        );
+      },
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.person, color: Colors.green[700], size: 22),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      widget.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () async{
-                    await acceptKeeperRequest(widget.docId, widget.requestId ,widget.index);
-                  },
-                  icon: const Icon(Icons.check, size: 18),
-                  label: const Text('Kabul Et'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green[600],
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      await acceptKeeperRequest(widget.docId, widget.requestId ,widget.index);
+                    },
+                    icon: const Icon(Icons.check, size: 18),
+                    label: const Text('Kabul Et'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green[600],
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton.icon(
-                  onPressed: () async{
-                    await declineKeeperRequest(widget.docId, widget.requestId ,widget.index);
-                  },
-                  icon: const Icon(Icons.close, size: 18),
-                  label: const Text('Reddet'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[400],
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                  const SizedBox(width: 12),
+                  ElevatedButton.icon(
+                    onPressed: () async{
+                      await declineKeeperRequest(widget.docId, widget.requestId ,widget.index);
+                    },
+                    icon: const Icon(Icons.close, size: 18),
+                    label: const Text('Reddet'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red[400],
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Future<Map<String,dynamic>> getSellerDetails() async {
+    try {
+      DocumentReference docref = _firestore
+      .collection('Users')
+      .doc(widget.uid);
+
+      DocumentSnapshot snapshot = await docref.get();
+      if (!snapshot.exists) {
+        return {};
+      }
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      if (data.containsKey('sellerDetails')) {
+        return Map<String,dynamic>.from(data['sellerDetails']);
+      } 
+      return {};
+    } catch (e) {
+      print('Error getting the seller details $e');
+      return {};
+    }
   }
 
   // todo: userGig e requests diye collection sonrada bunları requestId si ile birlikte kullanmak daha mı mantıklı

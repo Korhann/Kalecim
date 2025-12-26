@@ -488,12 +488,14 @@ class _ApptRequestState extends State<ApptRequest> {
 
   Future<void> requestToUserGig() async {
     try {
-      // eğer aynı kullanıcı veya ilanı yoksa randevuyu kabul edemiyecek
-      bool hasGig = await checkIfKeeperHasGig();
-      if (hasGig) {
+      final bool hasGig = await checkIfKeeperHasGig();
+      final bool sentApptRequestBefore = await checkIfSentBefore();
+
+      if (hasGig && sentApptRequestBefore) {
         await sendAppointmentRequest();
+        await insertRequestSenderUids();
+
         NotificationFromKeeperToUser notificationFromKeeperToUser = NotificationFromKeeperToUser();
-        // todo: burada selleruid ye göndermemem lazım (firebase da gig i oluşturan diye bir uid oluştur shareGigpage)
         await PushHelper.sendPushBefore(userId: widget.sellerUid, text: notificationFromKeeperToUser.notification(), page: 'shareGigPage');
         if (mounted) {
           Showalert(context: context, text: 'Randevu talebi gönderilmiştir').showSuccessAlert();
@@ -502,7 +504,7 @@ class _ApptRequestState extends State<ApptRequest> {
         if (mounted) {
           Showalert(
           context: context,
-          text: 'Randevu talebi göndermek için ilk önce ilan oluşturmanız gerekiyor')
+          text: 'Randevu talebi göndermek için ilk önce ilan oluşturmanız gerekiyor!')
           .navigateAlert();
         }
       }
@@ -532,17 +534,33 @@ class _ApptRequestState extends State<ApptRequest> {
         'timestamp': DateTime.now()
       };
 
-      // await _firestore.collection('Users')
-      // .doc(widget.sellerUid)
-      // .collection('userGig')
-      // .doc(widget.gigId)
-      // .collection('requests')
-      // .add({
-      //   'requestFromKeeper': requestFromKeeper
-      // });
+      await _firestore.collection('Users')
+      .doc(widget.sellerUid)
+      .collection('userGig')
+      .doc(widget.gigId)
+      .collection('requests')
+      .add({
+        'requestFromKeeper': requestFromKeeper
+      });
       
     } catch (e) {
       print('Error sendin app request to gigs $e');
+    }
+  }
+
+  Future<void> insertRequestSenderUids() async {
+    try {
+      final docRef = _firestore
+      .collection('Users')
+      .doc(widget.sellerUid)
+      .collection('userGig')
+      .doc(widget.gigId);
+
+      await docRef.update({
+        'userGig.requestSenderUids': FieldValue.arrayUnion([currentuser])
+      });
+    } catch (e) {
+      print('Error inserting uids $e');
     }
   }
 
@@ -562,6 +580,32 @@ class _ApptRequestState extends State<ApptRequest> {
       return false;
     }
   }
+
+  Future<bool> checkIfSentBefore() async {
+  try {
+    final docSnap = await _firestore
+      .collection('Users')
+      .doc(widget.sellerUid)
+      .collection('userGig')
+      .doc(widget.gigId)
+      .get();
+
+    if (!docSnap.exists) return false;
+
+    final data = docSnap.data();
+    if (data == null) return false;
+
+    final List<dynamic>? uids = data['requestSenderUids'];
+
+    if (uids == null) return false;
+
+    return uids.contains(currentuser);
+  } catch (e) {
+    print('Error checking the gig request sent before: $e');
+    return false;
+  }
+}
+
 
   Future<bool> checkIfDifferentUser() async {
     return widget.sellerUid != currentuser;

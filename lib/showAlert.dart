@@ -47,7 +47,7 @@ class Showalert {
       cancelBtnText: 'Vazgeç',
       title: 'İlan oluşturun',
       onConfirmBtnTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => SellerAddPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => SellerAddPage()));
       },
     );
   }

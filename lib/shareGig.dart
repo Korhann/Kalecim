@@ -372,17 +372,15 @@ class _ShareGigPageState extends State<ShareGigPage> {
         'field': fieldController.text,
         'price': priceController.text,
         'gigOwner': currentUserUid,
-        'timestamp': DateTime.now().toUtc()
+        'timestamp': DateTime.now().toUtc(),
+        'requestSenderUids': []
       };
 
       if (_formKey.currentState!.validate()) {
         bool dayPassed = await checkIf24HoursPassed();
         // bir gün geçmiş mi diye kontrol ediyor
         if (dayPassed == false) {
-          Showalert(
-                  context: context,
-                  text: 'Yeni ilan için 24 saat geçmesi gerekmektedir')
-              .showErrorAlert();
+          Showalert(context: context, text: 'Yeni ilan için 24 saat geçmesi gerekmektedir').showErrorAlert();
           clearAllFields();
         } else {
           await collectionReference
