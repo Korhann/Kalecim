@@ -487,34 +487,60 @@ class _ApptRequestState extends State<ApptRequest> {
   }
 
   Future<void> requestToUserGig() async {
-    try {
-      final bool hasGig = await checkIfKeeperHasGig();
-      final bool sentApptRequestBefore = await checkIfSentBefore();
+  try {
+    final bool hasGig = await checkIfKeeperHasGig();
+    final bool hasSentBefore = await checkIfSentBefore();
 
-      if (hasGig && sentApptRequestBefore) {
-        await sendAppointmentRequest();
-        await insertRequestSenderUids();
-
-        NotificationFromKeeperToUser notificationFromKeeperToUser = NotificationFromKeeperToUser();
-        await PushHelper.sendPushBefore(userId: widget.sellerUid, text: notificationFromKeeperToUser.notification(), page: 'shareGigPage');
-        if (mounted) {
-          Showalert(context: context, text: 'Randevu talebi gönderilmiştir').showSuccessAlert();
-        }
-      } else {
-        if (mounted) {
-          Showalert(
+    if (!hasGig) {
+      if (mounted) {
+        Showalert(
           context: context,
-          text: 'Randevu talebi göndermek için ilk önce ilan oluşturmanız gerekiyor!')
-          .navigateAlert();
-        }
+          text: 'Randevu talebi göndermek için önce ilan oluşturmanız gerekiyor',
+        ).navigateAlert();
       }
-    } catch (e) {
-      print('Error sending request $e');
-      if (mounted){
-        Showalert(context: context, text: 'Ooops...').showErrorAlert();
+      return;
+    }
+
+    if (hasSentBefore) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Aynı kullanıcıya birden fazla randevu talebi gönderemezsiniz!'),
+          backgroundColor: Colors.red,
+        )
+      );
       }
+      return;
+    }
+
+    // ✅ SAFE TO SEND REQUEST
+    await sendAppointmentRequest();
+    await insertRequestSenderUids();
+
+    final notification = NotificationFromKeeperToUser();
+    await PushHelper.sendPushBefore(
+      userId: widget.sellerUid,
+      text: notification.notification(),
+      page: 'shareGigPage',
+    );
+
+    if (mounted) {
+      Showalert(
+        context: context,
+        text: 'Randevu talebi gönderilmiştir',
+      ).showSuccessAlert();
+    }
+  } catch (e) {
+    print('Error sending request: $e');
+    if (mounted) {
+      Showalert(
+        context: context,
+        text: 'Ooops...',
+      ).showErrorAlert();
     }
   }
+}
+
 
   Future<void> sendAppointmentRequest() async{
     try {
@@ -595,10 +621,9 @@ class _ApptRequestState extends State<ApptRequest> {
     final data = docSnap.data();
     if (data == null) return false;
 
-    final List<dynamic>? uids = data['requestSenderUids'];
+    final List<dynamic>? uids = data['userGig']['requestSenderUids'];
 
     if (uids == null) return false;
-
     return uids.contains(currentuser);
   } catch (e) {
     print('Error checking the gig request sent before: $e');

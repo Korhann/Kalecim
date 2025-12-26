@@ -51,4 +51,7 @@ class Showalert {
       },
     );
   }
+  Future<void> showWarningAlert() async{
+    QuickAlert.show(context: context, text: text,type: QuickAlertType.warning,confirmBtnText: 'Tamam',title: 'Bir şeyler ters gitti');
+  }
 }

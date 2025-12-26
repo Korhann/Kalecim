@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
 import 'package:kiralik_kaleci/sellerDetails.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
@@ -10,7 +11,8 @@ import 'package:kiralik_kaleci/styles/designs.dart';
 class RequestsReceived extends StatefulWidget {
   final List<dynamic> gigRequesters;
   final String docId;
-  const RequestsReceived({super.key, required this.gigRequesters, required this.docId});
+  final String price;
+  const RequestsReceived({super.key, required this.gigRequesters, required this.docId, required this.price});
 
   @override
   State<RequestsReceived> createState() => _RequestsReceivedState();
@@ -58,7 +60,7 @@ class _RequestsReceivedState extends State<RequestsReceived> {
             final timestamp = widget.gigRequesters[index]['timestamp'];
             final uid = widget.gigRequesters[index]['uid'];
 
-            return GigRequestsView(name:name, requestId: requestId, status: status ,timestamp:timestamp, uid:uid, docId: widget.docId, index:index);
+            return GigRequestsView(name:name, requestId: requestId, status: status ,timestamp:timestamp, uid:uid, docId: widget.docId, price: widget.price,index:index);
           }
         ),
       ),
@@ -73,6 +75,7 @@ class GigRequestsView extends StatefulWidget {
   final Timestamp timestamp;
   final String uid;
   final String docId;
+  final String price;
   final int index;
   const GigRequestsView({
     super.key,
@@ -82,6 +85,7 @@ class GigRequestsView extends StatefulWidget {
     required this.timestamp,
     required this.uid,
     required this.docId,
+    required this.price,
     required this.index
   });
 
@@ -138,37 +142,27 @@ class _GigRequestsViewState extends State<GigRequestsView> {
               ),
               const SizedBox(height: 14),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  ElevatedButton.icon(
+                  ElevatedButton(
                     onPressed: () async {
-                      await acceptKeeperRequest(widget.docId, widget.requestId ,widget.index);
-                    },
-                    icon: const Icon(Icons.check, size: 18),
-                    label: const Text('Kabul Et'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green[600],
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  ElevatedButton.icon(
-                    onPressed: () async{
-                      await declineKeeperRequest(widget.docId, widget.requestId ,widget.index);
-                    },
-                    icon: const Icon(Icons.close, size: 18),
-                    label: const Text('Reddet'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red[400],
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
+                      await paymentFlow(widget.docId, widget.requestId, widget.index);
+                    }, 
+                    style: GlobalStyles.buttonPrimary(context),
+                    child: Row(
+                      children: [
+                        
+                        Text(
+                        'Ödeme ₺${widget.price}',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                        ),
+                      ]
+                    )
+                  )
                 ],
               ),
             ],
@@ -199,8 +193,7 @@ class _GigRequestsViewState extends State<GigRequestsView> {
     }
   }
 
-  // todo: userGig e requests diye collection sonrada bunları requestId si ile birlikte kullanmak daha mı mantıklı
-  Future<void> acceptKeeperRequest(String docId,String requestId ,int index) async {
+  Future<void> paymentFlow(String docId,String requestId ,int index) async {
     try {
       await _firestore
       .collection('Users')
@@ -215,23 +208,6 @@ class _GigRequestsViewState extends State<GigRequestsView> {
 
     } catch (e) {
       print('Error accepting the keeper request $e');
-    }
-  } 
-
-  Future<void> declineKeeperRequest(String docId,String requestId,int index) async {
-    try {
-      await _firestore
-      .collection('Users')
-      .doc(currentuser)
-      .collection('userGig')
-      .doc(widget.docId)
-      .collection('requests')
-      .doc(requestId)
-      .update({
-        'requestFromKeeper.status' : 'declined'
-      });
-    } catch (e) {
-      print('Error declining the keeper request $e');
     }
   } 
 }

@@ -920,7 +920,7 @@ class GigView extends StatelessWidget {
                     // todo: Eğer istek yoksa ok çıkmayacak
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => RequestsReceived(gigRequesters: gigRequesters, docId: docId))
+                        builder: (context) => RequestsReceived(gigRequesters: gigRequesters, docId: docId, price:price))
                     );
                   },
                   child: Container(

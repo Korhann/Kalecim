@@ -12,10 +12,11 @@ Yapılacaklar:
 [√] Eğer kaleci ilanı var ise randevuyu kabul edebilecek, yoksa ilk başta ilan açması gerekiyor
 [√] Kaleci ilana randevu talebi gönderebilecek
 [√] İstek gönderenlerin isteğine basınca profilini görebiliceksin
-[ ] Request to usergig hata mesajı mantığını düzelt
-[ ] Aynı kullanıcı iki kere randevu talebi gönderemicek
-[ ] Randevu talepleri sayfasında kabul et reddet yerine ödeme yap olucak
+[√] Request to usergig hata mesajı mantığını düzelt
+[√] Aynı kullanıcı iki kere randevu talebi gönderemicek
+[ ] Randevu talepleri sayfasında kabul et reddet yerine ödeme sayfasına atıcak 
 [ ] İlan kullanıcı kaleciye ödeme yapınca veya ilan verdikten 24 saat sonra kapanıcak
+[ ] Ui larını düzelt
 
 
 
