@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:kiralik_kaleci/Messagepage.dart';
 import 'package:kiralik_kaleci/approvedfield.dart';
+import 'package:kiralik_kaleci/config/env.dart';
 import 'package:kiralik_kaleci/football_field.dart';
 import 'package:kiralik_kaleci/globals.dart';
 import 'package:kiralik_kaleci/loginpage.dart';
@@ -53,9 +54,13 @@ Future<void> initializeApp() async {
   addKeepersToOneSignal();
 
   // firebase crashlytics
-  FlutterError.onError = (errorDetails) {
-    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-    FirebaseCrashlytics.instance.setUserIdentifier(FirebaseAuth.instance.currentUser?.uid ?? 'anonymous');
+  FlutterError.onError = (errorDetails) { 
+    if (!kIsWeb) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+      FirebaseCrashlytics.instance.setUserIdentifier(FirebaseAuth.instance.currentUser?.uid ?? 'anonymous');
+    } else {
+      FlutterError.dumpErrorToConsole(errorDetails);
+    }
   };
 
   //Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics

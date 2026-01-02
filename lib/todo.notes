@@ -4,6 +4,14 @@ Yapılacaklar:
 [ ] Kalecilerin kart renginin puanlamalara göre değişmesi
 [!] shareGig den bakarak selleraddpage dropdownlarına da validator koyabilirsin
 
+
+- WEB DE BAŞLATMAK İÇİN
+[ ] flutter run -d chrome -t lib/main_dev.dart --dart-define=FLAVOR=dev
+
+- TELEFON SAFARİ DE BAŞLATMAK İÇİN
+[ ] flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8080 -t lib/main_dev.dart --dart-define=FLAVOR=dev
+[ ] http://192.168.1.134:8080
+
 - ANDROID FIXES
 [ ] mesajlaşma sayfasına textfield altında kalıyor, dene ve çöz (çözümünü bulamadım)
 [ ] android ve ios kullanıcıları için tag koy onesignal da
@@ -15,6 +23,7 @@ Yapılacaklar:
 [√] Request to usergig hata mesajı mantığını düzelt
 [√] Aynı kullanıcı iki kere randevu talebi gönderemicek
 [ ] Randevu talepleri sayfasında kabul et reddet yerine ödeme sayfasına atıcak 
+[ ] YENİ PAYMENTPAGE YAPIP KULLANABİLİRSİN, ŞUAN Kİ FARKLI BİLGİLER İÇİN ÇALIŞIYOR
 [ ] İlan kullanıcı kaleciye ödeme yapınca veya ilan verdikten 24 saat sonra kapanıcak
 [ ] Ui larını düzelt
 

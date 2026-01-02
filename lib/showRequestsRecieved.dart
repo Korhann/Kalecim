@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
+import 'package:kiralik_kaleci/paymentpage.dart';
 import 'package:kiralik_kaleci/sellerDetails.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
@@ -11,8 +12,19 @@ import 'package:kiralik_kaleci/styles/designs.dart';
 class RequestsReceived extends StatefulWidget {
   final List<dynamic> gigRequesters;
   final String docId;
-  final String price;
-  const RequestsReceived({super.key, required this.gigRequesters, required this.docId, required this.price});
+  final String selectedDay;
+  final String selectedHour;
+  final String selectedField;
+  final String selectedPrice;
+  const RequestsReceived({
+    super.key,
+    required this.gigRequesters,
+    required this.docId,
+    required this.selectedDay,
+    required this.selectedHour,
+    required this.selectedField,
+    required this.selectedPrice
+  });
 
   @override
   State<RequestsReceived> createState() => _RequestsReceivedState();
@@ -60,7 +72,19 @@ class _RequestsReceivedState extends State<RequestsReceived> {
             final timestamp = widget.gigRequesters[index]['timestamp'];
             final uid = widget.gigRequesters[index]['uid'];
 
-            return GigRequestsView(name:name, requestId: requestId, status: status ,timestamp:timestamp, uid:uid, docId: widget.docId, price: widget.price,index:index);
+            return GigRequestsView(
+              name:name,
+              requestId: requestId,
+              status: status,
+              timestamp:timestamp,
+              uid:uid,
+              docId: widget.docId,
+              day: widget.selectedDay,
+              hour: widget.selectedHour,
+              field: widget.selectedField,
+              price: widget.selectedPrice,
+              index:index
+            );
           }
         ),
       ),
@@ -75,6 +99,9 @@ class GigRequestsView extends StatefulWidget {
   final Timestamp timestamp;
   final String uid;
   final String docId;
+  final String day;
+  final String hour;
+  final String field;
   final String price;
   final int index;
   const GigRequestsView({
@@ -85,6 +112,9 @@ class GigRequestsView extends StatefulWidget {
     required this.timestamp,
     required this.uid,
     required this.docId,
+    required this.day,
+    required this.hour,
+    required this.field,
     required this.price,
     required this.index
   });
@@ -97,6 +127,17 @@ class _GigRequestsViewState extends State<GigRequestsView> {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String currentuser = FirebaseAuth.instance.currentUser!.uid;
+
+  @override
+  void initState() { 
+    super.initState();
+    print(widget.uid);
+    print(widget.docId);
+    print(currentuser);
+    print(widget.day);
+    print(widget.hour);
+    print(widget.field);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +187,20 @@ class _GigRequestsViewState extends State<GigRequestsView> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      await paymentFlow(widget.docId, widget.requestId, widget.index);
+                      // await paymentFlow(widget.docId, widget.requestId, widget.index);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PaymentPage(
+                            sellerUid: widget.uid,
+                            sellerDocId: widget.docId,
+                            buyerUid: currentuser,
+                            selectedDay: widget.day,
+                            selectedHour: widget.hour,
+                            selectedField: widget.field,
+                          )
+                        )
+                      );
                     }, 
                     style: GlobalStyles.buttonPrimary(context),
                     child: Row(

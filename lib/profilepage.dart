@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
@@ -49,7 +51,9 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       saveUserType('user');
       userorseller = false;
-      PushHelper.updateOneSignal();
+      if (Platform.isIOS) {
+        PushHelper.updateOneSignal();
+      }
     } catch (e, stack) {
       reportErrorToCrashlytics(
         e,

@@ -41,6 +41,9 @@ flutter run --flavor dev -t lib/main_dev.dart
 flutter run --flavor stage -t lib/main_stage.dart
 flutter run --flavor prod -t lib/main_prod.dart  
 
+for web 
+flutter run -d chrome -t lib/main_dev.dart --dart-define=FLAVOR=dev
+
 for building release version
 flutter build ios --release --flavor prod -t lib/main_prod.dart
 

@@ -1,4 +1,5 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 
 Future<void> reportErrorToCrashlytics(
   dynamic e,
@@ -6,10 +7,12 @@ Future<void> reportErrorToCrashlytics(
   String? reason,
   bool fatal = false,
 }) async {
-  await FirebaseCrashlytics.instance.recordError(
+  if (!kIsWeb){
+    await FirebaseCrashlytics.instance.recordError(
     e,
     stack,
     reason: reason,
     fatal: fatal,
   );
+  }
 }
