@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_rating/flutter_rating.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kiralik_kaleci/globals.dart';
+import 'package:kiralik_kaleci/responsive/responsivedesign.dart';
 import 'package:kiralik_kaleci/sellerDetails.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 

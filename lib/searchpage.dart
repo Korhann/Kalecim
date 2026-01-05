@@ -1,19 +1,20 @@
+import 'dart:io';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/simple/list_notifier.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kiralik_kaleci/SellerGridItem.dart';
 import 'package:kiralik_kaleci/appointmentspage.dart';
 import 'package:kiralik_kaleci/filterpage.dart';
 import 'package:kiralik_kaleci/globals.dart';
+import 'package:kiralik_kaleci/responsive/responsivedesign.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
-import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'sellerDetails.dart';
 import 'sharedvalues.dart';
 
@@ -119,7 +120,7 @@ class _GetUserDataState extends State<GetUserData> {
   Widget build(BuildContext context) {
   final width = MediaQuery.sizeOf(context).width;
   final height = MediaQuery.sizeOf(context).height;
-  final bannerHeight = width * 0.3;
+  final bannerHeight = (width * 0.3).clamp(180.0, 420.0);
 
   return SafeArea(
     child: Scaffold(
@@ -141,6 +142,8 @@ class _GetUserDataState extends State<GetUserData> {
                 height: height,
               ),
             ),
+            // todo: sonradan imageslider'ı geri koy
+            if (!kIsWeb)
             ImageSliderDemo(width: width, height: bannerHeight),
             const SizedBox(height: 10),
             Expanded(
@@ -290,10 +293,10 @@ class _HeaderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-      final iconSize = width * 0.06;
+      final iconSize = (width * 0.06).clamp(24.0, 40.0);
       return Container(
         width: width,
-        height: height * 0.07,
+        height: height * 0.10,
         color: background,  
         padding: const EdgeInsets.only(top: 15),
         child: Row(
@@ -376,8 +379,6 @@ class _HeaderSection extends StatelessWidget {
 }
 
 
-
-
 class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -424,35 +425,33 @@ class _SellerGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        double width = constraints.maxWidth;
-        int crossAxisCount = width > 600 ? 3 : 2; 
-
-        return GridView.builder(
-          controller: scrollController,
-          padding: EdgeInsets.zero,
-          physics: const ScrollPhysics(),
-          shrinkWrap: true,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            childAspectRatio: 1.8 / 2.3,
+    int crossAxisCount = ResponsiveDesign.isMobile(context) ? 2 : 3;
+        return ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: GridView.builder(
+            controller: scrollController,
+            padding: EdgeInsets.zero,
+            physics: const ScrollPhysics(),
+            shrinkWrap: true,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: ResponsiveDesign.isDesktop(context) ? 4 : crossAxisCount,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.8/2.3,
+            ),
+            itemCount: docs.length,
+            itemBuilder: (context, index) {
+              var sellerDetails = docs[index]['sellerDetails'];
+              var sellerUid = docs[index].id;
+              return SellerGridItem(
+                sellerDetails: sellerDetails,
+                sellerUid: sellerUid,
+                onTap: (uid) => onCardTap(context, sellerDetails, uid),
+              );
+            },
           ),
-          itemCount: docs.length,
-          itemBuilder: (context, index) {
-            var sellerDetails = docs[index]['sellerDetails'];
-            var sellerUid = docs[index].id;
-            return SellerGridItem(
-              sellerDetails: sellerDetails,
-              sellerUid: sellerUid,
-              onTap: (uid) => onCardTap(context, sellerDetails, uid),
-            );
-          },
         );
-      },
-    );
+      
   }
 }
 

@@ -10,6 +10,7 @@ import 'package:kiralik_kaleci/authpage.dart';
 import 'package:kiralik_kaleci/directmessages.dart';
 import 'package:kiralik_kaleci/homepage.dart';
 import 'package:kiralik_kaleci/profilepage.dart';
+import 'package:kiralik_kaleci/responsive/responsivedesign.dart';
 import 'package:kiralik_kaleci/shareGig.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
@@ -46,6 +47,8 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
+    final isMobile = ResponsiveDesign.isMobile(context);
+
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,overlays: [SystemUiOverlay.top]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     return StreamBuilder<User?>(
@@ -55,8 +58,26 @@ class _MainPageState extends State<MainPage> {
           // kullanıcı giriş yaptı
           return Scaffold(
             resizeToAvoidBottomInset: true,
-            body: screens()[_currentIndex],
-            bottomNavigationBar: BottomNavyBar(
+            body: isMobile 
+            ? screens()[_currentIndex]
+            : Row(
+              children: [
+                SidePanel(
+                  selectedIndex: _currentIndex, 
+                  onItemSelected: (index) {
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                  },
+                  unreadCountStream: getUnreadCount(),
+                  getSellerUnreadCount: getSellerUnreadCount(),
+                ),
+                Expanded(
+                  child: screens()[_currentIndex],
+                )
+              ],
+            ),
+            bottomNavigationBar: isMobile ? BottomNavyBar(
               backgroundColor: background,
               selectedIndex: _currentIndex,
               onItemSelected: (index) {
@@ -215,7 +236,7 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ),
               ],
-            ),
+            ): null,
           );
         } else {
           // kullanıcı giriş yapmadı demek
@@ -292,7 +313,7 @@ class _MainPageState extends State<MainPage> {
     } catch (e, stack) {
       await reportErrorToCrashlytics(e, stack,
           reason:
-              'directmessages getUnreadCount error for user $currentUser, participantId: $participantId');
+              'directmessages getUnreadMessages error for user $currentUser, participantId: $participantId');
       return 0;
     }
   }
@@ -335,5 +356,234 @@ class _MainPageState extends State<MainPage> {
         .where('appointmentDetails.isSeen', isEqualTo: false)
         .snapshots()
         .map((snapshot) => snapshot.docs.length);
+  }
+}
+
+class SidePanel extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onItemSelected;
+  final Stream<int> unreadCountStream;
+  final Stream<int> getSellerUnreadCount;
+
+  const SidePanel({
+    super.key,
+    required this.selectedIndex,
+    required this.onItemSelected,
+    required this.unreadCountStream,
+    required this.getSellerUnreadCount
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 80,
+      color: Colors.grey[200],
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: Stack(
+              children: [
+                Icon(
+                  Icons.home, color: selectedIndex == 0 ? Colors.blue : Colors.black
+                ),
+                StreamBuilder<int> (
+                  stream: unreadCountStream,
+                  builder:(context, snapshot) {
+                    if (!snapshot.hasData || snapshot.data == 0) {return const SizedBox();}
+                    return Positioned(
+                            right: 0,
+                            top: -5,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(
+                                  minWidth: 10, minHeight: 10),
+                              child: Text(
+                                '${snapshot.data}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                  },
+                )
+              ],
+            ),
+            onPressed: () => onItemSelected(0),
+          ),
+          IconButton(
+            icon: Icon(Icons.search, color: selectedIndex == 1 ? Colors.blue : Colors.black),
+            onPressed: () => onItemSelected(1),
+          ),
+          IconButton(
+                  icon: Stack(
+                    children: [
+                      Icon(Icons.mail, color: selectedIndex == 2 ? Colors.blue: Colors.black),
+                      StreamBuilder<List<String>>(
+                        stream: fetchParticipantIds(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return const SizedBox();
+                          }
+                          var participantIds = snapshot.data!;
+                          return FutureBuilder<int>(
+                              future: _calculateTotalUnread(participantIds),
+                              builder: (context, unreadSnapshot) {
+                                if (!unreadSnapshot.hasData ||
+                                    unreadSnapshot.data == 0) {
+                                  return const SizedBox();
+                                }
+                                return Positioned(
+                                  right: 0,
+                                  top: -5,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    constraints: const BoxConstraints(
+                                        minWidth: 10, minHeight: 10),
+                                    child: Text(
+                                      '${unreadSnapshot.data}',
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 8),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                );
+                              });
+                        },
+                      )
+                    ],
+                  ),
+                  onPressed: () => onItemSelected(2),
+                ),
+                IconButton(
+                  icon: Stack(
+                    children: [
+                      Icon(Icons.person,color: selectedIndex == 3 ? Colors.blue: Colors.black),
+                      // Add the badge using StreamBuilder
+                      StreamBuilder<int>(
+                        stream: getSellerUnreadCount,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData || snapshot.data == 0) return const SizedBox();
+                          return Positioned(
+                            right: 0,
+                            top: -5,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(
+                                  minWidth: 10, minHeight: 10),
+                              child: Text(
+                                '${snapshot.data}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  onPressed: () => onItemSelected(3)
+                ),
+        ],
+      ),
+    );
+  }
+  Stream<List<String>> fetchParticipantIds() {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return const Stream.empty();
+
+    final currentUser = user.uid;
+
+    Stream<QuerySnapshot> sentStream = FirebaseFirestore.instance
+        .collectionGroup('messages')
+        .where('senderId', isEqualTo: currentUser)
+        .snapshots();
+
+    Stream<QuerySnapshot> receivedStream = FirebaseFirestore.instance
+        .collectionGroup('messages')
+        .where('receiverId', isEqualTo: currentUser)
+        .snapshots();
+
+    return Rx.combineLatest2(
+      sentStream,
+      receivedStream,
+      (QuerySnapshot sentSnap, QuerySnapshot receivedSnap) {
+        Set<String> participantIds = {};
+        for (var doc in sentSnap.docs) {
+          participantIds.add(doc['receiverId']);
+        }
+        for (var doc in receivedSnap.docs) {
+          participantIds.add(doc['senderId']);
+        }
+        return participantIds.toList();
+      },
+    );
+  }
+  Future<int> _calculateTotalUnread(List<String> participantIds) async {
+    int totalUnread = 0;
+
+    for (String participantId in participantIds) {
+      try {
+        int unreadCount = await getUnreadMessages(participantId);
+        totalUnread += unreadCount;
+      } catch (e) {
+        continue;
+      }
+    }
+
+    return totalUnread;
+  }
+  Future<int> getUnreadMessages(String participantId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null)
+      return Future.error('noUnreadCount'); // Or redirect to login
+
+    final currentUser = user.uid;
+
+    try {
+      List<String> ids = [currentUser, participantId];
+      ids.sort();
+      String chatRoomId = ids.join('_');
+
+      DocumentSnapshot metaDoc = await FirebaseFirestore.instance
+          .collection('chat_rooms')
+          .doc(chatRoomId)
+          .collection('messages')
+          .doc('meta')
+          .get();
+
+      if (!metaDoc.exists) return 0;
+
+      Map<String, dynamic> data = metaDoc.data() as Map<String, dynamic>;
+
+      if (data['senderId'] == currentUser) {
+        return data['to_msg'] ?? 0;
+      } else {
+        return data['from_msg'] ?? 0;
+      }
+    } catch (e, stack) {
+      await reportErrorToCrashlytics(e, stack,
+          reason:
+              'directmessages getUnreadCount error for user $currentUser, participantId: $participantId');
+      return 0;
+    }
   }
 }

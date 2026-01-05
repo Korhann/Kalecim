@@ -197,9 +197,9 @@ class _HomeRouterState extends State<HomeRouter> {
     if (userType == null) {
       return LogIn();
     } else if (userType == 'seller') {
-      return SellerMainPage(index: 2);
+      return SellerMainPage(index: 3);
     } else if (userType == 'user') {
-      return MainPage(index: 2);
+      return MainPage(index: 3);
     } else {
       return LogIn();
     }

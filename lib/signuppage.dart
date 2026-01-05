@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kiralik_kaleci/loginpage.dart';
+import 'package:kiralik_kaleci/responsive/responsivedesign.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
 import 'package:kiralik_kaleci/userorseller.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
@@ -124,20 +125,36 @@ class _SignUpState extends State<SignUp> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: background,
-      resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final width = constraints.maxWidth;
-            return SingleChildScrollView(
+        child: Row(
+          children: [
+            if (!ResponsiveDesign.isMobile(context))
+            Expanded(
+              flex: ResponsiveDesign.isTablet(context) ? 1 : 3,
+              // bunu ekran görüntüleri ile değiştir
+              child: Image.asset('lib/images/kalecimLogo.png',height: 200, width: 200),
+            ),
+            Expanded(
+              flex: 2,
+              child: _buildSignUpForm(context),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+  Widget _buildSignUpForm(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
+    return SingleChildScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom + 100
           ),
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minWidth: constraints.maxWidth,
-              minHeight: constraints.maxHeight
+              minWidth: width,
+              minHeight: height
             ),
             child: IntrinsicHeight(
               child: Column(
@@ -478,9 +495,5 @@ class _SignUpState extends State<SignUp> {
             ),
           ),
                 );
-          },
-        )
-      ),
-    );
   }
 }
