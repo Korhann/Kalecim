@@ -14,6 +14,7 @@ import 'package:kiralik_kaleci/globals.dart';
 import 'package:kiralik_kaleci/directedMessagepage.dart';
 import 'package:kiralik_kaleci/apptRequest.dart';
 import 'package:kiralik_kaleci/imageZoomscreen.dart';
+import 'package:kiralik_kaleci/responsive/responsivedesign.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/selleraddpage.dart';
 import 'package:kiralik_kaleci/sellermainpage.dart';
@@ -21,6 +22,7 @@ import 'package:kiralik_kaleci/sharedvalues.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 import 'package:quickalert/quickalert.dart';
 
@@ -213,16 +215,14 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
             icon: Icon(Icons.arrow_back, color: userorseller ? Colors.white: Colors.black),
           ),
         ),
+          backgroundColor: background,
           body: Stack(
           children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: height * 0.60
-              ),
-              child: SingleChildScrollView(
-                child: Container(
-                height: height,
-                color: userorseller ? sellerbackground : background,
+            SingleChildScrollView(
+              child: Container(
+              height: height,
+              color: userorseller ? sellerbackground : background,
+              child: Center(
                 child: Column(  
                   children: [
                     SizedBox(height: height * 0.025),
@@ -230,338 +230,340 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),  
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          // burada kart rengini ayarla
-                          color: userorseller ? sellergrey : Colors.white,
-                          height: height * 0.60,
-                          width: width,
-                          child: SingleChildScrollView(
-                            child: Padding(
-                              padding: EdgeInsets.only(bottom: 20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context, 
-                                        MaterialPageRoute(builder: (context) => Imagezoomscreen(imageUrl: imageUrl))
-                                      );
-                                    },
-                                    child: SizedBox(
-                                      child: showImage(imageUrl: imageUrl, sellerDetails: widget.sellerDetails, sellerUid: widget.sellerUid, width: width, height: height, whereFrom: widget.wherFrom,)
-                                    ),
-                                  ),
-                                  SizedBox(height: height * 0.020),
-
-                                  Row(
-                                    children: [
-                                      showNameSurname(sellerDetails: widget.sellerDetails),
-                                      const Spacer(),
-                                      AverageRating(
-                                        sellerUid: widget.sellerUid,
-                                        // onCardColorsChanged: (colors) {
-                                        // _cardColors = colors;
+                        child: PageContainerDesktop(
+                          child: Container(
+                            // burada kart rengini ayarla
+                            color: userorseller ? sellergrey : Colors.white,
+                            height: height * 0.60,
+                            width: width,
+                            child: SingleChildScrollView(
+                              child: Padding(
+                                padding: EdgeInsets.only(bottom: 20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context, 
+                                          MaterialPageRoute(builder: (context) => Imagezoomscreen(imageUrl: imageUrl))
+                                        );
+                                      },
+                                      child: SizedBox(
+                                        child: showImage(imageUrl: imageUrl, sellerDetails: widget.sellerDetails, sellerUid: widget.sellerUid, width: width, height: height, whereFrom: widget.wherFrom,)
                                       ),
-                                    ],
-                                  ),
-                                  
-                                  SizedBox(height: height * 0.007),
-                                  
-                                  showCityDistrict(sellerDetails: widget.sellerDetails),
-
-                                  // check if user posted a gig
-                                  StreamBuilder<DocumentSnapshot>(
-                                    stream: FirebaseFirestore.instance.collection('Users').doc(widget.sellerUid).snapshots(),
-                                    builder: (context, snapshot) {
-                                      if (!snapshot.hasData || !snapshot.data!.exists) {
-                                        return SizedBox();
-                                      }
-                                      
-                                      final data = snapshot.data!.data();
-                                      if (data == null) {
-                                        return SizedBox();
-                                      }
-                                      
-                                      final sellerDetailsMap = data as Map<String, dynamic>;
-                                      
-                                      // Check if sellerDetails exists and is not null
-                                      if (!sellerDetailsMap.containsKey('sellerDetails') || sellerDetailsMap['sellerDetails'] == null) {
-                                        return SizedBox();
-                                      }
-                                      
-                                      final nestedSellerDetails = sellerDetailsMap['sellerDetails'] as Map<String, dynamic>?;
-                                      
-                                      // Additional null check
-                                      if (nestedSellerDetails == null) {
-                                        return SizedBox();
-                                      }
-                                      
-                                      final bool hasGig = nestedSellerDetails.containsKey('sellerGig') && 
-                                                         nestedSellerDetails['sellerGig'] != null && 
-                                                         (nestedSellerDetails['sellerGig'] as String).trim().isNotEmpty;
-                                      
-                                      return Column(
-                                        children: [
-                                          if (hasGig) SizedBox(height: height * 0.020),
-                                          if (hasGig) showGig(sellerDetails: nestedSellerDetails),
-                                        ],
-                                      );
-                                    },
-                                  ),
-
-                                  SizedBox(height: height * 0.005),
-
-                                  // burada kullanıcı saha seçmemiş ise ilk sahayı ata
-                                  SellerFields(
-                                    selectedField: _selectedField ?? widget.sellerDetails['fields'][0],
-                                    sellerDetails: widget.sellerDetails,
-                                    onFieldChanged: (newField) {
-                                      setState(() {
-                                        _selectedField = newField;
-                                      });
-                                    }, 
-                                    width: width,
                                     ),
-                                  SizedBox(height: height * 0.010),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                                    child: Column(
+                                    SizedBox(height: height * 0.020),
+                          
+                                    Row(
                                       children: [
-                                        Text(
-                                          "Saatler",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                            color: userorseller ? Colors.white : Colors.black,
-                                          ),
-                                          textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+                                        showNameSurname(sellerDetails: widget.sellerDetails),
+                                        const Spacer(),
+                                        AverageRating(
+                                          sellerUid: widget.sellerUid,
+                                          // onCardColorsChanged: (colors) {
+                                          // _cardColors = colors;
                                         ),
-                                        SizedBox(height: height * 0.010),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                      ],
+                                    ),
+                                    
+                                    SizedBox(height: height * 0.007),
+                                    
+                                    showCityDistrict(sellerDetails: widget.sellerDetails),
+                          
+                                    // check if user posted a gig
+                                    StreamBuilder<DocumentSnapshot>(
+                                      stream: FirebaseFirestore.instance.collection('Users').doc(widget.sellerUid).snapshots(),
+                                      builder: (context, snapshot) {
+                                        if (!snapshot.hasData || !snapshot.data!.exists) {
+                                          return SizedBox();
+                                        }
+                                        
+                                        final data = snapshot.data!.data();
+                                        if (data == null) {
+                                          return SizedBox();
+                                        }
+                                        
+                                        final sellerDetailsMap = data as Map<String, dynamic>;
+                                        
+                                        // Check if sellerDetails exists and is not null
+                                        if (!sellerDetailsMap.containsKey('sellerDetails') || sellerDetailsMap['sellerDetails'] == null) {
+                                          return SizedBox();
+                                        }
+                                        
+                                        final nestedSellerDetails = sellerDetailsMap['sellerDetails'] as Map<String, dynamic>?;
+                                        
+                                        // Additional null check
+                                        if (nestedSellerDetails == null) {
+                                          return SizedBox();
+                                        }
+                                        
+                                        final bool hasGig = nestedSellerDetails.containsKey('sellerGig') && 
+                                                           nestedSellerDetails['sellerGig'] != null && 
+                                                           (nestedSellerDetails['sellerGig'] as String).trim().isNotEmpty;
+                                        
+                                        return Column(
                                           children: [
-                                            //todo: Gece saatleri sıkıntılı çalışıyor ve _getDaysName de de aynı kod çalışıyor, hangisi boş anla
-                                            StreamBuilder<DocumentSnapshot>(
-                                              stream: _stream(),
-                                              builder: (context, snapshot) {
-                                                if (!snapshot.hasData) {
-                                                  return const Center(child: CircularProgressIndicator());
-                                                }
-                                                
-                                                // Check if document exists
-                                                if (!snapshot.data!.exists) {
-                                                  return const Text('Kullanıcı bulunamadı');
-                                                }
-                                                
-                                                // Check if data is null
-                                                final data = snapshot.data!.data();
-                                                if (data == null) {
-                                                  return const Text('Kullanıcı bilgisi bulunamadı');
-                                                }
-                                                
-                                                // Safe casting with null check
-                                                final userData = data as Map<String, dynamic>?;
-                                                if (userData == null) {
-                                                  return const Text('Kullanıcı bilgisi bulunamadı');
-                                                }
-                                                
-                                                // Check if sellerDetails exists
-                                                if (!userData.containsKey('sellerDetails') || userData['sellerDetails'] == null) {
-                                                  return const Text('Kullanıcı artık mevcut değil');
-                                                }
-                                                
-                                                // Safe access to sellerDetails
-                                                final sellerDetails = userData['sellerDetails'] as Map<String, dynamic>?;
-                                                if (sellerDetails == null) {
-                                                  return const Text('Kullanıcı artık mevcut değil');
-                                                }
-                                                
-                                                // Check if selectedHoursByDay exists
-                                                if (!sellerDetails.containsKey('selectedHoursByDay') || sellerDetails['selectedHoursByDay'] == null) {
-                                                  return const Text('Saat bilgisi bulunamadı');
-                                                }
-                                                
-                                                final selectedHoursByDay = sellerDetails['selectedHoursByDay'] as Map<String, dynamic>?;
-                                                if (selectedHoursByDay == null) {
-                                                  return const Text('Saat bilgisi bulunamadı');
-                                                }
-                                                
-                                                // Clear existing data
-                                                days.clear();
-                                                hoursByDay.clear();
-                                                hourColors.clear();
-                                                
-                                                final now = DateTime.now().toUtc().add(const Duration(hours: 3));
-                                                final int currentDayIndex = now.weekday - 1;
-                                                
-                                                // Process the hours data
-                                                for (int i = 0; i < orderedDays.length; i++) {
-                                                  final day = orderedDays[i];
-                                                  if (!selectedHoursByDay.containsKey(day)) continue;
+                                            if (hasGig) SizedBox(height: height * 0.020),
+                                            if (hasGig) showGig(sellerDetails: nestedSellerDetails),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                          
+                                    SizedBox(height: height * 0.005),
+                          
+                                    // burada kullanıcı saha seçmemiş ise ilk sahayı ata
+                                    SellerFields(
+                                      selectedField: _selectedField ?? widget.sellerDetails['fields'][0],
+                                      sellerDetails: widget.sellerDetails,
+                                      onFieldChanged: (newField) {
+                                        setState(() {
+                                          _selectedField = newField;
+                                        });
+                                      }, 
+                                      width: width,
+                                      ),
+                                    SizedBox(height: height * 0.010),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            "Saatler",
+                                            style: GoogleFonts.inter(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                              color: userorseller ? Colors.white : Colors.black,
+                                            ),
+                                            textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+                                          ),
+                                          SizedBox(height: height * 0.010),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              //todo: Gece saatleri sıkıntılı çalışıyor ve _getDaysName de de aynı kod çalışıyor, hangisi boş anla
+                                              StreamBuilder<DocumentSnapshot>(
+                                                stream: _stream(),
+                                                builder: (context, snapshot) {
+                                                  if (!snapshot.hasData) {
+                                                    return const Center(child: CircularProgressIndicator());
+                                                  }
                                                   
-                                                  final hourListData = selectedHoursByDay[day];
-                                                  if (hourListData == null) continue;
+                                                  // Check if document exists
+                                                  if (!snapshot.data!.exists) {
+                                                    return const Text('Kullanıcı bulunamadı');
+                                                  }
                                                   
-                                                  List<dynamic> hourList = hourListData is List ? hourListData : [];
-                                                  if (hourList.isEmpty) continue;
+                                                  // Check if data is null
+                                                  final data = snapshot.data!.data();
+                                                  if (data == null) {
+                                                    return const Text('Kullanıcı bilgisi bulunamadı');
+                                                  }
                                                   
-                                                  days.add(day);
-                                                  List<String> hourTitles = [];
+                                                  // Safe casting with null check
+                                                  final userData = data as Map<String, dynamic>?;
+                                                  if (userData == null) {
+                                                    return const Text('Kullanıcı bilgisi bulunamadı');
+                                                  }
                                                   
-                                                  for (var hour in hourList) {
-                                                    try {
-                                                      final hourMap = hour as Map<String, dynamic>;
-                                                      final String title = hourMap['title'] ?? '';
-                                                      final bool istaken = hourMap['istaken'] ?? false;
-                                                      final String? takenby = hourMap['takenby'];
-                                                      
-                                                      if (title.isEmpty) continue;
-                                                      
-                                                      final String startTime = title.split('-')[0];
-                                                      final String dayHourKey = '$day $title';
-                                                      List<String> nightTitles = ['00:00-01:00','01:00-02:00','02:00-03:00'];
-                                                      bool isNightHour = nightTitles.contains(title);
-
-                                                      dayChecker(i, currentDayIndex, now, startTime, dayHourKey, takenby ?? '', day, title, hourTitles, isNightHour, istaken, hours);
-                                                    } catch (e) {
-                                                      // Skip invalid hour data
-                                                      continue;
+                                                  // Check if sellerDetails exists
+                                                  if (!userData.containsKey('sellerDetails') || userData['sellerDetails'] == null) {
+                                                    return const Text('Kullanıcı artık mevcut değil');
+                                                  }
+                                                  
+                                                  // Safe access to sellerDetails
+                                                  final sellerDetails = userData['sellerDetails'] as Map<String, dynamic>?;
+                                                  if (sellerDetails == null) {
+                                                    return const Text('Kullanıcı artık mevcut değil');
+                                                  }
+                                                  
+                                                  // Check if selectedHoursByDay exists
+                                                  if (!sellerDetails.containsKey('selectedHoursByDay') || sellerDetails['selectedHoursByDay'] == null) {
+                                                    return const Text('Saat bilgisi bulunamadı');
+                                                  }
+                                                  
+                                                  final selectedHoursByDay = sellerDetails['selectedHoursByDay'] as Map<String, dynamic>?;
+                                                  if (selectedHoursByDay == null) {
+                                                    return const Text('Saat bilgisi bulunamadı');
+                                                  }
+                                                  
+                                                  // Clear existing data
+                                                  days.clear();
+                                                  hoursByDay.clear();
+                                                  hourColors.clear();
+                                                  
+                                                  final now = DateTime.now().toUtc().add(const Duration(hours: 3));
+                                                  final int currentDayIndex = now.weekday - 1;
+                                                  
+                                                  // Process the hours data
+                                                  for (int i = 0; i < orderedDays.length; i++) {
+                                                    final day = orderedDays[i];
+                                                    if (!selectedHoursByDay.containsKey(day)) continue;
+                                                    
+                                                    final hourListData = selectedHoursByDay[day];
+                                                    if (hourListData == null) continue;
+                                                    
+                                                    List<dynamic> hourList = hourListData is List ? hourListData : [];
+                                                    if (hourList.isEmpty) continue;
+                                                    
+                                                    days.add(day);
+                                                    List<String> hourTitles = [];
+                                                    
+                                                    for (var hour in hourList) {
+                                                      try {
+                                                        final hourMap = hour as Map<String, dynamic>;
+                                                        final String title = hourMap['title'] ?? '';
+                                                        final bool istaken = hourMap['istaken'] ?? false;
+                                                        final String? takenby = hourMap['takenby'];
+                                                        
+                                                        if (title.isEmpty) continue;
+                                                        
+                                                        final String startTime = title.split('-')[0];
+                                                        final String dayHourKey = '$day $title';
+                                                        List<String> nightTitles = ['00:00-01:00','01:00-02:00','02:00-03:00'];
+                                                        bool isNightHour = nightTitles.contains(title);
+                          
+                                                        dayChecker(i, currentDayIndex, now, startTime, dayHourKey, takenby ?? '', day, title, hourTitles, isNightHour, istaken, hours);
+                                                      } catch (e) {
+                                                        // Skip invalid hour data
+                                                        continue;
+                                                      }
                                                     }
                                                   }
-                                                }
-                                                
-                                                return DayHourListView(
-                                                  width: width,
-                                                  heigth: height,
-                                                  days: days,
-                                                  hoursByDay: hoursByDay,
-                                                  hourColors: hourColors,
-                                                  selectedDay: _selectedDay,
-                                                  selectedHour: _selectedHour,
-                                                  userorseller: userorseller,
-                                                  onDaySelected: (selectedDay) {
-                                                    setState(() {
-                                                      _selectedDay = selectedDay;
-                                                    });
-                                                  },
-                                                  onHourSelected: (selectedHour) {
-                                                    setState(() {
-                                                      _selectedHour = selectedHour;
-                                                    });
-                                                  },
-                                                  onClearSelection: () {
-                                                    setState(() {
-                                                      _selectedDay = null;
-                                                      _selectedHour = null;
-                                                      hourColors.forEach((key, value) {
-                                                        if (value != Colors.grey.shade600 && value != Colors.green) {
-                                                          hourColors[key] = Colors.cyan;
-                                                        }
+                                                  
+                                                  return DayHourListView(
+                                                    width: width,
+                                                    heigth: height,
+                                                    days: days,
+                                                    hoursByDay: hoursByDay,
+                                                    hourColors: hourColors,
+                                                    selectedDay: _selectedDay,
+                                                    selectedHour: _selectedHour,
+                                                    userorseller: userorseller,
+                                                    onDaySelected: (selectedDay) {
+                                                      setState(() {
+                                                        _selectedDay = selectedDay;
                                                       });
-                                                    });
-                                                  },
-                                                );
-                                              }),
-                                        ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 10),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          "Yorumlar",
-                                          style: GoogleFonts.inter(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                            color: userorseller ? Colors.white : Colors.black,
-                                          ),
-                                          textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
-                                        ),
-                                        const SizedBox(width: 20),
-                                        StreamBuilder<QuerySnapshot>(
-                                          stream: FirebaseFirestore.instance
-                                              .collection('Users')
-                                              .doc(widget.sellerUid)
-                                              .collection('rentedUsers')
-                                              .where('comment', isNotEqualTo: null)
-                                              .snapshots(),
-                                          builder: (context, snapshot) {
-                                            int commentCount = 0;
-                                            
-                                            if (snapshot.hasData) {
-                                              // Count only documents that have non-empty comments
-                                              commentCount = snapshot.data!.docs.where((doc) {
-                                                final data = doc.data() as Map<String, dynamic>;
-                                                return data['comment'] != null && data['comment'].toString().trim().isNotEmpty;
-                                              }).length;
-                                            }
-                                            
-                                            return RichText(
-                                              text: TextSpan(
-                                                text: '$commentCount yorumu gör',
-                                                style: linkStyle,
-                                                recognizer: TapGestureRecognizer()..onTap = () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) => CommentsPage(sellerUid: widget.sellerUid, checkIfSameUser: checkIfSameUser!)
-                                                    )
+                                                    },
+                                                    onHourSelected: (selectedHour) {
+                                                      setState(() {
+                                                        _selectedHour = selectedHour;
+                                                      });
+                                                    },
+                                                    onClearSelection: () {
+                                                      setState(() {
+                                                        _selectedDay = null;
+                                                        _selectedHour = null;
+                                                        hourColors.forEach((key, value) {
+                                                          if (value != Colors.grey.shade600 && value != Colors.green) {
+                                                            hourColors[key] = Colors.cyan;
+                                                          }
+                                                        });
+                                                      });
+                                                    },
                                                   );
-                                                }
-                                              )
-                                            );
-                                          },
-                                        ),
-                                        const Spacer(),
-
-                                        FutureBuilder<bool>(
-                                          future: checkIfSameUser,
-                                          builder: (context,snapshot) {
-                                            if (snapshot.connectionState == ConnectionState.waiting) {
-                                              return const SizedBox.shrink(); // Don't show anything while loading
-                                            }
-                                            if (snapshot.hasError) {
-                                              return const SizedBox.shrink(); // Don't show on error
-                                            }
-                                            if (snapshot.hasData && snapshot.data == true) {
-                                              return Ratings(
-                                                sellerUid: widget.sellerUid,
-                                                currentUserUid: currentUserUid!,
+                                                }),
+                                          ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            "Yorumlar",
+                                            style: GoogleFonts.inter(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                              color: userorseller ? Colors.white : Colors.black,
+                                            ),
+                                            textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+                                          ),
+                                          const SizedBox(width: 20),
+                                          StreamBuilder<QuerySnapshot>(
+                                            stream: FirebaseFirestore.instance
+                                                .collection('Users')
+                                                .doc(widget.sellerUid)
+                                                .collection('rentedUsers')
+                                                .where('comment', isNotEqualTo: null)
+                                                .snapshots(),
+                                            builder: (context, snapshot) {
+                                              int commentCount = 0;
+                                              
+                                              if (snapshot.hasData) {
+                                                // Count only documents that have non-empty comments
+                                                commentCount = snapshot.data!.docs.where((doc) {
+                                                  final data = doc.data() as Map<String, dynamic>;
+                                                  return data['comment'] != null && data['comment'].toString().trim().isNotEmpty;
+                                                }).length;
+                                              }
+                                              
+                                              return RichText(
+                                                text: TextSpan(
+                                                  text: '$commentCount yorumu gör',
+                                                  style: linkStyle,
+                                                  recognizer: TapGestureRecognizer()..onTap = () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => CommentsPage(sellerUid: widget.sellerUid, checkIfSameUser: checkIfSameUser!)
+                                                      )
+                                                    );
+                                                  }
+                                                )
                                               );
+                                            },
+                                          ),
+                                          const Spacer(),
+                          
+                                          FutureBuilder<bool>(
+                                            future: checkIfSameUser,
+                                            builder: (context,snapshot) {
+                                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                                return const SizedBox.shrink(); // Don't show anything while loading
+                                              }
+                                              if (snapshot.hasError) {
+                                                return const SizedBox.shrink(); // Don't show on error
+                                              }
+                                              if (snapshot.hasData && snapshot.data == true) {
+                                                return Ratings(
+                                                  sellerUid: widget.sellerUid,
+                                                  currentUserUid: currentUserUid!,
+                                                );
+                                              }
+                                              return const SizedBox.shrink();
                                             }
-                                            return const SizedBox.shrink();
-                                          }
-                                        )
-                                      ],
-                                    )
-                                  ),
-                                  CommentSection(sellerUid: widget.sellerUid),
-
-                                  FutureBuilder<bool>(
-                                    future: checkIfSameUser,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return const SizedBox.shrink(); // Don't show anything while loading
+                                          )
+                                        ],
+                                      )
+                                    ),
+                                    CommentSection(sellerUid: widget.sellerUid),
+                          
+                                    FutureBuilder<bool>(
+                                      future: checkIfSameUser,
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                          return const SizedBox.shrink(); // Don't show anything while loading
+                                        }
+                                        if (snapshot.hasError) {
+                                          return const SizedBox.shrink(); // Don't show on error
+                                        }
+                                        // Only show comment box if user has rented before
+                                        if (snapshot.hasData && snapshot.data == true) {
+                                          return SimpleCommentBox(
+                                            sellerUid: widget.sellerUid,
+                                            checkIfSameUser: checkIfSameUser!,
+                                          );
+                                        }
+                                        // Don't show comment box if user hasn't rented
+                                        return const SizedBox.shrink();
                                       }
-                                      if (snapshot.hasError) {
-                                        return const SizedBox.shrink(); // Don't show on error
-                                      }
-                                      // Only show comment box if user has rented before
-                                      if (snapshot.hasData && snapshot.data == true) {
-                                        return SimpleCommentBox(
-                                          sellerUid: widget.sellerUid,
-                                          checkIfSameUser: checkIfSameUser!,
-                                        );
-                                      }
-                                      // Don't show comment box if user hasn't rented
-                                      return const SizedBox.shrink();
-                                    }
-                                  ),
-                                ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -571,21 +573,24 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                     SizedBox(height: height * 0.015),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: showInfoAppointments(width: width, height: height)
-                          ),
-                          SizedBox(width: 10),
-                          ChatButton(
-                            sellerUid: widget.sellerUid,
-                            width: width,
-                            height: height,
-                            currentUser: currentUserUid
-                          ),
-                        ],
+                      child: PageContainerDesktop(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // buradaki expanded güzel durmuyo çöz
+                            Expanded(
+                              child: showInfoAppointments(width: width, height: height)
+                            ),
+                            SizedBox(width: 10),
+                            ChatButton(
+                              sellerUid: widget.sellerUid,
+                              width: width,
+                              height: height,
+                              currentUser: currentUserUid
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(height: height * 0.030),
@@ -600,7 +605,7 @@ class _SellerDetailsPageState extends State<SellerDetailsPage> {
                   ],
                 ),
               ),
-              ),
+            ),
             ),
           ],
           )
@@ -1337,12 +1342,14 @@ class _showImageState extends State<showImage> {
         Positioned(
           top: 15,
           right: 25,
-          child: buildFavoriteIcon(),
+          child: buildFavoriteIcon(widget.width),
         ),
       ],
     );
   }
-  Widget buildFavoriteIcon() {
+  Widget buildFavoriteIcon(final width) {
+  double iconSize = (width * 0.06).clamp(20.0, 32.0);
+
   final currentUserUid = FirebaseAuth.instance.currentUser?.uid;
   return StreamBuilder<QuerySnapshot>(
     stream: FirebaseFirestore.instance
@@ -1374,7 +1381,7 @@ class _showImageState extends State<showImage> {
         child: Icon(
           Icons.favorite,
           color: isFavorited ? Colors.red : Colors.grey,
-          size: widget.width * 0.08,
+          size: iconSize,
         ),
       );
     },
@@ -1654,6 +1661,8 @@ class DayHourListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double iconSize = (width * 0.02).clamp(10.0, 14.0);
+
     return SizedBox(
       height: heigth*0.37,
       width: double.infinity,
@@ -1737,7 +1746,7 @@ class DayHourListView extends StatelessWidget {
                                     child: Icon(
                                       Icons.close,
                                       color: Colors.white,
-                                      size: width*0.02,
+                                      size: iconSize,
                                     ),
                                   ),
                                 ),
@@ -1847,19 +1856,27 @@ class ChatButton extends StatelessWidget {
 
 
   @override
-  Widget build(BuildContext context) {
+Widget build(BuildContext context) {
+  // Clamp width and height for better responsiveness
+  double buttonWidth = width * 0.30;
+  buttonWidth = buttonWidth.clamp(120.0, 260.0);
+  double buttonHeight = height * 0.05;
+  buttonHeight = buttonHeight.clamp(38.0, 54.0);
 
-    return GestureDetector(
-      onTap: () async{
-        if (sellerUid == currentUser) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Kullanıcı kendisi ile sohbet edemez'),
-              backgroundColor: Colors.red,
-            )
-          );
-        } else {
-          Navigator.push(
+  double iconSize = (width * 0.06).clamp(20.0, 32.0);
+  double fontSize = (width * 0.035).clamp(13.0, 18.0);
+
+  return GestureDetector(
+    onTap: () async {
+      if (sellerUid == currentUser) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Kullanıcı kendisi ile sohbet edemez'),
+            backgroundColor: Colors.red,
+          )
+        );
+      } else {
+        Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) {
@@ -1868,41 +1885,41 @@ class ChatButton extends StatelessWidget {
             },
           ),
         );
-        }
-      },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          color: Colors.white,
-          width: width*0.30,
-          height: height*0.05,
-          child: Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.forward_to_inbox,
+      }
+    },
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        color: Colors.white,
+        width: buttonWidth,
+        height: buttonHeight,
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.forward_to_inbox,
+                color: Colors.black,
+                size: iconSize,
+              ),
+              const SizedBox(width: 5),
+              Text(
+                "Sohbet",
+                style: GoogleFonts.inter(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w600,
                   color: Colors.black,
-                  size: width*0.06,
                 ),
-                SizedBox(width: 5),
-                Text(
-                  "Sohbet",
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
-                  textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
-                ),
-              ],
-            ),
+                textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+              ),
+            ],
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
   Future<bool> isPaymentMade() async {
     QuerySnapshot snapshots = await FirebaseFirestore.instance.collection('Users')
     .doc(currentUser)

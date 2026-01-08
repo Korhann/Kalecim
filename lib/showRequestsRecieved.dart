@@ -8,6 +8,7 @@ import 'package:kiralik_kaleci/sellerDetails.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 
 class RequestsReceived extends StatefulWidget {
   final List<dynamic> gigRequesters;
@@ -156,70 +157,72 @@ class _GigRequestsViewState extends State<GigRequestsView> {
           )
         );
       },
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.person, color: Colors.green[700], size: 22),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      widget.name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: Colors.black87,
+      child: PageContainerDesktop(
+        child: Card(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          elevation: 3,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.person, color: Colors.green[700], size: 22),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        widget.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      // await paymentFlow(widget.docId, widget.requestId, widget.index);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PaymentPage(
-                            sellerUid: widget.uid,
-                            sellerDocId: widget.docId,
-                            buyerUid: currentuser,
-                            selectedDay: widget.day,
-                            selectedHour: widget.hour,
-                            selectedField: widget.field,
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        // await paymentFlow(widget.docId, widget.requestId, widget.index);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PaymentPage(
+                              sellerUid: widget.uid,
+                              sellerDocId: widget.docId,
+                              buyerUid: currentuser,
+                              selectedDay: widget.day,
+                              selectedHour: widget.hour,
+                              selectedField: widget.field,
+                            )
                           )
-                        )
-                      );
-                    }, 
-                    style: GlobalStyles.buttonPrimary(context),
-                    child: Row(
-                      children: [
-                        
-                        Text(
-                        'Ödeme ₺${widget.price}',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                        ),
-                      ]
+                        );
+                      }, 
+                      style: GlobalStyles.buttonPrimary(context),
+                      child: Row(
+                        children: [
+                          
+                          Text(
+                          'Ödeme ₺${widget.price}',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          ),
+                        ]
+                      )
                     )
-                  )
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

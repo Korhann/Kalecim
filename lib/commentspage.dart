@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kiralik_kaleci/comment_model.dart';
 import 'package:kiralik_kaleci/comment_section.dart';
+import 'package:kiralik_kaleci/responsive/responsivedesign.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 
 class CommentsPage extends StatefulWidget {
@@ -23,6 +25,8 @@ class _CommentsPageState extends State<CommentsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final maxWidth = ResponsiveDesign.isDesktop(context) ? 1300.0 : double.infinity;
+
     return Scaffold(
       backgroundColor: background,
       appBar: AppBar(
@@ -31,96 +35,102 @@ class _CommentsPageState extends State<CommentsPage> {
         foregroundColor: Colors.black,
         elevation: 1,
       ),
-      body: Column(
-        children: [
-          // Comments list
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('Users')
-                  .doc(widget.sellerUid)
-                  .collection('rentedUsers')
-                  .where('comment', isNotEqualTo: null)
-                  .orderBy('timestamp', descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      'Yorumlar yüklenirken hata oluştu',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                      ),
-                    ),
-                  );
-                }
-                
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
+      body: Center(
+        child: Column(
+          children: [
+            // Comments list
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('Users')
+                    .doc(widget.sellerUid)
+                    .collection('rentedUsers')
+                    .where('comment', isNotEqualTo: null)
+                    .orderBy('timestamp', descending: true)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  
+                  if (snapshot.hasError) {
+                    return Center(
                       child: Text(
-                        'Henüz yorum yapılmamış',
+                        'Yorumlar yüklenirken hata oluştu',
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 14,
                         ),
                       ),
-                    ),
-                  );
-                }
-                
-                // Process the data
-                List<Comment_model> comments = [];
-                for (var doc in snapshot.data!.docs) {
-                  final data = doc.data() as Map<String, dynamic>;
-                  if (data['comment'] != null && data['comment'].toString().trim().isNotEmpty) {
-                    comments.add(
-                      Comment_model(
-                        author: data['author'] ?? 'Anonymous',
-                        content: data['comment'] ?? '',
-                        serverTimestamp: data['timestamp'],
+                    );
+                  }
+                  
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(
+                          'Henüz yorum yapılmamış',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
                     );
                   }
-                }
-
-                // Return the ListView with proper scrolling
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16.0),
-                  itemCount: comments.length,
-                  itemBuilder: (context, index) {
-                    return CommentWidget(comment: comments[index]);
-                  },
-                );
-              },
+                  
+                  // Process the data
+                  List<Comment_model> comments = [];
+                  for (var doc in snapshot.data!.docs) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    if (data['comment'] != null && data['comment'].toString().trim().isNotEmpty) {
+                      comments.add(
+                        Comment_model(
+                          author: data['author'] ?? 'Anonymous',
+                          content: data['comment'] ?? '',
+                          serverTimestamp: data['timestamp'],
+                        ),
+                      );
+                    }
+                  }
+        
+                  // Return the ListView with proper scrolling
+                  return PageContainerDesktop(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16.0),
+                      itemCount: comments.length,
+                      itemBuilder: (context, index) {
+                        return CommentWidget(comment: comments[index]);
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-          FutureBuilder<bool>(
-            future: widget.checkIfSameUser, // Use the passed future
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SizedBox.shrink(); // Don't show anything while loading
+            FutureBuilder<bool>(
+              future: widget.checkIfSameUser, // Use the passed future
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SizedBox.shrink(); // Don't show anything while loading
+                }
+                if (snapshot.hasError) {
+                  return const SizedBox.shrink(); // Don't show on error
+                }
+                // Only show comment box if user has rented before
+                if (snapshot.hasData && snapshot.data == true) {
+                  return PageContainerDesktop(
+                    child: CommentBox(
+                      sellerUid: widget.sellerUid
+                    ),
+                  );
+                }
+                // Don't show comment box if user hasn't rented
+                return const SizedBox.shrink();
               }
-              if (snapshot.hasError) {
-                return const SizedBox.shrink(); // Don't show on error
-              }
-              // Only show comment box if user has rented before
-              if (snapshot.hasData && snapshot.data == true) {
-                return CommentBox(
-                  sellerUid: widget.sellerUid
-                );
-              }
-              // Don't show comment box if user hasn't rented
-              return const SizedBox.shrink();
-            }
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -12,6 +12,7 @@ import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/showRequestsRecieved.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 
 class ShareGigPage extends StatefulWidget {
   const ShareGigPage({super.key});
@@ -132,59 +133,61 @@ class _ShareGigPageState extends State<ShareGigPage> {
                         centerTitle: true,
                       ),
                       backgroundColor: background,
-                      body: ListView.builder(
-                        itemCount: gigs.length,
-                        itemBuilder: (context, index) {
-                          final gigData = gigs[index].data() as Map<String, dynamic>;
-                          docId = gigs[index].id;
-
-                          final day = gigData['userGig']['day'];
-                          final district = gigData['userGig']['district'];
-                          final field = gigData['userGig']['field'];
-                          final hour = gigData['userGig']['hour'];
-                          final name = gigData['userGig']['name'];
-                          final price = gigData['userGig']['price'];
-                          final province = gigData['userGig']['province'];
-                          final gigOwner = gigData['userGig']['gigOwner'];
-
-                          // todo: aşşağıdaki kısımları gigRequester için alınıcak
-                          return StreamBuilder<QuerySnapshot>(
-                            stream: gigRequestersStream(),
-                            builder: (context, requestSnapshot) {
-                              if (!requestSnapshot.hasData) {
-                                return const SizedBox();
+                      body: PageContainerDesktop(
+                        child: ListView.builder(
+                          itemCount: gigs.length,
+                          itemBuilder: (context, index) {
+                            final gigData = gigs[index].data() as Map<String, dynamic>;
+                            docId = gigs[index].id;
+                        
+                            final day = gigData['userGig']['day'];
+                            final district = gigData['userGig']['district'];
+                            final field = gigData['userGig']['field'];
+                            final hour = gigData['userGig']['hour'];
+                            final name = gigData['userGig']['name'];
+                            final price = gigData['userGig']['price'];
+                            final province = gigData['userGig']['province'];
+                            final gigOwner = gigData['userGig']['gigOwner'];
+                        
+                            // todo: aşşağıdaki kısımları gigRequester için alınıcak
+                            return StreamBuilder<QuerySnapshot>(
+                              stream: gigRequestersStream(),
+                              builder: (context, requestSnapshot) {
+                                if (!requestSnapshot.hasData) {
+                                  return const SizedBox();
+                                }
+                                final requests = requestSnapshot.data!.docs;
+                                final requesterLength = requests.length;
+                        
+                                final gigRequesters = requests.map((doc) {
+                                  final data = doc.data() as Map<String,dynamic>;
+                                  final requestsData = data['requestFromKeeper'];
+                                  return {
+                                    'requestId': doc.id,
+                                    'fullName': requestsData['fullName'],
+                                    'paymentStatus': requestsData['paymentstatus'],
+                                    'status': requestsData['status'],
+                                    'timestamp': requestsData['timestamp'],
+                                    'uid': requestsData['uid'],
+                                  };
+                                }).toList();
+                                return GigView(
+                                  day: day,
+                                  district: district,
+                                  field: field,
+                                  name: name,
+                                  hour: hour,
+                                  province: province,
+                                  price: price,
+                                  gigOwner: gigOwner,
+                                  gigRequesters: gigRequesters,
+                                  requesterLength: requesterLength,
+                                  docId: docId,
+                                );
                               }
-                              final requests = requestSnapshot.data!.docs;
-                              final requesterLength = requests.length;
-
-                              final gigRequesters = requests.map((doc) {
-                                final data = doc.data() as Map<String,dynamic>;
-                                final requestsData = data['requestFromKeeper'];
-                                return {
-                                  'requestId': doc.id,
-                                  'fullName': requestsData['fullName'],
-                                  'paymentStatus': requestsData['paymentstatus'],
-                                  'status': requestsData['status'],
-                                  'timestamp': requestsData['timestamp'],
-                                  'uid': requestsData['uid'],
-                                };
-                              }).toList();
-                              return GigView(
-                                day: day,
-                                district: district,
-                                field: field,
-                                name: name,
-                                hour: hour,
-                                province: province,
-                                price: price,
-                                gigOwner: gigOwner,
-                                gigRequesters: gigRequesters,
-                                requesterLength: requesterLength,
-                                docId: docId,
-                              );
-                            }
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     );
                   }),

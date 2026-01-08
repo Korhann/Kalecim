@@ -186,7 +186,11 @@ class _SellerDirectMessagesState extends State<SellerDirectMessages> {
   @override
   Widget build(BuildContext context) {
   final width = MediaQuery.sizeOf(context).width;
-  final iconSize = width * 0.06;
+  double iconSize = (width * 0.06).clamp(20.0, 32.0);
+
+  final double avatarRadius = (width * 0.045).clamp(22.0, 36.0);
+  final double titleFontSize = (width * 0.038).clamp(14.0, 20.0);
+  final double subtitleFontSize = (width * 0.032).clamp(12.0, 17.0);
     return StreamBuilder<List<String>>(
       stream: fetchParticipantIds(),
       builder: (context, snapshot) {
@@ -233,100 +237,69 @@ class _SellerDirectMessagesState extends State<SellerDirectMessages> {
             centerTitle: true,
           ),
           backgroundColor: sellerbackground,
-          body: LayoutBuilder(
-            builder: (context, constraints) {
-              final width = constraints.maxWidth;
-              return ListView.builder(
-              itemCount: participantIds.length,
-              itemBuilder: (context, index) {
-                final participantId = participantIds[index];
-                return FutureBuilder<Map<String, dynamic>>(
-                  future: fetchConversationData(participantId),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return ListTile(
-                        title: const SizedBox(),
-                      );
-                    }
-                    var conversation = snapshot.data!;
-                    return ListTile(
-                      leading: CircleAvatar(
-                        radius: MediaQuery.of(context).size.width * 0.055,
-                        backgroundColor: Colors.grey[300],
-                        child: conversation['imageUrl'] != null && conversation['imageUrl'].toString().isNotEmpty
-                            ? ClipOval(
-                                child: Image.network(
-                                  conversation['imageUrl'],
-                                  width: MediaQuery.of(context).size.width * 0.11,
-                                  height: MediaQuery.of(context).size.width * 0.11,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    // Show placeholder if image fails to load
-                                    return Icon(
-                                      Icons.person,
-                                      size: MediaQuery.of(context).size.width * 0.06,
-                                      color: Colors.grey[600],
-                                    );
-                                  },
-                                  loadingBuilder: (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    // Show loading indicator while image is loading
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.grey[600],
-                                      ),
-                                    );
-                                  },
-                                ),
-                              )
-                            : Icon(
-                                Icons.person,
-                                size: MediaQuery.of(context).size.width * 0.06,
-                                color: Colors.grey[600],
-                              ),
+          body: ListView.builder(
+          itemCount: participantIds.length,
+          itemBuilder: (context, index) {
+            final participantId = participantIds[index];
+            return FutureBuilder<Map<String, dynamic>>(
+              future: fetchConversationData(participantId),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return ListTile(
+                    title: const SizedBox(),
+                  );
+                }
+                var conversation = snapshot.data!;
+                return ListTile(
+              leading: CircleAvatar(
+                radius: avatarRadius,
+                backgroundImage: conversation['imageUrl'] != null
+                    ? NetworkImage(conversation['imageUrl'])
+                    : null,
+                child: conversation['imageUrl'] == null
+                    ? const Icon(Icons.person)
+                    : null,
+              ),
+              title: Text(conversation['receiverName'], style: TextStyle(fontSize: titleFontSize, color: Colors.white)),
+              subtitle: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      conversation['lastMessage'], 
+                      style: TextStyle(fontSize: subtitleFontSize, color: Colors.white),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    )
+                  ),
+                  const SizedBox(width: 8),
+                  if (conversation['unread'] > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      title: Text(conversation['receiverName'], style: const TextStyle(color: Colors.white)),
-                      subtitle: Row(
-                        children: [
-                          Text(
-                            conversation['lastMessage'],
-                            style: TextStyle(fontSize: width * 0.04,color: Colors.white),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-
-                          ),
-                          const Spacer(),
-                          if (conversation['unread'] > 0)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                '${conversation['unread']}',
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            )
-                        ],
+                      child: Text(
+                        '${conversation['unread']}',
+                        style: const TextStyle(color: Colors.white),
                       ),
-                      onTap: () async {
-                        await resetUnredMessages(conversation['receiverId']);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MessagePage(receiverId: conversation['receiverId']),
-                          ),
-                        );
-                      },
-                    );
-                  },
+                    )
+                ],
+              ),
+              onTap: () async {
+                await resetUnredMessages(conversation['receiverId']);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MessagePage(receiverId: conversation['receiverId']),
+                  ),
                 );
               },
             );
-            },
-          ),
+              },
+            );
+          },
+                      ),
         );
       },
     );

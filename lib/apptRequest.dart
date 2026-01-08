@@ -8,11 +8,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:kiralik_kaleci/mainpage.dart';
 import 'package:kiralik_kaleci/notification/push_helper.dart';
 import 'package:kiralik_kaleci/notification_model.dart';
+import 'package:kiralik_kaleci/responsive/responsivedesign.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 
 class ApptRequest extends StatefulWidget {
@@ -56,8 +58,8 @@ class _ApptRequestState extends State<ApptRequest> {
   
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
     final height = MediaQuery.sizeOf(context).height;
+    final maxWidth = ResponsiveDesign.isDesktop(context) ? 1300.0 : double.infinity;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: background,
@@ -68,154 +70,161 @@ class _ApptRequestState extends State<ApptRequest> {
             Navigator.of(context).pop();
         }, icon: const Icon(Icons.arrow_back, color: Colors.black)),
       ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 30),
-            Container(
-              width: double.infinity,
-              height: height*0.30,
-              color: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 10),
-                    Text(
-                      'Seçilen gün ve saat',
-                      style: GoogleFonts.inter(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold
-                      ),
-                      textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
-                    ),
-                    const SizedBox(height: 8),
-                    Padding(
-                      padding: EdgeInsets.only(right: 20),
-                      child: Row(
+      body: Center(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 30),
+              PageContainerDesktop(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10.0),
+                  child: Container(
+                    width: double.infinity,
+                    height: height*0.35,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _selectedDay(),
-                          const Spacer(),
-                          _selectedHour()
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Seçilen saha',
-                      style: GoogleFonts.inter(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold
-                      ),
-                      textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context))
-                    ),
-                    const SizedBox(height: 8),
-                    Padding(
-                      padding: EdgeInsets.only(right: 20),
-                      child: _selectedField(),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Ödenecek Tutar',
-                      style: GoogleFonts.inter(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold
-                      ),
-                      textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context))
-                    ),
-                    const SizedBox(height: 8),
-                    Padding(
-                      padding: EdgeInsets.only(right: 20),
-                      child: Row(
-                        children: [
+                          const SizedBox(height: 10),
                           Text(
-                            'Hizmet Bedeli:',
-                              style: GoogleFonts.inter(
-                                fontSize: 15,
-                                fontWeight: FontWeight.normal,
-                                color: Colors.black
-                              ),
-                              textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context))
+                            'Seçilen gün ve saat',
+                            style: GoogleFonts.inter(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold
+                            ),
+                            textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
                           ),
-                          const Spacer(),
-                          _price()
+                          const SizedBox(height: 8),
+                          Padding(
+                            padding: EdgeInsets.only(right: 20),
+                            child: Row(
+                              children: [
+                                _selectedDay(),
+                                const Spacer(),
+                                _selectedHour()
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            'Seçilen saha',
+                            style: GoogleFonts.inter(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold
+                            ),
+                            textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context))
+                          ),
+                          const SizedBox(height: 8),
+                          Padding(
+                            padding: EdgeInsets.only(right: 20),
+                            child: _selectedField(),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            'Ödenecek Tutar',
+                            style: GoogleFonts.inter(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold
+                            ),
+                            textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context))
+                          ),
+                          const SizedBox(height: 8),
+                          Padding(
+                            padding: EdgeInsets.only(right: 20),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Hizmet Bedeli:',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.black
+                                    ),
+                                    textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context))
+                                ),
+                                const Spacer(),
+                                _price()
+                              ],
+                            ),
+                          )
                         ],
                       ),
-                    )
-                  ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
-            Center(
-              child: ElevatedButton(
-                // check for the internet connection
-                onPressed: _buttonDisable ? null : () async{
-                  if (await InternetConnection().hasInternetAccess) {
-                    if (!_buttonDisable) {
-                      if (mounted) {
-                        setState(() {
-                        _buttonDisable = true;
-                      });
-                      }
-                    }
-                    if (widget.whereFrom == 'fromSellerDetails') {
-                      bool isSameAppointment = await checkIfSameApptRequest();
-                      if (isSameAppointment) {
-                        await sendRequest();
-                        await navigateToHomePage();
-                      }else {
+              const SizedBox(height: 30),
+              Center(
+                child: ElevatedButton(
+                  // check for the internet connection
+                  onPressed: _buttonDisable ? null : () async{
+                    if (await InternetConnection().hasInternetAccess) {
+                      if (!_buttonDisable) {
                         if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Aynı saat için birden fazla talep gönderemezsiniz'),
-                              backgroundColor: Colors.red,
-                            )
-                          );
+                          setState(() {
+                          _buttonDisable = true;
+                        });
                         }
                       }
-                    } else {
-                      // keeperRequest sayfasından gelince burası çalışıcak
-                      if (widget.sellerUid != currentuser) {
-                        await requestToUserGig();
+                      if (widget.whereFrom == 'fromSellerDetails') {
+                        bool isSameAppointment = await checkIfSameApptRequest();
+                        if (isSameAppointment) {
+                          await sendRequest();
+                          await navigateToHomePage();
+                        }else {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Aynı saat için birden fazla talep gönderemezsiniz'),
+                                backgroundColor: Colors.red,
+                              )
+                            );
+                          }
+                        }
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Kullanıcı kendini seçemez'),
-                          backgroundColor: Colors.red,
-                        )
-                      );
+                        // keeperRequest sayfasından gelince burası çalışıcak
+                        if (widget.sellerUid != currentuser) {
+                          await requestToUserGig();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Kullanıcı kendini seçemez'),
+                            backgroundColor: Colors.red,
+                          )
+                        );
+                        }
                       }
-                    }
-                    Future.delayed(const Duration(seconds: 5), () {
+                      Future.delayed(const Duration(seconds: 5), () {
+                        if (mounted) {
+                          setState(() {
+                          _buttonDisable = false;
+                        });
+                        }
+                      }); 
+                    } else {
                       if (mounted) {
-                        setState(() {
-                        _buttonDisable = false;
-                      });
+                        Showalert(context: context, text: 'Ooops...').showErrorAlert();
                       }
-                    }); 
-                  } else {
-                    if (mounted) {
-                      Showalert(context: context, text: 'Ooops...').showErrorAlert();
                     }
-                  }
-                }, 
-              style: GlobalStyles.buttonPrimary(context),
-              child: Text(
-                'Randevu Talebi Gönder',
-                style: GoogleFonts.inter(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  }, 
+                style: GlobalStyles.buttonPrimary(context),
+                child: Text(
+                  'Randevu Talebi Gönder',
+                  style: GoogleFonts.inter(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                  textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context))
+                  )
                 ),
-                textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context))
-                )
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );

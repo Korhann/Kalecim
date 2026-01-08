@@ -207,7 +207,12 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
   @override
   Widget build(BuildContext context) {
   final width = MediaQuery.sizeOf(context).width;
-  final iconSize = width * 0.06;
+  double iconSize = (width * 0.06).clamp(20.0, 32.0);
+
+  final double avatarRadius = (width * 0.045).clamp(22.0, 36.0);
+  final double titleFontSize = (width * 0.038).clamp(14.0, 20.0);
+  final double subtitleFontSize = (width * 0.032).clamp(12.0, 17.0);
+
   return StreamBuilder<List<String>>(
     stream: fetchParticipantIds(),
     builder: (context, snapshot) {
@@ -254,68 +259,63 @@ Future<Map<String, dynamic>> fetchConversationData(String participantId) async {
           centerTitle: true,
         ),
         backgroundColor: background,
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            final width = constraints.maxWidth;
-            return ListView.builder(
-              itemCount: participantIds.length,
-              itemBuilder: (context, index) {
-                final participantId = participantIds[index];
-                return FutureBuilder<Map<String, dynamic>>(
-                  future: fetchConversationData(participantId),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      // todo: change the message shimmer
-                      return ListTile(
-                        title: const SizedBox(),
-                      );
-                    }
-                    var conversation = snapshot.data!;
-                    return ListTile(
-                      leading: CircleAvatar(
-                        radius: MediaQuery.of(context).size.width * 0.055,
-                        backgroundImage: conversation['imageUrl'] != null
-                            ? NetworkImage(conversation['imageUrl'])
-                            : null,
-                        child: conversation['imageUrl'] == null
-                            ? const Icon(Icons.person)
-                            : null,
+        body: ListView.builder(
+          itemCount: participantIds.length,
+          itemBuilder: (context, index) {
+            final participantId = participantIds[index];
+            return FutureBuilder<Map<String, dynamic>>(
+              future: fetchConversationData(participantId),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  // todo: change the message shimmer
+                  return ListTile(
+                    title: const SizedBox(),
+                  );
+                }
+                var conversation = snapshot.data!;
+                return ListTile(
+                  leading: CircleAvatar(
+                    radius: avatarRadius,
+                    backgroundImage: conversation['imageUrl'] != null
+                        ? NetworkImage(conversation['imageUrl'])
+                        : null,
+                    child: conversation['imageUrl'] == null
+                        ? const Icon(Icons.person)
+                        : null,
+                  ),
+                  title: Text(conversation['receiverName'], style: TextStyle(fontSize: titleFontSize)),
+                  subtitle: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          conversation['lastMessage'], 
+                          style: TextStyle(fontSize: subtitleFontSize),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        )
                       ),
-                      title: Text(conversation['receiverName'], style: TextStyle(fontSize: width * 0.045)),
-                      subtitle: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              conversation['lastMessage'], 
-                              style: TextStyle(fontSize: width * 0.04),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            )
+                      const SizedBox(width: 8),
+                      if (conversation['unread'] > 0)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          const SizedBox(width: 8),
-                          if (conversation['unread'] > 0)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                '${conversation['unread']}',
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            )
-                        ],
+                          child: Text(
+                            '${conversation['unread']}',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        )
+                    ],
+                  ),
+                  onTap: () async {
+                    await resetUnredMessages(conversation['receiverId']);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MessagePage(receiverId: conversation['receiverId']),
                       ),
-                      onTap: () async {
-                        await resetUnredMessages(conversation['receiverId']);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MessagePage(receiverId: conversation['receiverId']),
-                          ),
-                        );
-                      },
                     );
                   },
                 );

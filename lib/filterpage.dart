@@ -5,10 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:kiralik_kaleci/connectivityWithBackButton.dart';
 import 'package:kiralik_kaleci/football_field.dart';
+import 'package:kiralik_kaleci/responsive/responsivedesign.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:http/http.dart' as http;
 import 'package:kiralik_kaleci/styles/designs.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -155,211 +157,215 @@ class _FilterPageState extends State<FilterPage> {
           return Scaffold(
             resizeToAvoidBottomInset: true,
             backgroundColor: background,
-            body: SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: height * 0.040),
-                    Stack(
+            body: Center(
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  child: PageContainerDesktop(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Align(
-                          alignment: Alignment.center,
+                        SizedBox(height: height * 0.040),
+                        Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Filtreler',
+                                style: GoogleFonts.roboto(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black),
+                                textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: clearFilters(
+                                ontap: () {
+                                clearAllFilters();
+                                setState(() {
+                                  isCleared = true;
+                                });
+                              }),
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Column(
+                          children: [
+                            NameInputField(
+                              controller: _nameController,
+                              onChanged: (value) {
+                                setState(() {
+                                  nameFilter = value;
+                                });
+                              },
+                              width: width,
+                              height: height,
+                            ),
+                            const SizedBox(height: 8),
+                            DistrictDropdown(
+                              selectedDistrict: districtFilter,
+                              districts: districts,
+                              onDistrictSelected: (value) async {
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                await prefs.setString('selectedDistrict', value!);
+                                await fetchFields(value);
+                                setState(() {
+                                  districtFilter = value;
+                                  fieldFilter = null;
+                                });
+                              },
+                              onClear: () async {
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                await prefs.remove('selectedDistrict');
+                                SharedPreferences prefs2 = await SharedPreferences.getInstance();
+                                await prefs2.remove('selectedField');
+                                setState(() {
+                                  districtFilter = null;
+                                  fieldFilter = null;
+                                  fields.clear();
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 8),
+                            FieldDropdown(
+                              selectedField: fieldFilter,
+                              fields: fields,
+                              onFieldSelected: (value) async {
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                await prefs.setString('selectedField', value!);
+                                setState(() {
+                                  fieldFilter = value;
+                                });
+                              },
+                              onClear: () async {
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                await prefs.remove('selectedField');
+                                setState(() {
+                                  fieldFilter = null;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: height * 0.040),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15),
                           child: Text(
-                            'Filtreler',
+                            'Gün Seçiniz',
                             style: GoogleFonts.roboto(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                fontWeight: FontWeight.normal,
                                 color: Colors.black),
-                            textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+                            textScaler: textScaler,
                           ),
                         ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: clearFilters(
-                            ontap: () {
-                            clearAllFilters();
+                        SizedBox(height: height * 0.020),
+                        DayPickerFirst(
+                          selectedDay: selectedDay,
+                          onDaySelected: (day) {
                             setState(() {
-                              isCleared = true;
-                            });
-                          }),
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Column(
-                      children: [
-                        NameInputField(
-                          controller: _nameController,
-                          onChanged: (value) {
-                            setState(() {
-                              nameFilter = value;
-                            });
-                          },
-                          width: width,
-                          height: height,
-                        ),
-                        const SizedBox(height: 8),
-                        DistrictDropdown(
-                          selectedDistrict: districtFilter,
-                          districts: districts,
-                          onDistrictSelected: (value) async {
-                            SharedPreferences prefs = await SharedPreferences.getInstance();
-                            await prefs.setString('selectedDistrict', value!);
-                            await fetchFields(value);
-                            setState(() {
-                              districtFilter = value;
-                              fieldFilter = null;
-                            });
-                          },
-                          onClear: () async {
-                            SharedPreferences prefs = await SharedPreferences.getInstance();
-                            await prefs.remove('selectedDistrict');
-                            SharedPreferences prefs2 = await SharedPreferences.getInstance();
-                            await prefs2.remove('selectedField');
-                            setState(() {
-                              districtFilter = null;
-                              fieldFilter = null;
-                              fields.clear();
+                              if (selectedDay == day) {
+                                selectedDay = null;
+                                days.clear();
+                              } else {
+                                selectedDay = day;
+                                days
+                                ..clear()
+                                ..add(day);
+                              }
                             });
                           },
                         ),
-                        const SizedBox(height: 8),
-                        FieldDropdown(
-                          selectedField: fieldFilter,
-                          fields: fields,
-                          onFieldSelected: (value) async {
-                            SharedPreferences prefs = await SharedPreferences.getInstance();
-                            await prefs.setString('selectedField', value!);
+                        const SizedBox(height: 10),
+                        DayPickerSecond(
+                          selectedDay: selectedDay,
+                          onDaySelected: (day) {
                             setState(() {
-                              fieldFilter = value;
-                            });
-                          },
-                          onClear: () async {
-                            SharedPreferences prefs = await SharedPreferences.getInstance();
-                            await prefs.remove('selectedField');
-                            setState(() {
-                              fieldFilter = null;
+                              if (selectedDay == day) {
+                                selectedDay = null;
+                                days.clear();
+                              } else {
+                                selectedDay = day;
+                                days
+                                ..clear()
+                                ..add(day);
+                              }
                             });
                           },
                         ),
-                      ],
-                    ),
-                    SizedBox(height: height * 0.040),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: Text(
-                        'Gün Seçiniz',
-                        style: GoogleFonts.roboto(
-                            fontSize: 18,
-                            fontWeight: FontWeight.normal,
-                            color: Colors.black),
-                        textScaler: textScaler,
-                      ),
-                    ),
-                    SizedBox(height: height * 0.020),
-                    DayPickerFirst(
-                      selectedDay: selectedDay,
-                      onDaySelected: (day) {
-                        setState(() {
-                          if (selectedDay == day) {
-                            selectedDay = null;
-                            days.clear();
-                          } else {
-                            selectedDay = day;
-                            days
-                            ..clear()
-                            ..add(day);
-                          }
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    DayPickerSecond(
-                      selectedDay: selectedDay,
-                      onDaySelected: (day) {
-                        setState(() {
-                          if (selectedDay == day) {
-                            selectedDay = null;
-                            days.clear();
-                          } else {
-                            selectedDay = day;
-                            days
-                            ..clear()
-                            ..add(day);
-                          }
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    dayPickerThird(
-                      selectedDay: selectedDay,
-                      onDaySelected: (day) {
-                        setState(() {
-                          if (selectedDay == day) {
-                            selectedDay = null;
-                            days.clear();
-                          } else {
-                            selectedDay = day;
-                            days
-                            ..clear()
-                            ..add(day);
-                          }
-                        });
-                      },
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: Text(
-                        'Fiyat Aralığı',
-                        style: GoogleFonts.roboto(
-                            fontSize: 18,
-                            fontWeight: FontWeight.normal,
-                            color: Colors.black),
-                        textScaler: textScaler,
-                      ),
-                    ),
-                    SizedBox(height: height * 0.020),
-                    Padding(
-                      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-                      child: PriceRanger(
-                        minPriceController: _minPriceController,
-                        maxPriceController: _maxPriceController,
-                        onPriceChanged: updatePriceFilters,
-                        width: width,
-                        height: height,
-                      ),
-                    ),
-                    SizedBox(height: height * 0.050),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(
-                            context,
-                            {
-                              'nameFilter': nameFilter,
-                              'cityFilter': cityFilter,
-                              'districtFilter': districtFilter,
-                              'fieldFilter': fieldFilter,
-                              'daysFilter': selectedDay,
-                              'minFilter': minFilter,
-                              'maxFilter': maxFilter
+                        const SizedBox(height: 10),
+                        dayPickerThird(
+                          selectedDay: selectedDay,
+                          onDaySelected: (day) {
+                            setState(() {
+                              if (selectedDay == day) {
+                                selectedDay = null;
+                                days.clear();
+                              } else {
+                                selectedDay = day;
+                                days
+                                ..clear()
+                                ..add(day);
+                              }
+                            });
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: Text(
+                            'Fiyat Aralığı',
+                            style: GoogleFonts.roboto(
+                                fontSize: 18,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.black),
+                            textScaler: textScaler,
+                          ),
+                        ),
+                        SizedBox(height: height * 0.020),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                          child: PriceRanger(
+                            minPriceController: _minPriceController,
+                            maxPriceController: _maxPriceController,
+                            onPriceChanged: updatePriceFilters,
+                            width: width,
+                            height: height,
+                          ),
+                        ),
+                        SizedBox(height: height * 0.050),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(
+                                context,
+                                {
+                                  'nameFilter': nameFilter,
+                                  'cityFilter': cityFilter,
+                                  'districtFilter': districtFilter,
+                                  'fieldFilter': fieldFilter,
+                                  'daysFilter': selectedDay,
+                                  'minFilter': minFilter,
+                                  'maxFilter': maxFilter
+                                },
+                              );
                             },
-                          );
-                        },
-                        style: GlobalStyles.buttonPrimary(context),
-                        child: Text(
-                          'Filtrele',
-                          style: GoogleFonts.roboto(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                          textScaler: textScaler,
+                            style: GlobalStyles.buttonPrimary(context),
+                            child: Text(
+                              'Filtrele',
+                              style: GoogleFonts.roboto(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                              textScaler: textScaler,
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 30)
+                      ],
                     ),
-                    const SizedBox(height: 30)
-                  ],
+                  ),
                 ),
               ),
             ),

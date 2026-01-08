@@ -15,6 +15,7 @@ import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/sellermainpage.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'globals.dart';
@@ -212,33 +213,35 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                   cardColor = Colors.grey;
                 }
 
-                return AppointmentView(
-                  cardColor: cardColor,
-                  name: name,
-                  surname: surname,
-                  day: day,
-                  hour: hour,
-                  field: field,
-                  status: status,
-                  paymentStatus: paymentStatus,
-                  sellerUid: sellerUid,
-                  appointmentDetails: appointmentDetails['appointmentDetails'],
-                  verificationCode: verificationCode,
-                  verificationState: verificationState,
-                  isPastDay: isPastDay,
-                  docId: docId,
-                  userorseller: userorseller,
-                  width: width,
-                  height: height,
-                  onApprove: () async {
-                    await approveAppointment(docId, index);
-                  },
-                  onReject: () async {
-                    await rejectAppointment(docId, index);
-                  },
-                  onDelete: () async {
-                    await deleteAppointment(docId, index);
-                  },
+                return PageContainerDesktop(
+                  child: AppointmentView(
+                    cardColor: cardColor,
+                    name: name,
+                    surname: surname,
+                    day: day,
+                    hour: hour,
+                    field: field,
+                    status: status,
+                    paymentStatus: paymentStatus,
+                    sellerUid: sellerUid,
+                    appointmentDetails: appointmentDetails['appointmentDetails'],
+                    verificationCode: verificationCode,
+                    verificationState: verificationState,
+                    isPastDay: isPastDay,
+                    docId: docId,
+                    userorseller: userorseller,
+                    width: width,
+                    height: height,
+                    onApprove: () async {
+                      await approveAppointment(docId, index);
+                    },
+                    onReject: () async {
+                      await rejectAppointment(docId, index);
+                    },
+                    onDelete: () async {
+                      await deleteAppointment(docId, index);
+                    },
+                  ),
                 );
               },
             ),
@@ -914,6 +917,7 @@ class AppointmentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double iconSize = (width * 0.06).clamp(20.0, 32.0);
 
     return Padding(
       padding: const EdgeInsets.all(10),
@@ -1023,11 +1027,11 @@ class AppointmentView extends StatelessWidget {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      iconDayHour(day: day, hour: hour),
+                      iconDayHour(day: day, hour: hour, iconSize: iconSize,),
                       const SizedBox(height: 5),
                       Row(
                         children: [
-                          Icon(Icons.location_on, size: width*0.06),
+                          Icon(Icons.location_on, size: iconSize),
                           const SizedBox(width: 5),
                           Expanded(
                             child: Text(
@@ -1286,10 +1290,12 @@ bool isStartTimePastNightHours(DateTime now, String startTime) {
 class iconDayHour extends StatelessWidget {
   final String day;
   final String hour;
+  final double iconSize;
   const iconDayHour({
     Key? key,
     required this.day,
     required this.hour,
+    required this.iconSize
     }): super(key: key);
 
   @override
@@ -1297,11 +1303,11 @@ class iconDayHour extends StatelessWidget {
     TextScaler textScaler = TextScaler.linear(ScaleSize.textScaleFactor(context));
     return Row(
       children: [
-        Icon(Icons.calendar_month, size: MediaQuery.sizeOf(context).width*0.05,),
+        Icon(Icons.calendar_month, size: iconSize),
         const SizedBox(width: 5),
         Text(day, textScaler: textScaler),
         const Spacer(),
-        Icon(Icons.watch_later_outlined, size: MediaQuery.sizeOf(context).width*0.05,),
+        Icon(Icons.watch_later_outlined, size: iconSize),
         const SizedBox(width: 5),
         Text(hour, textScaler: textScaler),
       ],

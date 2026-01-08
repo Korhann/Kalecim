@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kiralik_kaleci/comment_model.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 
 class CommentSection extends StatefulWidget {
   final String sellerUid;
@@ -83,7 +84,7 @@ class _CommentSectionState extends State<CommentSection> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
-            return CommentWidget(comment: comments[index]);
+            return PageContainerDesktop(child: CommentWidget(comment: comments[index]));
           },
         );
       },

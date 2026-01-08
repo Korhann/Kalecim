@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kiralik_kaleci/responsive/responsivedesign.dart';
 import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 
@@ -29,16 +30,29 @@ class GlobalStyles {
     );
   }
   static ButtonStyle buttonPrimary(BuildContext context) {
-  final screenWidth = MediaQuery.of(context).size.width;
-  final screenHeight = MediaQuery.sizeOf(context).height;
+  double screenWidth = MediaQuery.of(context).size.width;
+  double screenHeight = MediaQuery.of(context).size.height;
+
+  // Responsive width
+  double width;
+  if (ResponsiveDesign.isMobile(context)) {
+    width = screenWidth * 0.85;
+  } else if (ResponsiveDesign.isTablet(context)) {
+    width = screenWidth * 0.80;
+  } else {
+    width = screenWidth * 0.70;
+  }
+  width = width.clamp(200.0, 700.0);
+
+  // Responsive height
+  double height = screenHeight > 1024 ? 60 : 48;
+
   return ElevatedButton.styleFrom(
-    minimumSize: Size(screenWidth * 0.85, screenHeight > 1024 ? 70 : 50), 
-    backgroundColor: green, 
+    minimumSize: Size(width, height),
+    backgroundColor: green,
     elevation: 0,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(
-        Radius.circular(20),
-      ),
+      borderRadius: BorderRadius.all(Radius.circular(20)),
     ),
   );
 }
