@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kiralik_kaleci/authpage.dart';
+import 'package:kiralik_kaleci/mainpage.dart';
+import 'package:kiralik_kaleci/responsive/responsivedesign.dart';
 import 'package:kiralik_kaleci/seeKeeperRequests.dart';
 import 'package:kiralik_kaleci/sellerHomepage.dart';
 import 'package:kiralik_kaleci/selleraddpage.dart';
@@ -49,13 +51,34 @@ class SellerMainPageState extends State<SellerMainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = ResponsiveDesign.isMobile(context);
+    
     return StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Scaffold(
-              body: screens()[_currentIndex],
-              bottomNavigationBar: BottomNavyBar(
+              resizeToAvoidBottomInset: true,
+              body: isMobile 
+              ? screens()[_currentIndex]
+              : Row(
+                children: [
+                  SellerSidePanel(
+                    selectedIndex: _currentIndex,
+                    onItemSelected: (index) {
+                      setState(() {
+                        _currentIndex = index;
+                      });
+                    },
+                    unreadAppointmentCount: getUnreadAppointmentCount(),
+                    buyerUnreadCount: getBuyerUnreadCount(),
+                    participantIdsStream: fetchParticipantIds(),
+                    calculateTotalUnread: _calculateTotalUnread,
+                  ),
+                  Expanded(child: screens()[_currentIndex])
+                ],
+              ),
+              bottomNavigationBar: isMobile ? BottomNavyBar(
                 backgroundColor: sellerbackground,
                 selectedIndex: _currentIndex,
                 onItemSelected: (index) {
@@ -209,7 +232,7 @@ class SellerMainPageState extends State<SellerMainPage> {
                   ),
                 ),
                 ],
-              ),
+              ): null
             );
           } else {
             return const AuthPage();
@@ -331,5 +354,141 @@ class SellerMainPageState extends State<SellerMainPage> {
         .where('appointmentDetails.isSeen', isEqualTo: false)
         .snapshots()
         .map((snapshot) => snapshot.docs.length);
+  }
+}
+
+class SellerSidePanel extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onItemSelected;
+  final Stream<int> unreadAppointmentCount;
+  final Stream<int> buyerUnreadCount;
+  final Stream<List<String>> participantIdsStream;
+  final Future<int> Function(List<String>) calculateTotalUnread;
+
+  const SellerSidePanel({
+    super.key,
+    required this.selectedIndex,
+    required this.onItemSelected,
+    required this.unreadAppointmentCount,
+    required this.buyerUnreadCount,
+    required this.participantIdsStream,
+    required this.calculateTotalUnread,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 80,
+      color: Color(0xFF2C3137), // <-- changed to black
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: Stack(
+              children: [
+                Icon(Icons.home, color: selectedIndex == 0 ? Colors.green : Colors.white),
+                StreamBuilder<int>(
+                  stream: unreadAppointmentCount,
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData || snapshot.data == 0) return const SizedBox();
+                    return Positioned(
+                      right: 0,
+                      top: -5,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(minWidth: 10, minHeight: 10),
+                        child: Text(
+                          '${snapshot.data}',
+                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            onPressed: () => onItemSelected(0),
+          ),
+          IconButton(
+            icon: Icon(Icons.attach_money, color: selectedIndex == 1 ? Colors.green : Colors.white),
+            onPressed: () => onItemSelected(1),
+          ),
+          IconButton(
+            icon: Stack(
+              children: [
+                Icon(Icons.mail, color: selectedIndex == 2 ? Colors.green : Colors.white), // <-- always white
+                StreamBuilder<List<String>>(
+                  stream: participantIdsStream,
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) return const SizedBox();
+                    var participantIds = snapshot.data!;
+                    return FutureBuilder<int>(
+                      future: calculateTotalUnread(participantIds),
+                      builder: (context, unreadSnapshot) {
+                        if (!unreadSnapshot.hasData || unreadSnapshot.data == 0) return const SizedBox();
+                        return Positioned(
+                          right: 0,
+                          top: -5,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(minWidth: 10, minHeight: 10),
+                            child: Text(
+                              '${unreadSnapshot.data}',
+                              style: const TextStyle(color: Colors.white, fontSize: 8),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+            onPressed: () => onItemSelected(2),
+          ),
+          IconButton(
+            icon: Stack(
+              children: [
+                Icon(Icons.person, color: selectedIndex == 3 ? Colors.green : Colors.white), 
+                StreamBuilder<int>(
+                  stream: buyerUnreadCount,
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData || snapshot.data == 0) return const SizedBox();
+                    return Positioned(
+                      right: 0,
+                      top: -5,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(minWidth: 10, minHeight: 10),
+                        child: Text(
+                          '${snapshot.data}',
+                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            onPressed: () => onItemSelected(3),
+          ),
+        ],
+      ),
+    );
   }
 }

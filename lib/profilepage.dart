@@ -66,6 +66,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    double iconSize = (width * 0.06).clamp(20.0, 32.0);
     return Scaffold(
       backgroundColor: background,
       body: SafeArea(
@@ -101,7 +103,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         },
                         icon: Icon(
                           Icons.settings,
-                          size: MediaQuery.sizeOf(context).width * 0.065,
+                          size: iconSize,
                           color: Colors.black,
                         ),
                       )
@@ -157,7 +159,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                       child: OtherBars(
                         text: 'Randevularım',
-                        icons: Icon(Icons.alarm, size: MediaQuery.sizeOf(context).width * 0.06),
+                        icons: Icon(Icons.alarm, size: iconSize),
                       ),
                     ),
                   
@@ -171,7 +173,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                       child: OtherBars(
                         text: 'Favorilerim',
-                        icons: Icon(Icons.favorite_border,size: MediaQuery.sizeOf(context).width * 0.06),
+                        icons: Icon(Icons.favorite_border,size: iconSize),
                       ),
                     ),
                   
@@ -185,7 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                       child: OtherBars(
                         text: 'Halı Saha Ekle',
-                        icons: Icon(Icons.add,size: MediaQuery.sizeOf(context).width * 0.06),
+                        icons: Icon(Icons.add,size: iconSize),
                       ),
                     ),
 
@@ -200,7 +202,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: OtherBars(
                         text: 'Onaylı Halı Sahalar',
                         icons: Icon(
-                        Icons.location_on,size: MediaQuery.sizeOf(context).width * 0.06),
+                        Icons.location_on,size: iconSize),
                       ),
                     ),
                   
@@ -214,7 +216,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                       child: OtherBars(
                         text: 'Kalecim',
-                        icons: Icon(Icons.handshake_outlined,size: MediaQuery.sizeOf(context).width * 0.06),
+                        icons: Icon(Icons.handshake_outlined,size: iconSize),
                       ),
                     ),
                   
@@ -254,11 +256,11 @@ class Email extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.sizeOf(context).height * 0.080,
+      //height: MediaQuery.sizeOf(context).height * 0.10,
       width: double.infinity,
       color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.only(left: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -311,11 +313,10 @@ class UserName extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.sizeOf(context).height * 0.080,
       width: double.infinity,
       color: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.only(left: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -481,8 +482,21 @@ class BeSellerOrUser extends StatefulWidget {
 class _BeSellerOrUserState extends State<BeSellerOrUser> {
   @override
   Widget build(BuildContext context) {
-    final double toggleWidth = MediaQuery.of(context).size.width * 0.25;
-    final double badgeSize = 18;
+
+    final double screenWidth = MediaQuery.of(context).size.width;
+final double screenHeight = MediaQuery.of(context).size.height;
+
+// Responsive toggle width and height
+final double toggleWidth = (screenWidth * 0.25).clamp(120.0, 220.0);
+final double toggleHeight = (screenHeight * 0.045).clamp(32.0, 48.0);
+
+// Responsive badge size and font
+final double badgeSize = (toggleHeight * 0.6).clamp(14.0, 22.0);
+final double badgeFontSize = (badgeSize * 0.65).clamp(10.0, 14.0);
+
+// Responsive badge position
+final double badgeRight = (toggleWidth * 0.1).clamp(8.0, 20.0);
+final double badgeTop = (-badgeSize * 0.45).clamp(-16.0, -6.0);
 
     return Container(
       color: Colors.white,
@@ -501,7 +515,7 @@ class _BeSellerOrUserState extends State<BeSellerOrUser> {
               clipBehavior: Clip.none,
               children: [
                 ToggleSwitch(
-                  minHeight: MediaQuery.sizeOf(context).height * 0.045,
+                  minHeight: toggleHeight,
                   minWidth: toggleWidth,
                   cornerRadius: 20.0,
                   activeBgColors: [
@@ -548,9 +562,8 @@ class _BeSellerOrUserState extends State<BeSellerOrUser> {
                 ),
                 // Badge overlay for "Kaleci"
                 Positioned(
-                  // Position the badge at the top right of the "Kaleci" label
-                  right: toggleWidth * 0.1, 
-                  top: -8,
+                  right: badgeRight,
+                  top: badgeTop,
                   child: StreamBuilder<int>(
                     stream: getUnreadCount(),
                     builder: (context, snapshot) {
@@ -567,9 +580,10 @@ class _BeSellerOrUserState extends State<BeSellerOrUser> {
                         ),
                         child: Text(
                           '${snapshot.data}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 12,
+                            fontSize: badgeFontSize,
+                            fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
                         ),

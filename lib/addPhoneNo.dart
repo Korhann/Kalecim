@@ -10,6 +10,7 @@ import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 
 class PhoneNo extends StatefulWidget {
@@ -52,86 +53,88 @@ class _PhoneNoState extends State<PhoneNo> {
         ),
       ),
       backgroundColor: userorseller ? sellerbackground : background,
-      body: Form(
-        key: _key,
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 30),
-              phoneNo(),
-              const SizedBox(height: 5),
-              Container(
-                width: width,
-                color: userorseller ? sellerbackground : background,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: SizedBox(
-                              width: width,
-                              child: TextFormField(
-                                  controller: phoneController,
-                                  inputFormatters: [LengthLimitingTextInputFormatter(10)],
-                                  keyboardType: TextInputType.phone,
-                                  style: const TextStyle(color: Colors.black, fontSize: 20),
-                                  decoration: GlobalStyles.inputDecorationPhoneNotOptional(
-                                     showError: _showErrorPhone,
-                                    ),
-                                  onChanged: (value) => clearErrors(),
-                                  validator: (value) {
-                                  if (value == null || value.isEmpty || value.length < 10) {
-                                    setState(() {
-                                      _showErrorPhone = true;
-                                    });
-                                    return 'Lütfen doğru telefon numaranızı girin';
-                                  } else {
-                                    setState(() {
-                                      _showErrorPhone = false;
-                                    });
-                                  }
-                                  return null;
-                                },
-                                  onSaved: (value) {
-                                    phoneController.text = value!;
-                                  }
-                                ),
-                            ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_key.currentState!.validate()) {
-                      if (await InternetConnection().hasInternetAccess) {
-                        await addPhoneNo();
-                        if (isUpdated) {
-                          phoneController.clear();
-                          if (mounted) {
-                            Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
-                            await Future.delayed(const Duration(seconds: 2));
-                          }
-                        }
-                      } else {
-                        if (mounted) {
-                          Showalert(context: context, text: 'Ooopps...').showErrorAlert();
-                        }
-                      }
-                    }
-                    isUpdated = false;
-                  },
-                  style: GlobalStyles.buttonPrimary(context),
-                  child: Text(
-                    'Onayla',
-                    style: GoogleFonts.roboto(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: userorseller ? Colors.white : Colors.black,
-                    ),
-                    textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+      body: PageContainerDesktop(
+        child: Form(
+          key: _key,
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 30),
+                phoneNo(),
+                const SizedBox(height: 5),
+                Container(
+                  width: width,
+                  color: userorseller ? sellerbackground : background,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: SizedBox(
+                                width: width,
+                                child: TextFormField(
+                                    controller: phoneController,
+                                    inputFormatters: [LengthLimitingTextInputFormatter(10)],
+                                    keyboardType: TextInputType.phone,
+                                    style: const TextStyle(color: Colors.black, fontSize: 20),
+                                    decoration: GlobalStyles.inputDecorationPhoneNotOptional(
+                                       showError: _showErrorPhone,
+                                      ),
+                                    onChanged: (value) => clearErrors(),
+                                    validator: (value) {
+                                    if (value == null || value.isEmpty || value.length < 10) {
+                                      setState(() {
+                                        _showErrorPhone = true;
+                                      });
+                                      return 'Lütfen doğru telefon numaranızı girin';
+                                    } else {
+                                      setState(() {
+                                        _showErrorPhone = false;
+                                      });
+                                    }
+                                    return null;
+                                  },
+                                    onSaved: (value) {
+                                      phoneController.text = value!;
+                                    }
+                                  ),
+                              ),
                   ),
                 ),
-              )
-            ],
+                const SizedBox(height: 30),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_key.currentState!.validate()) {
+                        if (await InternetConnection().hasInternetAccess) {
+                          await addPhoneNo();
+                          if (isUpdated) {
+                            phoneController.clear();
+                            if (mounted) {
+                              Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
+                              await Future.delayed(const Duration(seconds: 2));
+                            }
+                          }
+                        } else {
+                          if (mounted) {
+                            Showalert(context: context, text: 'Ooopps...').showErrorAlert();
+                          }
+                        }
+                      }
+                      isUpdated = false;
+                    },
+                    style: GlobalStyles.buttonPrimary(context),
+                    child: Text(
+                      'Onayla',
+                      style: GoogleFonts.roboto(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: userorseller ? Colors.white : Colors.black,
+                      ),
+                      textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

@@ -9,6 +9,7 @@ import 'package:kiralik_kaleci/sellerDetails.dart';
 import 'package:kiralik_kaleci/shimmers.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 
 class FavouritesPage extends StatefulWidget {
@@ -77,34 +78,36 @@ class _FavouritesPageState extends State<FavouritesPage> {
               centerTitle: true,
             ),
             backgroundColor: userorseller ? sellerbackground : background,
-            body: Column(
-              children: [
-                showFavouritesText(),
-                ListView.builder(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.all(10),
-                  itemCount: favourites.length,
-                  itemBuilder: (context, index) {
-                    final favourite = favourites[index];
-                    final sellerFullName = favourite['sellerFullName'] ?? '';
-                    final city = favourite['city'] ?? 'Bilinmiyor';
-                    final district = favourite['district'] ?? '';
-                    final imageUrl = (favourite['imageUrls'] != null && favourite['imageUrls'].isNotEmpty)
-                        ? favourite['imageUrls'][0]
-                        : 'https://via.placeholder.com/150';
-
-                    return showCardFavourite(
-                      imageUrl: imageUrl,
-                      sellerFullName: sellerFullName,
-                      city: city,
-                      district: district,
-                      favourite: favourite,
-                      width: width,
-                      height: height,
-                    );
-                  },
-                ),
-              ],
+            body: PageContainerDesktop(
+              child: Column(
+                children: [
+                  showFavouritesText(),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.all(10),
+                    itemCount: favourites.length,
+                    itemBuilder: (context, index) {
+                      final favourite = favourites[index];
+                      final sellerFullName = favourite['sellerFullName'] ?? '';
+                      final city = favourite['city'] ?? 'Bilinmiyor';
+                      final district = favourite['district'] ?? '';
+                      final imageUrl = (favourite['imageUrls'] != null && favourite['imageUrls'].isNotEmpty)
+                          ? favourite['imageUrls'][0]
+                          : 'https://via.placeholder.com/150';
+              
+                      return showCardFavourite(
+                        imageUrl: imageUrl,
+                        sellerFullName: sellerFullName,
+                        city: city,
+                        district: district,
+                        favourite: favourite,
+                        width: width,
+                        height: height,
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -152,46 +155,57 @@ class showCardFavourite extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextScaler textScaler = TextScaler.linear(ScaleSize.textScaleFactor(context));
+    // Responsive values
+    final double imageWidth = (width * 0.18).clamp(56.0, 110.0);
+    final double imageHeight = (height * 0.13).clamp(56.0, 110.0);
+    final double iconSize = (width * 0.045).clamp(18.0, 32.0);
+    final double titleFontSize = (width * 0.038).clamp(15.0, 20.0);
+    final double subtitleFontSize = (width * 0.032).clamp(12.0, 17.0);
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                        elevation: 4,
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(15),
-                          leading: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              imageUrl,
-                              width: width*0.200,
-                              height: height*0.150,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          title: Text(
-                            sellerFullName,
-                            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-                            textScaler: textScaler,
-                          ),
-                          subtitle: Text(
-                            '$city, $district',
-                            style: GoogleFonts.inter(fontSize: 16, color: Colors.grey[700]),
-                            textScaler: textScaler,
-                          ),
-                          trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey, size: width*0.06),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SellerDetailsPage(
-                                  sellerDetails: favourite,
-                                  sellerUid: favourite['sellerUid'] ?? '',
-                                  wherFrom: '',
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      );
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 4,
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(15),
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.network(
+            imageUrl,
+            width: imageWidth,
+            height: imageHeight,
+            fit: BoxFit.cover,
+          ),
+        ),
+        title: Text(
+          sellerFullName,
+          style: GoogleFonts.inter(
+            fontSize: titleFontSize,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        subtitle: Text(
+          '$city, $district',
+          style: GoogleFonts.inter(
+            fontSize: subtitleFontSize,
+            color: Colors.grey[700],
+          ),
+        ),
+        trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey, size: iconSize),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SellerDetailsPage(
+                sellerDetails: favourite,
+                sellerUid: favourite['sellerUid'] ?? '',
+                wherFrom: '',
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 }

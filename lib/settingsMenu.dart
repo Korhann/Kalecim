@@ -27,6 +27,8 @@ class _SettingsMenuState extends State<SettingsMenu> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    double iconSize = (width * 0.06).clamp(20.0, 32.0);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: userorseller ? sellerbackground : background,
@@ -34,8 +36,7 @@ class _SettingsMenuState extends State<SettingsMenu> {
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: Icon(Icons.arrow_back,
-                color: userorseller ? Colors.white : Colors.black)),
+            icon: Icon(Icons.arrow_back,color: userorseller ? Colors.white : Colors.black)),
       ),
       backgroundColor: userorseller ? sellerbackground : background,
       body: SafeArea(
@@ -44,35 +45,35 @@ class _SettingsMenuState extends State<SettingsMenu> {
           children: [
             const SizedBox(height: 30),
 
-            Menus(text: 'Kullanıcı Adı Değiştir', ontap:() => _navigateToPage('username') ),
+            Menus(text: 'Kullanıcı Adı Değiştir', ontap:() => _navigateToPage('username'), iconSize: iconSize),
 
             Container(
               height: 1,
               color: sellerwhite,
             ),
 
-            Menus(text: 'Şifre Değiştir', ontap:() => _navigateToPage('password')),
+            Menus(text: 'Şifre Değiştir', ontap:() => _navigateToPage('password'),iconSize: iconSize),
 
             Container(
               height: 1,
               color: sellerwhite,
             ),
 
-            Menus(text: 'Email Değiştir', ontap:() => _navigateToPage('email')),
+            Menus(text: 'Email Değiştir', ontap:() => _navigateToPage('email'),iconSize: iconSize),
 
             Container(
               height: 1,
               color: sellerwhite,
             ),
             
-            Menus(text: 'Telefon numarası', ontap:() => _navigateToPage('phone')),
+            Menus(text: 'Telefon numarası', ontap:() => _navigateToPage('phone'),iconSize: iconSize),
 
             Container(
               height: 1,
               color: sellerwhite,
             ),
 
-            Menus(text: 'Hesabı sil', ontap:() => _showMyDialog()),
+            Menus(text: 'Hesabı sil', ontap:() => _showMyDialog(),iconSize: iconSize),
           ],
         ),
       ),
@@ -274,12 +275,12 @@ class Menus extends StatelessWidget {
 
   final String text;
   final VoidCallback ontap;
+  final double iconSize;
 
-  const Menus({required this.text, required this.ontap});
+  const Menus({required this.text, required this.ontap, required this.iconSize});
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
     final height = MediaQuery.sizeOf(context).height;
     TextScaler textScaler = TextScaler.linear(ScaleSize.textScaleFactor(context));
     return GestureDetector(
@@ -303,7 +304,7 @@ class Menus extends StatelessWidget {
               const Spacer(),
               Icon(
                 Icons.arrow_forward,
-                size: width*0.06,
+                size: iconSize,
                 color: userorseller ? Colors.white : Colors.black,
               )
             ],

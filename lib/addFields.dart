@@ -7,6 +7,7 @@ import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 
 class AddFields extends StatefulWidget {
@@ -72,107 +73,109 @@ class _AddFieldsState extends State<AddFields> {
         ),
       ),
       backgroundColor: userorseller ? sellerbackground : background,
-      body: Form(
-        key: _formKey,
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              addFieldText(),
-              const SizedBox(height: 20),
-              // District input
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: TextFormField(
-                  controller: _districtController,
-                  decoration: GlobalStyles.inputDecoration1(
-                    hintText: 'İlçe',
-                    showError: _showErrorDistrict,
+      body: PageContainerDesktop(
+        child: Form(
+          key: _formKey,
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                addFieldText(),
+                const SizedBox(height: 20),
+                // District input
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: TextFormField(
+                    controller: _districtController,
+                    decoration: GlobalStyles.inputDecoration1(
+                      hintText: 'İlçe',
+                      showError: _showErrorDistrict,
+                    ),
+                    style: TextStyle(color: Colors.black, fontSize: 20),
+                    onChanged: (value) => clearErrors(),
+                    validator: (value) {
+                      final trimmedValue = value?.trim();
+                      if (trimmedValue == null || trimmedValue.isEmpty) {
+                        setState(() {
+                          _showErrorDistrict = true;
+                        });
+                        return '';
+                      } else {
+                        setState(() {
+                          _showErrorDistrict = false;
+                        });
+                        return null;
+                      }
+                    },
                   ),
-                  style: TextStyle(color: Colors.black, fontSize: 20),
-                  onChanged: (value) => clearErrors(),
-                  validator: (value) {
-                    final trimmedValue = value?.trim();
-                    if (trimmedValue == null || trimmedValue.isEmpty) {
-                      setState(() {
-                        _showErrorDistrict = true;
-                      });
-                      return '';
-                    } else {
-                      setState(() {
-                        _showErrorDistrict = false;
-                      });
-                      return null;
-                    }
-                  },
                 ),
-              ),
-              if (_showErrorDistrict && _districtController.text.trim().isEmpty)
-                errorMessage('İlçe boş bırakılamaz'),
-              const SizedBox(height: 15),
-              // Field name input
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: TextFormField(
-                  controller: _fieldNameController,
-                  decoration: GlobalStyles.inputDecoration1(
-                    hintText: 'Halı Saha Adı',
-                    showError: _showErrorFieldName,
+                if (_showErrorDistrict && _districtController.text.trim().isEmpty)
+                  errorMessage('İlçe boş bırakılamaz'),
+                const SizedBox(height: 15),
+                // Field name input
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: TextFormField(
+                    controller: _fieldNameController,
+                    decoration: GlobalStyles.inputDecoration1(
+                      hintText: 'Halı Saha Adı',
+                      showError: _showErrorFieldName,
+                    ),
+                    style: TextStyle(color: Colors.black, fontSize: 20),
+                    onChanged: (value) => clearErrors(),
+                    validator: (value) {
+                      final trimmedValue = value?.trim();
+                      if (trimmedValue == null || trimmedValue.isEmpty) {
+                        setState(() {
+                          _showErrorFieldName = true;
+                        });
+                        return '';
+                      } else {
+                        setState(() {
+                          _showErrorFieldName = false;
+                        });
+                        return null;
+                      }
+                    },
                   ),
-                  style: TextStyle(color: Colors.black, fontSize: 20),
-                  onChanged: (value) => clearErrors(),
-                  validator: (value) {
-                    final trimmedValue = value?.trim();
-                    if (trimmedValue == null || trimmedValue.isEmpty) {
-                      setState(() {
-                        _showErrorFieldName = true;
-                      });
-                      return '';
-                    } else {
-                      setState(() {
-                        _showErrorFieldName = false;
-                      });
-                      return null;
-                    }
-                  },
                 ),
-              ),
-              if (_showErrorFieldName && _fieldNameController.text.trim().isEmpty)
-                errorMessage('Halı saha adı boş bırakılamaz'),
-              const SizedBox(height: 30),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      if (await InternetConnection().hasInternetAccess) {
-                        await submitRecommendation();
-                        if (isReccommendationsent) {
-                          if (mounted) {
-                            Showalert(context: context, text: 'Tavsiye Gönderildi').showSuccessAlert();
+                if (_showErrorFieldName && _fieldNameController.text.trim().isEmpty)
+                  errorMessage('Halı saha adı boş bırakılamaz'),
+                const SizedBox(height: 30),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        if (await InternetConnection().hasInternetAccess) {
+                          await submitRecommendation();
+                          if (isReccommendationsent) {
+                            if (mounted) {
+                              Showalert(context: context, text: 'Tavsiye Gönderildi').showSuccessAlert();
+                            }
                           }
                         }
+                      } else {
+                        if (mounted) {
+                          Showalert(context: context, text: 'Ooopps...').showErrorAlert();
+                        }
                       }
-                    } else {
-                      if (mounted) {
-                        Showalert(context: context, text: 'Ooopps...').showErrorAlert();
-                      }
-                    }
-                    isReccommendationsent = false;
-                  },
-                  style: GlobalStyles.buttonPrimary(context),
-                  child: Text(
-                    'Gönder',
-                    style: GoogleFonts.roboto(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: userorseller ? Colors.white : Colors.black,
+                      isReccommendationsent = false;
+                    },
+                    style: GlobalStyles.buttonPrimary(context),
+                    child: Text(
+                      'Gönder',
+                      style: GoogleFonts.roboto(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: userorseller ? Colors.white : Colors.black,
+                      ),
+                      textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
                     ),
-                    textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

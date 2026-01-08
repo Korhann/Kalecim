@@ -8,6 +8,7 @@ import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 
 class ChangeUserName extends StatefulWidget {
@@ -45,81 +46,83 @@ class _ChangeUserNameState extends State<ChangeUserName> {
         ),
       ),
       backgroundColor: userorseller ? sellerbackground : background,
-      body: Form(
-        key: _key,
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              newUserName(),
-              const SizedBox(height: 5),
-              Container(
-                width: double.infinity,
-                color: userorseller ? sellerbackground : background,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: TextFormField(
-                    decoration: GlobalStyles.inputDecoration1(hintText: 'Ad Soyad', showError: _showErrorUsername),
-                    style: TextStyle(color: Colors.black, fontSize: 20),
-                    controller: _newUsername,
-                    onChanged: (value) => clearErrors(),
-                    validator: (value) {
-                      final trimmedValue = value?.trim();
-                      if (trimmedValue == null ||
-                          trimmedValue.isEmpty ||
-                          trimmedValue.length < 6) {
-                        setState(() {
-                          _showErrorUsername = true;
-                        });
-                        return '';
-                      } else {
-                        setState(() {
-                          _showErrorUsername = false;
-                        });
-                        return null;
-                      }
-                    },
+      body: PageContainerDesktop(
+        child: Form(
+          key: _key,
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                newUserName(),
+                const SizedBox(height: 5),
+                Container(
+                  width: double.infinity,
+                  color: userorseller ? sellerbackground : background,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: TextFormField(
+                      decoration: GlobalStyles.inputDecoration1(hintText: 'Ad Soyad', showError: _showErrorUsername),
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                      controller: _newUsername,
+                      onChanged: (value) => clearErrors(),
+                      validator: (value) {
+                        final trimmedValue = value?.trim();
+                        if (trimmedValue == null ||
+                            trimmedValue.isEmpty ||
+                            trimmedValue.length < 6) {
+                          setState(() {
+                            _showErrorUsername = true;
+                          });
+                          return '';
+                        } else {
+                          setState(() {
+                            _showErrorUsername = false;
+                          });
+                          return null;
+                        }
+                      },
+                    ),
                   ),
                 ),
-              ),
-              if (_showErrorUsername && _newUsername.text.trim().isEmpty)
-                errorMessage('Kullanıcı adı boş bırakılamaz'),
-              if (_showErrorUsername && _newUsername.text.trim().length < 6)
-                errorMessage('Kullanıcı adı 6 haneden uzun olmalı'),
-              const SizedBox(height: 30),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_key.currentState!.validate()) {
-                      if (await InternetConnection().hasInternetAccess) {
-                        await changeUsername();
-                        if (isUpdated) {
-                          _newUsername.clear();
+                if (_showErrorUsername && _newUsername.text.trim().isEmpty)
+                  errorMessage('Kullanıcı adı boş bırakılamaz'),
+                if (_showErrorUsername && _newUsername.text.trim().length < 6)
+                  errorMessage('Kullanıcı adı 6 haneden uzun olmalı'),
+                const SizedBox(height: 30),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_key.currentState!.validate()) {
+                        if (await InternetConnection().hasInternetAccess) {
+                          await changeUsername();
+                          if (isUpdated) {
+                            _newUsername.clear();
+                            if (mounted) {
+                              _showUserNameChangeSuccess();
+                            }
+                          }
+                        } else {
                           if (mounted) {
-                            _showUserNameChangeSuccess();
+                            Showalert(context: context, text: 'Ooopps...').showErrorAlert();
                           }
                         }
-                      } else {
-                        if (mounted) {
-                          Showalert(context: context, text: 'Ooopps...').showErrorAlert();
-                        }
                       }
-                    }
-                    isUpdated = false;
-                  },
-                  style: GlobalStyles.buttonPrimary(context),
-                  child: Text(
-                    'Onayla',
-                    style: GoogleFonts.roboto(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: userorseller ? Colors.white : Colors.black,
+                      isUpdated = false;
+                    },
+                    style: GlobalStyles.buttonPrimary(context),
+                    child: Text(
+                      'Onayla',
+                      style: GoogleFonts.roboto(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: userorseller ? Colors.white : Colors.black,
+                      ),
+                      textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
                     ),
-                    textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),

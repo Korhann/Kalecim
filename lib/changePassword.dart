@@ -7,6 +7,7 @@ import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 
 class ChangePassword extends StatefulWidget {
@@ -54,135 +55,137 @@ class _ChangePasswordState extends State<ChangePassword> {
         ),
       ),
       backgroundColor: userorseller ? sellerbackground : background,
-      body: Form(
-        key: _key,
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 30),
-              passwordCurrent(),
-              const SizedBox(height: 5),
-              Container(
-                width: double.infinity,
-                color: userorseller ? sellerbackground : background,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: TextFormField(
-                    decoration: GlobalStyles.inputDecoration1(
-                        hintText: 'Şifre', showError: _showErrorPassword),
-                    style: TextStyle(color: Colors.black, fontSize: 20),
-                    controller: _currentPasswordController,
-                    obscureText: true,
-                    onChanged: (value) => clearErrors(),
-                    validator: (value) {
-                      final currentTrimmedPassword = value?.trim();
-                      if (currentTrimmedPassword!.isEmpty ||
-                          currentTrimmedPassword.length < 6 ||
-                          currentTrimmedPassword.contains(" ")) {
-                        setState(() {
-                          _showErrorPassword = true;
-                        });
-                        return '';
-                      } else {
-                        setState(() {
-                          _showErrorPassword = false;
-                        });
-                        return null;
-                      }
-                    },
+      body: PageContainerDesktop(
+        child: Form(
+          key: _key,
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 30),
+                passwordCurrent(),
+                const SizedBox(height: 5),
+                Container(
+                  width: double.infinity,
+                  color: userorseller ? sellerbackground : background,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: TextFormField(
+                      decoration: GlobalStyles.inputDecoration1(
+                          hintText: 'Şifre', showError: _showErrorPassword),
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                      controller: _currentPasswordController,
+                      obscureText: true,
+                      onChanged: (value) => clearErrors(),
+                      validator: (value) {
+                        final currentTrimmedPassword = value?.trim();
+                        if (currentTrimmedPassword!.isEmpty ||
+                            currentTrimmedPassword.length < 6 ||
+                            currentTrimmedPassword.contains(" ")) {
+                          setState(() {
+                            _showErrorPassword = true;
+                          });
+                          return '';
+                        } else {
+                          setState(() {
+                            _showErrorPassword = false;
+                          });
+                          return null;
+                        }
+                      },
+                    ),
                   ),
                 ),
-              ),
-              if (_showErrorPassword &&
-                  _currentPasswordController.text.trim().length < 6)
-                errorMessage("Parolanız çok kısa"),
-              if (_showErrorPassword &&
-                  _currentPasswordController.text.trim().contains(" "))
-                errorMessage("Parolada boşluk bulundurmayınız"),
-              if (_showErrorPassword &&
-                  _currentPasswordController.text.trim().isEmpty)
-                errorMessage("Parola boş bırakılamaz"),
-              if (_reauthErrorMessage.isNotEmpty)
-                errorMessage(_reauthErrorMessage),
-              const SizedBox(height: 15),
-              passwordNew(),
-              Container(
-                width: double.infinity,
-                color: userorseller ? sellerbackground : background,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: TextFormField(
-                    decoration: GlobalStyles.inputDecoration1(
-                        hintText: 'Yeni Şifre',
-                        showError: _showErrorNewPassword),
-                    style: TextStyle(color: Colors.black, fontSize: 20),
-                    controller: _newPasswordController,
-                    obscureText: true,
-                    onChanged: (value) => clearErrors(),
-                    validator: (value) {
-                      final newTrimmedPassword = value?.trim();
-                      if (newTrimmedPassword!.isEmpty ||
-                          newTrimmedPassword.length < 6 ||
-                          newTrimmedPassword.contains(" ")) {
-                        setState(() {
-                          _showErrorNewPassword = true;
-                        });
-                        return null;
-                      } else {
-                        setState(() {
-                          _showErrorNewPassword = false;
-                        });
-                        return null;
-                      }
-                    },
+                if (_showErrorPassword &&
+                    _currentPasswordController.text.trim().length < 6)
+                  errorMessage("Parolanız çok kısa"),
+                if (_showErrorPassword &&
+                    _currentPasswordController.text.trim().contains(" "))
+                  errorMessage("Parolada boşluk bulundurmayınız"),
+                if (_showErrorPassword &&
+                    _currentPasswordController.text.trim().isEmpty)
+                  errorMessage("Parola boş bırakılamaz"),
+                if (_reauthErrorMessage.isNotEmpty)
+                  errorMessage(_reauthErrorMessage),
+                const SizedBox(height: 15),
+                passwordNew(),
+                Container(
+                  width: double.infinity,
+                  color: userorseller ? sellerbackground : background,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: TextFormField(
+                      decoration: GlobalStyles.inputDecoration1(
+                          hintText: 'Yeni Şifre',
+                          showError: _showErrorNewPassword),
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                      controller: _newPasswordController,
+                      obscureText: true,
+                      onChanged: (value) => clearErrors(),
+                      validator: (value) {
+                        final newTrimmedPassword = value?.trim();
+                        if (newTrimmedPassword!.isEmpty ||
+                            newTrimmedPassword.length < 6 ||
+                            newTrimmedPassword.contains(" ")) {
+                          setState(() {
+                            _showErrorNewPassword = true;
+                          });
+                          return null;
+                        } else {
+                          setState(() {
+                            _showErrorNewPassword = false;
+                          });
+                          return null;
+                        }
+                      },
+                    ),
                   ),
                 ),
-              ),
-              if (_showErrorNewPassword &&
-                  _newPasswordController.text.trim().length < 6)
-                errorMessage("Parolanız çok kısa"),
-              if (_showErrorNewPassword &&
-                  _newPasswordController.text.trim().contains(" "))
-                errorMessage("Parolada boşluk bulundurmayınız"),
-              if (_showErrorNewPassword &&
-                  _newPasswordController.text.trim().isEmpty)
-                errorMessage("Parola boş bırakılamaz"),
-              const SizedBox(height: 30),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _isWaitingForVerification ? null : () async {
-                    if (_key.currentState!.validate()) {
-                      if (await InternetConnection().hasInternetAccess) {
-                        await changePassword();
-                        if (isUpdated) {
-                          _currentPasswordController.clear();
-                          _newPasswordController.clear();
+                if (_showErrorNewPassword &&
+                    _newPasswordController.text.trim().length < 6)
+                  errorMessage("Parolanız çok kısa"),
+                if (_showErrorNewPassword &&
+                    _newPasswordController.text.trim().contains(" "))
+                  errorMessage("Parolada boşluk bulundurmayınız"),
+                if (_showErrorNewPassword &&
+                    _newPasswordController.text.trim().isEmpty)
+                  errorMessage("Parola boş bırakılamaz"),
+                const SizedBox(height: 30),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _isWaitingForVerification ? null : () async {
+                      if (_key.currentState!.validate()) {
+                        if (await InternetConnection().hasInternetAccess) {
+                          await changePassword();
+                          if (isUpdated) {
+                            _currentPasswordController.clear();
+                            _newPasswordController.clear();
+                            if (mounted) {
+                              Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
+                            }
+                          }
+                        } else {
                           if (mounted) {
-                            Showalert(context: context, text: 'İşlem Başarılı').showSuccessAlert();
+                            Showalert(context: context, text: 'Ooopps...').showErrorAlert();
                           }
                         }
-                      } else {
-                        if (mounted) {
-                          Showalert(context: context, text: 'Ooopps...').showErrorAlert();
-                        }
                       }
-                    }
-                    isUpdated = false;
-                  },
-                  style: GlobalStyles.buttonPrimary(context),
-                  child: Text(
-                    'Onayla',
-                    style: GoogleFonts.roboto(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: userorseller ? Colors.white : Colors.black,
+                      isUpdated = false;
+                    },
+                    style: GlobalStyles.buttonPrimary(context),
+                    child: Text(
+                      'Onayla',
+                      style: GoogleFonts.roboto(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: userorseller ? Colors.white : Colors.black,
+                      ),
+                      textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
                     ),
-                    textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context)),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),

@@ -10,6 +10,7 @@ import 'package:kiralik_kaleci/responsiveTexts.dart';
 import 'package:kiralik_kaleci/showAlert.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 import 'package:kiralik_kaleci/verifyEmailpage.dart';
 
@@ -52,136 +53,138 @@ class _ChangeEmailState extends State<ChangeEmail> {
         ),
       ),
       backgroundColor: userorseller ? sellerbackground : background,
-      body: Form(
-        key: _key,
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 30),
-              newEmail(),
-              const SizedBox(height: 5),
-              Container(
-                width: double.infinity,
-                color: userorseller ? sellerbackground : background,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: TextFormField(
-                    decoration: GlobalStyles.inputDecoration1(
-                        hintText: 'Email', showError: _showErrorEmail),
-                    style: TextStyle(color: Colors.black, fontSize: 20),
-                    controller: _emailController,
-                    obscureText: false,
-                    keyboardType: TextInputType.emailAddress,
-                    onChanged: (value) => clearErrors(),
-                    validator: (value) {
-                      final currentTrimmedemail = value?.trim();
-                      if (currentTrimmedemail!.isEmpty ||
-                          !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                              .hasMatch(currentTrimmedemail)) {
-                        setState(() {
-                          _showErrorEmail = true;
-                        });
-                        return '';
-                      } else {
-                        setState(() {
-                          _showErrorEmail = false;
-                        });
-                        return null;
-                      }
-                    },
+      body: PageContainerDesktop(
+        child: Form(
+          key: _key,
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 30),
+                newEmail(),
+                const SizedBox(height: 5),
+                Container(
+                  width: double.infinity,
+                  color: userorseller ? sellerbackground : background,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: TextFormField(
+                      decoration: GlobalStyles.inputDecoration1(
+                          hintText: 'Email', showError: _showErrorEmail),
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                      controller: _emailController,
+                      obscureText: false,
+                      keyboardType: TextInputType.emailAddress,
+                      onChanged: (value) => clearErrors(),
+                      validator: (value) {
+                        final currentTrimmedemail = value?.trim();
+                        if (currentTrimmedemail!.isEmpty ||
+                            !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                .hasMatch(currentTrimmedemail)) {
+                          setState(() {
+                            _showErrorEmail = true;
+                          });
+                          return '';
+                        } else {
+                          setState(() {
+                            _showErrorEmail = false;
+                          });
+                          return null;
+                        }
+                      },
+                    ),
                   ),
                 ),
-              ),
-              if (_showErrorEmail)
-                errorMessage('Girdiğiniz mail hatalı veya kullanımda'),
-              const SizedBox(height: 30),
-              currentPassword(),
-              const SizedBox(height: 5),
-              Container(
-                width: double.infinity,
-                color: userorseller ? sellerbackground : background,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: TextFormField(
-                    decoration: GlobalStyles.inputDecoration1(
-                        hintText: 'Şifre', showError: _showErrorPassword),
-                    style: TextStyle(color: Colors.black, fontSize: 20),
-                    controller: _currentPasswordController,
-                    obscureText: true,
-                    onChanged: (value) => clearErrors(),
-                    validator: (value) {
-                      final currentTrimmedPassword = value?.trim();
-                      if (currentTrimmedPassword!.isEmpty ||
-                          currentTrimmedPassword.length < 6 ||
-                          currentTrimmedPassword.contains(" ")) {
-                        setState(() {
-                          _showErrorPassword = true;
-                        });
-                        return '';
-                      } else {
-                        setState(() {
-                          _showErrorPassword = false;
-                        });
-                        return null;
-                      }
-                    },
+                if (_showErrorEmail)
+                  errorMessage('Girdiğiniz mail hatalı veya kullanımda'),
+                const SizedBox(height: 30),
+                currentPassword(),
+                const SizedBox(height: 5),
+                Container(
+                  width: double.infinity,
+                  color: userorseller ? sellerbackground : background,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: TextFormField(
+                      decoration: GlobalStyles.inputDecoration1(
+                          hintText: 'Şifre', showError: _showErrorPassword),
+                      style: TextStyle(color: Colors.black, fontSize: 20),
+                      controller: _currentPasswordController,
+                      obscureText: true,
+                      onChanged: (value) => clearErrors(),
+                      validator: (value) {
+                        final currentTrimmedPassword = value?.trim();
+                        if (currentTrimmedPassword!.isEmpty ||
+                            currentTrimmedPassword.length < 6 ||
+                            currentTrimmedPassword.contains(" ")) {
+                          setState(() {
+                            _showErrorPassword = true;
+                          });
+                          return '';
+                        } else {
+                          setState(() {
+                            _showErrorPassword = false;
+                          });
+                          return null;
+                        }
+                      },
+                    ),
                   ),
                 ),
-              ),
-              if (_showErrorPassword &&
-                  _currentPasswordController.text.trim().length < 6)
-                errorMessage("Parolanız çok kısa"),
-              if (_showErrorPassword &&
-                  _currentPasswordController.text.trim().contains(" "))
-                errorMessage("Parolada boşluk bulundurmayınız"),
-              if (_showErrorPassword &&
-                  _currentPasswordController.text.trim().isEmpty)
-                errorMessage("Parola boş bırakılamaz"),
-              if (_reauthErrorMessage.isNotEmpty)
-                errorMessage(_reauthErrorMessage),
-              const SizedBox(height: 30),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _isWaitingForVerification ? null : () async {
-                    if (_key.currentState!.validate()) {
-                      if (await InternetConnection().hasInternetAccess) {
-                        await changeEmail();
-                      } else {
-                        if (mounted) {
-                          Showalert(context: context, text: 'İnternet bağlantısı yok').showErrorAlert();
+                if (_showErrorPassword &&
+                    _currentPasswordController.text.trim().length < 6)
+                  errorMessage("Parolanız çok kısa"),
+                if (_showErrorPassword &&
+                    _currentPasswordController.text.trim().contains(" "))
+                  errorMessage("Parolada boşluk bulundurmayınız"),
+                if (_showErrorPassword &&
+                    _currentPasswordController.text.trim().isEmpty)
+                  errorMessage("Parola boş bırakılamaz"),
+                if (_reauthErrorMessage.isNotEmpty)
+                  errorMessage(_reauthErrorMessage),
+                const SizedBox(height: 30),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _isWaitingForVerification ? null : () async {
+                      if (_key.currentState!.validate()) {
+                        if (await InternetConnection().hasInternetAccess) {
+                          await changeEmail();
+                        } else {
+                          if (mounted) {
+                            Showalert(context: context, text: 'İnternet bağlantısı yok').showErrorAlert();
+                          }
                         }
                       }
-                    }
-                  },
-                  style: GlobalStyles.buttonPrimary(context),
-                  child: _isWaitingForVerification 
-                    ? Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    },
+                    style: GlobalStyles.buttonPrimary(context),
+                    child: _isWaitingForVerification 
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
                             ),
+                            SizedBox(width: 8),
+                            Text('Doğrulama Bekleniyor...'),
+                          ],
+                        )
+                      : Text(
+                          'Onayla',
+                          style: GoogleFonts.roboto(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: userorseller ? Colors.white : Colors.black,
                           ),
-                          SizedBox(width: 8),
-                          Text('Doğrulama Bekleniyor...'),
-                        ],
-                      )
-                    : Text(
-                        'Onayla',
-                        style: GoogleFonts.roboto(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          color: userorseller ? Colors.white : Colors.black,
                         ),
-                      ),
-                ),
-              )
-            ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

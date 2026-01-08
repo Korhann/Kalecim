@@ -52,6 +52,7 @@ class _SellerProfilePageState extends State<SellerProfilePage> {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final height = MediaQuery.sizeOf(context).height;
+    double iconSize = (width * 0.06).clamp(20.0, 32.0);
     return Scaffold(
       backgroundColor: sellerbackground,
       body: SafeArea(
@@ -76,7 +77,7 @@ class _SellerProfilePageState extends State<SellerProfilePage> {
                         ),
                       );
                     },
-                      icon: GlobalStyles.iconStyle(context: context, icon: Icons.settings, color: Colors.white),
+                    icon: Icon(Icons.settings, size: iconSize, color: Colors.white,),
                     ),
                   ],
                 ),
@@ -116,11 +117,10 @@ class _SellerProfilePageState extends State<SellerProfilePage> {
                 child: Stack(
                     children: [
                       Container(
-                      height: height * 0.080,
                       width: double.infinity,
                       color: sellergrey,
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,7 +137,7 @@ class _SellerProfilePageState extends State<SellerProfilePage> {
                       child: Icon(
                         Icons.add,
                         color: Colors.white,
-                        size: width*0.06,
+                        size: iconSize,
                       ),
                     )
                     ],
@@ -158,8 +158,7 @@ class _SellerProfilePageState extends State<SellerProfilePage> {
                   },
                   child: OtherBars(
                     text: 'Kazançlarım',
-                    icon: Icons.forward,
-                    iconColor: Colors.white,
+                    icons: Icon(Icons.forward, size: iconSize,color: Colors.white),
                   )
                 ),
               SizedBox(height: height*0.030),
@@ -179,8 +178,7 @@ class _SellerProfilePageState extends State<SellerProfilePage> {
                 },
                 child: OtherBars(
                   text: 'Randevularım',
-                  icon: Icons.alarm,
-                  iconColor: Colors.white
+                  icons: Icon(Icons.alarm, size: iconSize,color: Colors.white),
                 )
               ),
               Container(
@@ -197,8 +195,7 @@ class _SellerProfilePageState extends State<SellerProfilePage> {
                 },
                 child: OtherBars(
                   text: 'İlanlarım',
-                  icon: Icons.diamond,
-                  iconColor: Colors.white,
+                  icons: Icon(Icons.diamond,size: iconSize, color: Colors.white,),
                 )
               ),
               Container(
@@ -214,8 +211,7 @@ class _SellerProfilePageState extends State<SellerProfilePage> {
                 },
                 child: OtherBars(
                   text: 'Halı Saha Ekle',
-                  icon: Icons.add,
-                  iconColor: Colors.white,
+                  icons: Icon(Icons.add, size: iconSize, color: Colors.white),
                 )
               ),
               SizedBox(height: height*0.060),
@@ -287,11 +283,10 @@ class UserName extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.sizeOf(context).height * 0.080,
       width: double.infinity,
       color: sellergrey,
       child: Padding(
-        padding: const EdgeInsets.only(left: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,10 +362,9 @@ class UserNameHeaderText extends StatelessWidget {
 
 class OtherBars extends StatelessWidget {
   final String text;
-  final IconData icon;
-  final Color iconColor;
+  final Icon icons;
 
-  const OtherBars({required this.text, required this.icon,this.iconColor = Colors.white});
+  const OtherBars({required this.text, required this.icons});
 
   @override
   Widget build(BuildContext context) {
@@ -383,8 +377,13 @@ class OtherBars extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            GlobalStyles.textStyle(text: text, context: context, size: 22, fontWeight: FontWeight.w500, color: Colors.white),
-            GlobalStyles.iconStyle(context: context, icon: icon, color: Colors.white)
+            Text(
+              text,
+
+              style: GoogleFonts.roboto(fontSize: 22, fontWeight: FontWeight.w500, color: Colors.white),
+              textScaler: TextScaler.linear(ScaleSize.textScaleFactor(context))
+            ),
+            icons
           ],
         ),
       ),
@@ -396,11 +395,10 @@ class Email extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.sizeOf(context).height * 0.080,
       width: double.infinity,
       color: sellergrey,
       child: Padding(
-        padding: const EdgeInsets.only(left: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -452,12 +450,23 @@ class BeSellerOrUser extends StatefulWidget {
 class _BeSellerOrUserState extends State<BeSellerOrUser> {
   @override
   Widget build(BuildContext context) {
-    final double toggleWidth = MediaQuery.of(context).size.width * 0.25;
-    final double badgeSize = 18;
-    final height = MediaQuery.sizeOf(context).height;
-    return Container(
+    final double screenWidth = MediaQuery.of(context).size.width;
+final double screenHeight = MediaQuery.of(context).size.height;
+
+// Responsive toggle width and height
+final double toggleWidth = (screenWidth * 0.25).clamp(120.0, 220.0);
+final double toggleHeight = (screenHeight * 0.045).clamp(32.0, 48.0);
+
+// Responsive badge size and font
+final double badgeSize = (toggleHeight * 0.6).clamp(14.0, 22.0);
+final double badgeFontSize = (badgeSize * 0.65).clamp(10.0, 14.0);
+
+// Responsive badge position
+final double badgeRight = (toggleWidth * 0.1).clamp(8.0, 20.0);
+final double badgeTop = (-badgeSize * 0.45).clamp(-16.0, -6.0);
+              return Container(
                 color: sellergrey,
-                height: height*0.070,
+                height: MediaQuery.sizeOf(context).height * 0.070,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Row(
@@ -473,7 +482,7 @@ class _BeSellerOrUserState extends State<BeSellerOrUser> {
                         children: [
                           ToggleSwitch(
                           minWidth: toggleWidth,
-                          minHeight: height*0.045,
+                          minHeight: toggleHeight,
                           cornerRadius: 20.0,
                           activeBgColors: [
                             [Colors.green[800]!],
@@ -513,8 +522,8 @@ class _BeSellerOrUserState extends State<BeSellerOrUser> {
                         ),
                       Positioned(
                   // Position the badge at the top right of the "Kullanıcı" label
-                  left: toggleWidth * 0.1, 
-                  top: -8,
+                  right: badgeRight,
+                  top: badgeTop,
                   child: StreamBuilder<int>(
                     stream: getBuyerUnreadCount(),
                     builder: (context, snapshot) {

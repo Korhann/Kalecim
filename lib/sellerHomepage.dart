@@ -134,6 +134,7 @@ class SellerQuickMenus extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final height = MediaQuery.sizeOf(context).height;
+    double iconSize = (width * 0.06).clamp(20.0, 32.0);
     return GestureDetector(
       onTap: ontap,
       child: ClipRRect(
@@ -148,7 +149,7 @@ class SellerQuickMenus extends StatelessWidget {
               children: [
                 GlobalStyles.textStyle(text: text, context: context, size: 18, fontWeight: FontWeight.w400, color: Colors.white),
                 const Spacer(),
-                GlobalStyles.iconStyle(context: context, icon: icon, color: Colors.white)
+                Icon(icon, size: iconSize, color: Colors.white,)
               ],
             ),
           ),
@@ -167,6 +168,7 @@ class NoOfAppointments extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final height = MediaQuery.sizeOf(context).height;
+    double iconSize = (width * 0.06).clamp(20.0, 32.0);
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
@@ -184,7 +186,7 @@ class NoOfAppointments extends StatelessWidget {
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    GlobalStyles.iconStyle(context: context, icon: Icons.notifications, color: Colors.white),
+                    Icon(Icons.notifications, size: iconSize, color: Colors.white),
                     StreamBuilder<int>(
                       stream: getUnreadCount(),
                       builder: (context, snapshot) {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kiralik_kaleci/selleraddpage.dart';
 import 'package:kiralik_kaleci/styles/colors.dart';
 import 'package:kiralik_kaleci/styles/designs.dart';
+import 'package:kiralik_kaleci/styles/pageContainerDesktop.dart';
 import 'package:kiralik_kaleci/utils/crashlytics_helper.dart';
 
 class EarningsPage extends StatefulWidget {
@@ -48,89 +49,91 @@ class _EarningsPageState extends State<EarningsPage> {
         ),
       ),
       backgroundColor: sellerbackground,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: height*0.020),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  width: double.infinity,
-                  height: height*0.3,
-                  color: Colors.blue,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20, top: 20),
-                        child: GlobalStyles.textStyle(text: 'Bakiye', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20,top: 10),
-                        child: StreamBuilder<num>(
-                          stream: getBalance,
-                          builder: (context,snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return SizedBox();
-                            } else {
-                              balance = snapshot.data!.toInt() ?? 0;
-                              return GlobalStyles.textStyle(text: '$balance TL', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white);
-                            }
-                          } 
+      body: PageContainerDesktop(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: height*0.020),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    width: double.infinity,
+                    height: height*0.3,
+                    color: Colors.blue,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20, top: 20),
+                          child: GlobalStyles.textStyle(text: 'Bakiye', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20, top: 20),
-                        child: GlobalStyles.textStyle(text: 'Çekim Taleplerim', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20, top: 10),
-                        child: StreamBuilder(
-                          stream: getWithdrawalbalance,
-                          builder: (context,snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return SizedBox();
-                            } else {
-                              withDrawalBalance = snapshot.data!.toInt() ?? 0;
-                              return GlobalStyles.textStyle(text: '$withDrawalBalance TL', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white);
-                            }
-                          } 
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20,top: 10),
+                          child: StreamBuilder<num>(
+                            stream: getBalance,
+                            builder: (context,snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return SizedBox();
+                              } else {
+                                balance = snapshot.data!.toInt() ?? 0;
+                                return GlobalStyles.textStyle(text: '$balance TL', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white);
+                              }
+                            } 
+                          ),
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20, top: 20),
+                          child: GlobalStyles.textStyle(text: 'Çekim Taleplerim', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20, top: 10),
+                          child: StreamBuilder(
+                            stream: getWithdrawalbalance,
+                            builder: (context,snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return SizedBox();
+                              } else {
+                                withDrawalBalance = snapshot.data!.toInt() ?? 0;
+                                return GlobalStyles.textStyle(text: '$withDrawalBalance TL', context: context, size: 20, fontWeight: FontWeight.w800, color: Colors.white);
+                              }
+                            } 
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: GlobalStyles.textStyle(text: 'Çekim talepleriniz 3 iş günü içerisinde hesabınıza aktarılacaktır', context: context, size: 12, fontWeight: FontWeight.w400, color: Colors.white),
-            ),
-            const SizedBox(height: 50),
-            Center(
-              child: ElevatedButton(
-                style: GlobalStyles.buttonPrimary(context),
-                onPressed: () async {
-                  if (balance > 0) {
-                    withDrawRequest = true;
-                    await sendWithdrawalRequest();
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Çekim talebi için hesabınızda birikmiş bakiye olması gerekir !'),
-                        backgroundColor: Colors.red,
-                      )
-                    );
-                  }
-                },
-                child: GlobalStyles.textStyle(text: 'Çekim Talebi', context: context, size: 24, fontWeight: FontWeight.w600, color: Colors.white),
+              const SizedBox(height: 15),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: GlobalStyles.textStyle(text: 'Çekim talepleriniz 3 iş günü içerisinde hesabınıza aktarılacaktır', context: context, size: 12, fontWeight: FontWeight.w400, color: Colors.white),
               ),
-            )
-          ],
+              const SizedBox(height: 50),
+              Center(
+                child: ElevatedButton(
+                  style: GlobalStyles.buttonPrimary(context),
+                  onPressed: () async {
+                    if (balance > 0) {
+                      withDrawRequest = true;
+                      await sendWithdrawalRequest();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Çekim talebi için hesabınızda birikmiş bakiye olması gerekir !'),
+                          backgroundColor: Colors.red,
+                        )
+                      );
+                    }
+                  },
+                  child: GlobalStyles.textStyle(text: 'Çekim Talebi', context: context, size: 24, fontWeight: FontWeight.w600, color: Colors.white),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
