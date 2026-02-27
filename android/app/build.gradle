@@ -1,0 +1,130 @@
+import java.util.Properties
+import java.io.FileInputStream
+
+
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services" // Firebase plugin for Google services
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader -> localProperties.load(reader) }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '1'
+def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0'
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace "com.kiralik.kaleci" // Define the namespace
+    compileSdk 36
+    //compileSdkVersion 35 // Match the latest stable SDK version
+    ndkVersion = "27.0.12077973" // Ensure NDK matches installed version
+    lintOptions {
+        abortOnError false
+    }
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        // old version was JAVAVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17" // Ensure Kotlin compatibility with Java 17
+    }
+
+    // Add this to suppress Java 8 warnings
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += [
+            '-Xlint:-options',
+            '-Xlint:-deprecation'
+        ]
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin' // Include Kotlin source directory
+    }
+
+    defaultConfig {
+        applicationId "com.kiralik.kaleci" // App package name
+        minSdkVersion 23 // Minimum supported Android version
+        targetSdkVersion 36 // Target Android version
+        versionCode flutterVersionCode.toInteger() // Version code from `local.properties`
+        versionName flutterVersionName // Version name from `local.properties`
+        multiDexEnabled true // Enable multidex support
+    }
+
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] 
+            keyPassword = keystoreProperties["keyPassword"]
+            storeFile = keystoreProperties["storeFile"] ? file(keystoreProperties['storeFile']):null
+            storePassword = keystoreProperties["storePassword"]
+        }
+    }
+    buildTypes {
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now,
+            // so `flutter run --release` works.
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+
+    flavorDimensions "env"
+
+        productFlavors {
+            dev {
+                dimension "env"
+                // dev'i de değiştir
+                applicationId "com.kiralik.kaleci.dev"
+                versionNameSuffix "-dev"
+                resValue "string", "app_name", "Kalecim Dev"
+            }
+            stage {
+                dimension "env"
+                applicationId "com.kiralik.kaleci.stg"
+                versionNameSuffix "-stage"
+                resValue "string", "app_name", "Kalecim Stage"
+            }
+            prod {
+                dimension "env"
+                applicationId "com.kiralik.kaleci"
+                resValue "string", "app_name", "Kalecim"
+            }
+        }
+    }
+
+
+
+
+
+flutter {
+    source '../..' // Flutter module source
+}
+
+dependencies {
+    // Firebase dependencies
+    implementation platform('com.google.firebase:firebase-bom:32.6.0') // Manage Firebase versions
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'androidx.work:work-runtime:2.7.1'
+
+    // Multidex support
+    implementation 'androidx.multidex:multidex:2.0.1'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
+    // (Optional) Add other dependencies here as needed
+    implementation 'androidx.window:window:1.0.0'
+    implementation 'androidx.window:window-java:1.0.0'
+    implementation("com.google.android.material:material:1.14.0-alpha02")
+}

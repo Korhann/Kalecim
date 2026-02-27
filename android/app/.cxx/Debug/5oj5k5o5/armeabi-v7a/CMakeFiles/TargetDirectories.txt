@@ -1,0 +1,2 @@
+C:/Users/Administrator/kiralik_kaleci/android/app/.cxx/Debug/5oj5k5o5/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/Administrator/kiralik_kaleci/android/app/.cxx/Debug/5oj5k5o5/armeabi-v7a/CMakeFiles/rebuild_cache.dir

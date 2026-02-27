@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "659021734017",
+    "project_id": "kiralikkaleci-stg",
+    "storage_bucket": "kiralikkaleci-stg.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:659021734017:android:de31cc02db94cc5e9f6d80",
+        "android_client_info": {
+          "package_name": "com.kiralik.kaleci.stg"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7Z6qlnzYkZsH1QQEoVuRT9U_NxD45VeM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:659021734017:android:a4e03d003ff63bf69f6d80",
+        "android_client_info": {
+          "package_name": "com.kiralik.kalecim.stg"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7Z6qlnzYkZsH1QQEoVuRT9U_NxD45VeM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

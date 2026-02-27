@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "kiralikkaleci-dev",
+    "development": "kiralikkaleci-dev",
+    "production": "kiralikkaleci-21f26"
+  },
+  "targets": {},
+  "etags": {}
+}

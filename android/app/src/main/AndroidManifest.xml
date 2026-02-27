@@ -1,0 +1,124 @@
+<!--<manifest xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    package="com.example.kiralik_kaleci">-->
+
+<!--    <uses-permission android:name="android.permission.INTERNET" />-->
+<!--    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />-->
+<!--    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>-->
+<!--    <uses-permission android:name="android.permission.READ_SMS"/>-->
+<!--    <uses-permission android:name="android.permission.RECEIVE_SMS"/>-->
+
+<!--    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>-->
+
+
+
+
+<!--    &lt;!&ndash; Queries required for flutter_email_sender &ndash;&gt;-->
+<!--    <queries>-->
+<!--        <intent>-->
+<!--            <action android:name="android.intent.action.SENDTO" />-->
+<!--            <data android:scheme="mailto" />-->
+<!--        </intent>-->
+<!--    </queries>-->
+
+<!--    <application-->
+<!--        android:label="Kiralik Kaleci"-->
+<!--        android:icon="@mipmap/launcher_icon"-->
+<!--        android:enableOnBackInvokedCallback="true">-->
+<!--        <meta-data-->
+<!--    android:name="firebase_messaging_auto_init_enabled"-->
+<!--    android:value="false" />-->
+<!--<meta-data-->
+<!--    android:name="firebase_analytics_collection_enabled"-->
+<!--    android:value="false" />-->
+
+<!--        <meta-data-->
+<!--           android:name="com.google.firebase.messaging.default_notification_icon"-->
+<!--           android:value = 'daily_channel_id'-->
+<!--           android:resource="@drawable/new_icon" />-->
+
+<!--        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />-->
+<!--        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">-->
+<!--    <intent-filter>-->
+<!--        <action android:name='FLUTTER_NOTIFICATION_CLICK'/>-->
+<!--        <category android:name='android.intent.category.DEFAULT'/>-->
+<!--        <action android:name="android.intent.action.BOOT_COMPLETED"/>-->
+<!--        <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>-->
+<!--        <action android:name="android.intent.action.QUICKBOOT_POWERON" />-->
+<!--        <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>-->
+<!--    </intent-filter>-->
+<!--</receiver>-->
+
+<!--        <activity-->
+<!--            android:name=".MainActivity"-->
+<!--            android:exported="true"-->
+<!--            android:launchMode="singleTop"-->
+<!--            android:theme="@style/LaunchTheme">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--                <action android:name="android.intent.action.VIEW" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--                <category android:name="android.intent.category.BROWSABLE" />-->
+<!--                <action android:name="android.intent.action.BOOT_COMPLETED"/>-->
+<!--        <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>-->
+<!--        <action android:name="android.intent.action.QUICKBOOT_POWERON" />-->
+<!--        <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
+<!--        <meta-data-->
+<!--            android:name="flutterEmbedding"-->
+<!--            android:value="2" />-->
+<!--        <meta-data-->
+<!--    android:name="com.google.firebase.messaging.default_notification_channel_id"-->
+<!--    android:value="daily_channel_id"/>-->
+
+
+<!--        -->
+<!--    </application>-->
+<!--</manifest>-->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- Queries required for flutter_email_sender -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="mailto" />
+        </intent>
+    </queries>
+
+    <application
+        android:label="Kalecim"
+        android:icon="@mipmap/launcher_icon"
+        android:enableOnBackInvokedCallback="true">
+
+        <!-- Firebase config -->
+        <meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false" />
+        <meta-data android:name="firebase_analytics_collection_enabled" android:value="false" />
+        <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/new_icon" />
+        <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="daily_channel_id" />
+        <meta-data android:name="flutterEmbedding" android:value="2" />
+
+        <!-- Flutter Local Notifications Receivers -->
+
+        <!-- Main Activity -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/LaunchTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>

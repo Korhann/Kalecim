@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "firebase-functions": "^6.3.2",
+    "iyzipay": "^2.0.64"
+  }
+}

@@ -1,0 +1,44 @@
+{
+    //dont forget the put the name in flavors like (dev,stage,prod)
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "kiralik_kaleci",
+            "request": "launch",
+            "type": "dart"
+        },
+        // below one is the profile mode
+        {
+            "name": "kiralik_kaleci (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "program": "lib/main_dev.dart",
+            "args": ["--flavor","dev","--target","lib/main_dev.dart"]
+        },
+        // dev mode
+        {
+            "name": "Launch Development",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_dev.dart",
+            "args": ["--flavor","dev","--target","lib/main_dev.dart"]
+        },
+        // stg mode
+        {
+            "name": "Launch Staging",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_stage.dart",
+            "args": ["--flavor","stage","--target","lib/main_stage.dart"]
+        },
+        // prod mode
+        {
+            "name": "Launch Production",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_prod.dart",
+            "args": ["--flavor","prod","--target","lib/main_prod.dart"]
+        }
+    ]
+}
